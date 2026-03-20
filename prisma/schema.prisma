@@ -1,7 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
 }
 
-generator client {
-  provider = "prisma-client-js"
+// --- Enums ---
+
+enum ExamType {
+  NATIONAL
+  STATE
+  UNIVERSITY
+  INTERNATIONAL
+}
+
+enum ExamMode {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum Frequency {
+  ONCE_A_YEAR
+  TWICE_A_YEAR
+  QUARTERLY
+  MONTHLY
+}
+
+enum EnquiryStatus {
+  PENDING
+  RESOLVED
+  FOLLOW_UP
+}
+
+// --- Independent / Base Models ---
+
+model Country {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  flagEmoji   String?
+  description String?
+  active      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  cities      City[]
+  colleges    College[]
+}
+
+model Category {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  slug             String    @unique
+  description      String?
+  active           Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  categoryImageUrl String?
+  colleges         College[] @relation("CategoryToCollege")
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  active      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  colleges    College[] @relation("CollegeToCourse")
+}
+
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  imageUrl  String?
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  imageUrl  String?
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  category  String?
+  status    EnquiryStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+
+model City {
+  id           String    @id @default(cuid())
+  name         String    @unique
+  slug         String    @unique
+  description  String?
+  cityImageURL String?
+  features     String[]  @default([])
+  active       Boolean   @default(false)
+  countryId    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  country      Country   @relation(fields: [countryId], references: [id])
+  colleges     College[]
+}
+
+model Exam {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  slug             String    @unique
+  shortName        String
+  description      String
+  active           Boolean   @default(false)
+  conductingBody   String
+  frequency        Frequency
+  examMode         ExamMode
+  examType         ExamType
+  examImageurl     String?
+  examPattern      Json?
+  examDates        Json?
+  overview         Json?
+  registration     Json?
+  resultStatistics Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  colleges         College[] @relation("CollegeToExam")
+}
+
+model College {
+  id                 String     @id @default(cuid())
+  name               String     @unique
+  slug               String     @unique
+  description        String?
+  establishment_year Int?
+  Countryranking     Int?
+  Internationalranking Int?
+  active             Boolean    @default(false)
+  features           String[]   @default([])
+  logoURL            String?
+  imageURL           String?
+  keyHighlights      Json?  //done
+  whyChooseUs        Json?  //done
+  documentsRequired  Json?  //done
+  feesStructure      Json?  //done
+  admissionProcess   Json?  //done
+  campusHighlights   Json?  //done
+  countryId          String
+  cityId             String
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  city               City       @relation(fields: [cityId], references: [id])
+  country            Country    @relation(fields: [countryId], references: [id])
+  categories         Category[] @relation("CategoryToCollege")
+  courses            Course[]   @relation("CollegeToCourse")
+  exams              Exam[]     @relation("CollegeToExam")
 }
