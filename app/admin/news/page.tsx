@@ -10,55 +10,50 @@ import { ViewNewsModal } from '@/components/admin/news/view-news-modal'
 import { EditNewsModal } from '@/components/admin/news/edit-news-modal'
 import { DeleteNewsModal } from '@/components/admin/news/delete-news-modal'
 import { LoadingPage, LoadingTable } from '@/components/ui/loading'
-import { useNews, News } from '@/hook/useNews'
+import { useNewsContext } from '@/contexts/news-context'
+import { News } from '@/hook/useNews'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
 
 export default function NewsPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedNews, setSelectedNews] = useState<News | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const { news, isLoading, error, createNews, deleteNews, updateNews, isUpdating } = useNews()
+  
+  const {
+    news,
+    isLoading,
+    error,
+    createNews,
+    updateNews,
+    deleteNews,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    selectedNews,
+    isCreating,
+    isUpdating
+  } = useNewsContext()
 
   const handleCreateNews = async (data: NewsFormData) => {
     await createNews(data)
-  }
-
-  const handleViewNews = (newsItem: News) => {
-    setSelectedNews(newsItem)
-    setIsViewModalOpen(true)
-  }
-
-  const handleEditNews = (newsItem: News) => {
-    setSelectedNews(newsItem)
-    setIsEditModalOpen(true)
-  }
-
-  const handleDeleteNews = (newsItem: News) => {
-    setSelectedNews(newsItem)
-    setIsDeleteModalOpen(true)
-  }
-
-  const handleCloseViewModal = () => {
-    setIsViewModalOpen(false)
-    setSelectedNews(null)
-  }
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false)
-    setSelectedNews(null)
-  }
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedNews(null)
+    closeAddModal()
   }
 
   const handleUpdateNews = async (id: string, data: Partial<NewsFormData>) => {
     await updateNews(id, data)
-    handleCloseEditModal()
+    closeEditModal()
+  }
+
+  const handleDeleteNews = async (id: string) => {
+    await deleteNews(id)
+    closeDeleteModal()
   }
 
   const filteredNews = news.filter(newsItem =>
@@ -95,7 +90,7 @@ export default function NewsPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">News</h1>
           <Button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={openAddModal}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -192,7 +187,7 @@ export default function NewsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
-                              onClick={() => handleViewNews(newsItem)}
+                              onClick={() => openViewModal(newsItem)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -200,7 +195,7 @@ export default function NewsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-green-400 hover:text-green-300 hover:bg-slate-700"
-                              onClick={() => handleEditNews(newsItem)}
+                              onClick={() => openEditModal(newsItem)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -208,7 +203,7 @@ export default function NewsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteNews(newsItem)}
+                              onClick={() => handleDeleteNews(newsItem.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -225,19 +220,19 @@ export default function NewsPage() {
 
         <AddNewsModal
           isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={closeAddModal}
           onSubmit={handleCreateNews}
         />
 
         <ViewNewsModal
           isOpen={isViewModalOpen}
-          onClose={handleCloseViewModal}
+          onClose={closeViewModal}
           news={selectedNews}
         />
 
         <EditNewsModal
           isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
+          onClose={closeEditModal}
           news={selectedNews}
           onUpdate={handleUpdateNews}
           isUpdating={isUpdating}
@@ -245,7 +240,7 @@ export default function NewsPage() {
 
         <DeleteNewsModal
           isOpen={isDeleteModalOpen}
-          onClose={handleCloseDeleteModal}
+          onClose={closeDeleteModal}
           news={selectedNews}
         />
       </div>

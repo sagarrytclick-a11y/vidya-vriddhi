@@ -14,12 +14,12 @@ import {
   Loader2
 } from 'lucide-react'
 import { useColleges } from '@/hook/useColleges'
-import { useCountries } from '@/hook/useCountries'
-import { useCities } from '@/hook/useCities'
-import { useCategories } from '@/hook/useCategories'
+import { useCountryContext } from '@/contexts/country-context'
+import { useCityContext } from '@/contexts/city-context'
+import { useCategoryContext } from '@/contexts/category-context'
 import { useCourses } from '@/hook/useCourses'
 import { useExams } from '@/hook/useExams'
-import { useBlogs } from '@/hook/useBlogs'
+import { useBlogContext } from '@/contexts/blog-context'
 import { useNews } from '@/hook/useNews'
 
 interface StatCard {
@@ -32,12 +32,12 @@ interface StatCard {
 
 export function StatsCards() {
   const { colleges, isLoading: collegesLoading } = useColleges()
-  const { countries, isLoading: countriesLoading } = useCountries()
-  const { cities, isLoading: citiesLoading } = useCities()
-  const { categories, isLoading: categoriesLoading } = useCategories()
+  const { countries, isLoading: countriesLoading } = useCountryContext()
+  const { cities, isLoading: citiesLoading } = useCityContext()
+  const { categories, loading: categoriesLoading } = useCategoryContext()
   const { courses, isLoading: coursesLoading } = useCourses()
   const { exams, isLoading: examsLoading } = useExams()
-  const { blogs, isLoading: blogsLoading } = useBlogs()
+  const { blogs, loading: blogsLoading } = useBlogContext()
   const { news, isLoading: newsLoading } = useNews()
 
   const statsData: StatCard[] = [

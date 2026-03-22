@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -25,12 +25,44 @@ export const blogKeys = {
 }
 
 interface BlogContextType {
+  // Data
   blogs: Blog[]
   loading: boolean
   error: string | null
+
+  // Mutations
   createBlog: (data: BlogFormData) => Promise<void>
   updateBlog: (id: string, data: Partial<BlogFormData>) => Promise<void>
   deleteBlog: (id: string) => Promise<void>
+
+  // Loading states
+  isCreating: boolean
+  isUpdating: boolean
+  isDeleting: boolean
+
+  // Modal state
+  selectedBlog: Blog | null
+  setSelectedBlog: (blog: Blog | null) => void
+  isViewModalOpen: boolean
+  setIsViewModalOpen: (open: boolean) => void
+  isEditModalOpen: boolean
+  setIsEditModalOpen: (open: boolean) => void
+  isDeleteModalOpen: boolean
+  setIsDeleteModalOpen: (open: boolean) => void
+  isAddModalOpen: boolean
+  setIsAddModalOpen: (open: boolean) => void
+
+  // Modal actions
+  openViewModal: (blog: Blog) => void
+  closeViewModal: () => void
+  openEditModal: (blog: Blog) => void
+  closeEditModal: () => void
+  openDeleteModal: (blog: Blog) => void
+  closeDeleteModal: () => void
+  openAddModal: () => void
+  closeAddModal: () => void
+
+  // Refetch
   refetchBlogs: () => Promise<any>
 }
 
@@ -102,6 +134,13 @@ const deleteBlog = async (id: string): Promise<void> => {
 export function BlogProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
 
+  // Modal state
+  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+
   // Fetch all blogs
   const {
     data: blogs = [],
@@ -164,13 +203,84 @@ export function BlogProvider({ children }: { children: ReactNode }) {
     await deleteBlogMutation.mutateAsync(id)
   }
 
+  // Modal actions
+  const openViewModal = (blog: Blog) => {
+    setSelectedBlog(blog)
+    setIsViewModalOpen(true)
+  }
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false)
+    setSelectedBlog(null)
+  }
+
+  const openEditModal = (blog: Blog) => {
+    setSelectedBlog(blog)
+    setIsEditModalOpen(true)
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedBlog(null)
+  }
+
+  const openDeleteModal = (blog: Blog) => {
+    setSelectedBlog(blog)
+    setIsDeleteModalOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setSelectedBlog(null)
+  }
+
+  const openAddModal = () => {
+    setIsAddModalOpen(true)
+  }
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false)
+  }
+
   const value: BlogContextType = {
+    // Data
     blogs,
     loading,
     error: error?.message || null,
+
+    // Mutations
     createBlog: createBlogHandler,
     updateBlog: updateBlogHandler,
     deleteBlog: deleteBlogHandler,
+
+    // Loading states
+    isCreating: createBlogMutation.isPending,
+    isUpdating: updateBlogMutation.isPending,
+    isDeleting: deleteBlogMutation.isPending,
+
+    // Modal state
+    selectedBlog,
+    setSelectedBlog,
+    isViewModalOpen,
+    setIsViewModalOpen,
+    isEditModalOpen,
+    setIsEditModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isAddModalOpen,
+    setIsAddModalOpen,
+
+    // Modal actions
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
+    openAddModal,
+    closeAddModal,
+
+    // Refetch
     refetchBlogs: refetch,
   }
 

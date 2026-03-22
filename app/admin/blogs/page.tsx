@@ -10,55 +10,50 @@ import { ViewBlogModal } from '@/components/admin/blogs/view-blog-modal'
 import { EditBlogModal } from '@/components/admin/blogs/edit-blog-modal'
 import { DeleteBlogModal } from '@/components/admin/blogs/delete-blog-modal'
 import { LoadingPage, LoadingTable } from '@/components/ui/loading'
-import { useBlogs, Blog, BlogFormData } from '@/hook/useBlogs'
+import { useBlogContext } from '@/contexts/blog-context'
+import { Blog, BlogFormData } from '@/contexts/blog-context'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
 
 export default function BlogsPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const { blogs, isLoading, error, createBlog, deleteBlog, updateBlog, isUpdating } = useBlogs()
+  
+  const {
+    blogs,
+    loading,
+    error,
+    createBlog,
+    updateBlog,
+    deleteBlog,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    selectedBlog,
+    isCreating,
+    isUpdating
+  } = useBlogContext()
 
   const handleCreateBlog = async (data: BlogFormData) => {
     await createBlog(data)
-  }
-
-  const handleViewBlog = (blog: Blog) => {
-    setSelectedBlog(blog)
-    setIsViewModalOpen(true)
-  }
-
-  const handleEditBlog = (blog: Blog) => {
-    setSelectedBlog(blog)
-    setIsEditModalOpen(true)
-  }
-
-  const handleDeleteBlog = (blog: Blog) => {
-    setSelectedBlog(blog)
-    setIsDeleteModalOpen(true)
-  }
-
-  const handleCloseViewModal = () => {
-    setIsViewModalOpen(false)
-    setSelectedBlog(null)
-  }
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false)
-    setSelectedBlog(null)
-  }
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedBlog(null)
+    closeAddModal()
   }
 
   const handleUpdateBlog = async (id: string, data: Partial<BlogFormData>) => {
     await updateBlog(id, data)
-    handleCloseEditModal()
+    closeEditModal()
+  }
+
+  const handleDeleteBlog = async (id: string) => {
+    await deleteBlog(id)
+    closeDeleteModal()
   }
 
   const filteredBlogs = blogs.filter(blog =>
@@ -67,7 +62,7 @@ export default function BlogsPage() {
     blog.content.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (isLoading) {
+  if (loading) {
     return (
       <AdminLayout>
         <div className="p-8">
@@ -95,7 +90,7 @@ export default function BlogsPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">Blogs</h1>
           <Button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={openAddModal}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -192,7 +187,7 @@ export default function BlogsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
-                              onClick={() => handleViewBlog(blog)}
+                              onClick={() => openViewModal(blog)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -200,7 +195,7 @@ export default function BlogsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-green-400 hover:text-green-300 hover:bg-slate-700"
-                              onClick={() => handleEditBlog(blog)}
+                              onClick={() => openEditModal(blog)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -208,7 +203,7 @@ export default function BlogsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteBlog(blog)}
+                              onClick={() => handleDeleteBlog(blog.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -225,26 +220,24 @@ export default function BlogsPage() {
 
         <AddBlogModal
           isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={closeAddModal}
         />
 
         <ViewBlogModal
           isOpen={isViewModalOpen}
-          onClose={handleCloseViewModal}
+          onClose={closeViewModal}
           blog={selectedBlog}
         />
 
         <EditBlogModal
           isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
+          onClose={closeEditModal}
           blog={selectedBlog}
-          onUpdate={handleUpdateBlog}
-          isUpdating={isUpdating}
         />
 
         <DeleteBlogModal
           isOpen={isDeleteModalOpen}
-          onClose={handleCloseDeleteModal}
+          onClose={closeDeleteModal}
           blog={selectedBlog}
         />
       </div>

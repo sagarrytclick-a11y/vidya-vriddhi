@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
     
+    // For list view, fetch only essential data
     const colleges = await db.college.findMany({
       where: {
         OR: [
@@ -72,12 +73,41 @@ export async function GET(request: NextRequest) {
         ]
       },
       orderBy: { createdAt: 'desc' },
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        courses: true,
-        exams: true
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        active: true,
+        establishment_year: true,
+        Countryranking: true,
+        Internationalranking: true,
+        logoURL: true,
+        imageURL: true,
+        createdAt: true,
+        updatedAt: true,
+        city: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        country: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            flagEmoji: true
+          }
+        },
+        _count: {
+          select: {
+            categories: true,
+            courses: true,
+            exams: true
+          }
+        }
       }
     })
 
@@ -97,46 +127,109 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = collegeSchema.parse(body)
 
-    const college = await db.college.create({
-      data: {
-        name: validatedData.name,
-        slug: validatedData.slug,
-        description: validatedData.description,
-        active: validatedData.active,
-        countryId: validatedData.countryId,
-        cityId: validatedData.cityId,
-        establishment_year: validatedData.establishment_year,
-        Countryranking: validatedData.Countryranking,
-        Internationalranking: validatedData.Internationalranking,
-        features: validatedData.features,
-        imageURL: validatedData.imageURL,
-        logoURL: validatedData.logoURL,
-        keyHighlights: validatedData.keyHighlights,
-        documentsRequired: validatedData.documentsRequired,
-        feesStructure: validatedData.feesStructure,
-        admissionProcess: validatedData.admissionProcess,
-        whyChooseUs: validatedData.whyChooseUs,
-        campusHighlights: validatedData.campusHighlights,
-        categories: validatedData.categories ? {
-          connect: validatedData.categories.map((id: string) => ({ id }))
-        } : undefined,
-        exams: validatedData.exams ? {
-          connect: validatedData.exams.map((id: string) => ({ id }))
-        } : undefined,
-        courses: validatedData.courses ? {
-          connect: validatedData.courses.map((id: string) => ({ id }))
-        } : undefined
-      },
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        courses: true,
-        exams: true
+    // Use transaction for better performance and data consistency
+    const result = await db.$transaction(async (tx) => {
+      // Create college without relations first
+      const college = await tx.college.create({
+        data: {
+          name: validatedData.name,
+          slug: validatedData.slug,
+          description: validatedData.description,
+          active: validatedData.active,
+          countryId: validatedData.countryId,
+          cityId: validatedData.cityId,
+          establishment_year: validatedData.establishment_year,
+          Countryranking: validatedData.Countryranking,
+          Internationalranking: validatedData.Internationalranking,
+          features: validatedData.features,
+          imageURL: validatedData.imageURL,
+          logoURL: validatedData.logoURL,
+          keyHighlights: validatedData.keyHighlights,
+          documentsRequired: validatedData.documentsRequired,
+          feesStructure: validatedData.feesStructure,
+          admissionProcess: validatedData.admissionProcess,
+          whyChooseUs: validatedData.whyChooseUs,
+          campusHighlights: validatedData.campusHighlights,
+        }
+      })
+
+      // Add relations if provided
+      if (validatedData.categories && validatedData.categories.length > 0) {
+        await tx.college.update({
+          where: { id: college.id },
+          data: {
+            categories: {
+              connect: validatedData.categories.map((id: string) => ({ id }))
+            }
+          }
+        })
       }
+
+      if (validatedData.exams && validatedData.exams.length > 0) {
+        await tx.college.update({
+          where: { id: college.id },
+          data: {
+            exams: {
+              connect: validatedData.exams.map((id: string) => ({ id }))
+            }
+          }
+        })
+      }
+
+      if (validatedData.courses && validatedData.courses.length > 0) {
+        await tx.college.update({
+          where: { id: college.id },
+          data: {
+            courses: {
+              connect: validatedData.courses.map((id: string) => ({ id }))
+            }
+          }
+        })
+      }
+
+      // Fetch the complete college with relations
+      return await tx.college.findUnique({
+        where: { id: college.id },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          establishment_year: true,
+          Countryranking: true,
+          Internationalranking: true,
+          logoURL: true,
+          imageURL: true,
+          createdAt: true,
+          updatedAt: true,
+          city: {
+            select: {
+              id: true,
+              name: true,
+              slug: true
+            }
+          },
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true
+            }
+          },
+          _count: {
+            select: {
+              categories: true,
+              courses: true,
+              exams: true
+            }
+          }
+        }
+      })
     })
 
-    return NextResponse.json(college, { status: 201 })
+    return NextResponse.json(result, { status: 201 })
   } catch (error) {
     console.error('Error creating college:', error)
     console.error('Error details:', JSON.stringify(error, null, 2))

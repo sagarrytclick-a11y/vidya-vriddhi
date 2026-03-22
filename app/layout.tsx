@@ -6,6 +6,10 @@ import { QueryProvider } from "@/providers/query-provider";
 import { CountryProvider } from "@/contexts/country-context";
 import { CityProvider } from "@/contexts/city-context";
 import { CategoryProvider } from "@/contexts/category-context";
+import { CourseProvider } from "@/contexts/course-context";
+import { NewsProvider } from "@/contexts/news-context";
+import { BlogProvider } from "@/contexts/blog-context";
+import { ExamProvider } from "@/contexts/exam-context";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -38,6 +42,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
+          <CategoryProvider>
+          <ExamProvider>
+          <BlogProvider>
+          <NewsProvider>
+          <CourseProvider>  
           <CountryProvider>
             <CityProvider>
               <CategoryProvider>
@@ -45,6 +54,11 @@ export default function RootLayout({
               </CategoryProvider>
             </CityProvider>
           </CountryProvider>
+          </CourseProvider>
+          </NewsProvider>
+          </BlogProvider>
+          </ExamProvider>
+          </CategoryProvider>
         </QueryProvider>
       </body>
     </html>

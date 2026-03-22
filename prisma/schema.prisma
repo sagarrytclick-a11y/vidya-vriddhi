@@ -72,7 +72,6 @@ model Course {
   colleges    College[] @relation("CollegeToCourse")
 }
 
-
 model News {
   id        String   @id @default(cuid())
   title     String
@@ -105,7 +104,6 @@ model Enquiry {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 }
-
 
 model City {
   id           String    @id @default(cuid())
@@ -145,30 +143,31 @@ model Exam {
 }
 
 model College {
-  id                 String     @id @default(cuid())
-  name               String     @unique
-  slug               String     @unique
-  description        String?
-  establishment_year Int?
-  Countryranking     Int?
+  id                   String     @id @default(cuid())
+  name                 String     @unique
+  slug                 String     @unique
+  description          String?
+  establishment_year   Int?
+  Countryranking       Int?
   Internationalranking Int?
-  active             Boolean    @default(false)
-  features           String[]   @default([])
-  logoURL            String?
-  imageURL           String?
-  keyHighlights      Json?  //done
-  whyChooseUs        Json?  //done
-  documentsRequired  Json?  //done
-  feesStructure      Json?  //done
-  admissionProcess   Json?  //done
-  campusHighlights   Json?  //done
-  countryId          String
-  cityId             String
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  city               City       @relation(fields: [cityId], references: [id])
-  country            Country    @relation(fields: [countryId], references: [id])
-  categories         Category[] @relation("CategoryToCollege")
-  courses            Course[]   @relation("CollegeToCourse")
-  exams              Exam[]     @relation("CollegeToExam")
+  active               Boolean    @default(false)
+  features             String[]   @default([])
+  logoURL              String?
+  imageURL             String?
+  keyHighlights        Json?
+  whyChooseUs          Json?
+  documentsRequired    Json?
+  feesStructure        Json?
+  admissionProcess     Json?
+  campusHighlights     Json?
+  countryId            String
+  cityId               String
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  
+  city                 City       @relation(fields: [cityId], references: [id])
+  country              Country    @relation(fields: [countryId], references: [id])
+  categories           Category[] @relation("CategoryToCollege")
+  courses              Course[]   @relation("CollegeToCourse")
+  exams                Exam[]     @relation("CollegeToExam")
 }

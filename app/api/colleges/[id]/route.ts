@@ -76,12 +76,63 @@ export async function GET(
     const { id } = await params
     const college = await db.college.findUnique({
       where: { id },
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        courses: true,
-        exams: true
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        active: true,
+        establishment_year: true,
+        Countryranking: true,
+        Internationalranking: true,
+        features: true,
+        logoURL: true,
+        imageURL: true,
+        keyHighlights: true,
+        whyChooseUs: true,
+        documentsRequired: true,
+        feesStructure: true,
+        admissionProcess: true,
+        campusHighlights: true,
+        createdAt: true,
+        updatedAt: true,
+        city: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        country: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            flagEmoji: true
+          }
+        },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        courses: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        exams: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            shortName: true
+          }
+        }
       }
     })
 
@@ -112,52 +163,122 @@ export async function PUT(
     const body = await request.json()
     const validatedData = collegeSchema.parse(body)
 
-    const college = await db.college.update({
-      where: { id },
-      data: {
-        name: validatedData.name,
-        slug: validatedData.slug,
-        description: validatedData.description,
-        active: validatedData.active,
-        countryId: validatedData.countryId,
-        cityId: validatedData.cityId,
-        establishment_year: validatedData.establishment_year,
-        Countryranking: validatedData.Countryranking,
-        Internationalranking: validatedData.Internationalranking,
-        features: validatedData.features,
-        imageURL: validatedData.imageURL,
-        logoURL: validatedData.logoURL,
-        keyHighlights: validatedData.keyHighlights,
-        documentsRequired: validatedData.documentsRequired,
-        feesStructure: validatedData.feesStructure,
-        admissionProcess: validatedData.admissionProcess,
-        whyChooseUs: validatedData.whyChooseUs,
-        campusHighlights: validatedData.campusHighlights,
-        categories: validatedData.categories && validatedData.categories.length > 0 ? {
-          set: validatedData.categories.map((item: string | { id: string }) => 
-            typeof item === 'string' ? { id: item } : item
-          )
-        } : {
-          set: []
-        },
-        exams: validatedData.exams && validatedData.exams.length > 0 ? {
-          set: validatedData.exams.map((item: string | { id: string }) => 
-            typeof item === 'string' ? { id: item } : item
-          )
-        } : {
-          set: []
-        },
-        courses: validatedData.courses && validatedData.courses.length > 0 ? {
-          set: validatedData.courses.map((item: string | { id: string }) => 
-            typeof item === 'string' ? { id: item } : item
-          )
-        } : {
-          set: []
+    // Use transaction for better performance and data consistency
+    const result = await db.$transaction(async (tx) => {
+      // Update college basic info first
+      const college = await tx.college.update({
+        where: { id },
+        data: {
+          name: validatedData.name,
+          slug: validatedData.slug,
+          description: validatedData.description,
+          active: validatedData.active,
+          countryId: validatedData.countryId,
+          cityId: validatedData.cityId,
+          establishment_year: validatedData.establishment_year,
+          Countryranking: validatedData.Countryranking,
+          Internationalranking: validatedData.Internationalranking,
+          features: validatedData.features,
+          imageURL: validatedData.imageURL,
+          logoURL: validatedData.logoURL,
+          keyHighlights: validatedData.keyHighlights,
+          documentsRequired: validatedData.documentsRequired,
+          feesStructure: validatedData.feesStructure,
+          admissionProcess: validatedData.admissionProcess,
+          whyChooseUs: validatedData.whyChooseUs,
+          campusHighlights: validatedData.campusHighlights,
         }
+      })
+
+      // Update relations only if they exist in the request
+      if (validatedData.categories !== undefined) {
+        await tx.college.update({
+          where: { id },
+          data: {
+            categories: validatedData.categories.length > 0 ? {
+              set: validatedData.categories.map((item: string | { id: string }) => 
+                typeof item === 'string' ? { id: item } : item
+              )
+            } : {
+              set: []
+            }
+          }
+        })
       }
+
+      if (validatedData.exams !== undefined) {
+        await tx.college.update({
+          where: { id },
+          data: {
+            exams: validatedData.exams.length > 0 ? {
+              set: validatedData.exams.map((item: string | { id: string }) => 
+                typeof item === 'string' ? { id: item } : item
+              )
+            } : {
+              set: []
+            }
+          }
+        })
+      }
+
+      if (validatedData.courses !== undefined) {
+        await tx.college.update({
+          where: { id },
+          data: {
+            courses: validatedData.courses.length > 0 ? {
+              set: validatedData.courses.map((item: string | { id: string }) => 
+                typeof item === 'string' ? { id: item } : item
+              )
+            } : {
+              set: []
+            }
+          }
+        })
+      }
+
+      // Fetch the updated college with optimized select
+      return await tx.college.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          establishment_year: true,
+          Countryranking: true,
+          Internationalranking: true,
+          logoURL: true,
+          imageURL: true,
+          createdAt: true,
+          updatedAt: true,
+          city: {
+            select: {
+              id: true,
+              name: true,
+              slug: true
+            }
+          },
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true
+            }
+          },
+          _count: {
+            select: {
+              categories: true,
+              courses: true,
+              exams: true
+            }
+          }
+        }
+      })
     })
 
-    return NextResponse.json(college)
+    return NextResponse.json(result)
   } catch (error) {
     console.error('Error updating college:', error)
     

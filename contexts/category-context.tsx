@@ -1,9 +1,11 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CategoryFormData } from '@/components/admin/categories/add-category-modal'
+
+export type { CategoryFormData }
 
 export interface Category {
   id: string
@@ -26,12 +28,44 @@ export const categoryKeys = {
 }
 
 interface CategoryContextType {
+  // Data
   categories: Category[]
   loading: boolean
   error: string | null
+
+  // Mutations
   createCategory: (data: CategoryFormData) => Promise<void>
   updateCategory: (id: string, data: Partial<CategoryFormData>) => Promise<void>
   deleteCategory: (id: string) => Promise<void>
+
+  // Loading states
+  isCreating: boolean
+  isUpdating: boolean
+  isDeleting: boolean
+
+  // Modal state
+  selectedCategory: Category | null
+  setSelectedCategory: (category: Category | null) => void
+  isViewModalOpen: boolean
+  setIsViewModalOpen: (open: boolean) => void
+  isEditModalOpen: boolean
+  setIsEditModalOpen: (open: boolean) => void
+  isDeleteModalOpen: boolean
+  setIsDeleteModalOpen: (open: boolean) => void
+  isAddModalOpen: boolean
+  setIsAddModalOpen: (open: boolean) => void
+
+  // Modal actions
+  openViewModal: (category: Category) => void
+  closeViewModal: () => void
+  openEditModal: (category: Category) => void
+  closeEditModal: () => void
+  openDeleteModal: (category: Category) => void
+  closeDeleteModal: () => void
+  openAddModal: () => void
+  closeAddModal: () => void
+
+  // Refetch
   refetchCategories: () => Promise<any>
 }
 
@@ -95,6 +129,13 @@ const deleteCategoryApi = async (id: string): Promise<void> => {
 
 export function CategoryProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
+
+  // Modal state
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   const {
     data: categories = [],
@@ -161,15 +202,86 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
     await deleteCategoryMutation.mutateAsync(id)
   }
 
+  // Modal actions
+  const openViewModal = (category: Category) => {
+    setSelectedCategory(category)
+    setIsViewModalOpen(true)
+  }
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false)
+    setSelectedCategory(null)
+  }
+
+  const openEditModal = (category: Category) => {
+    setSelectedCategory(category)
+    setIsEditModalOpen(true)
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedCategory(null)
+  }
+
+  const openDeleteModal = (category: Category) => {
+    setSelectedCategory(category)
+    setIsDeleteModalOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setSelectedCategory(null)
+  }
+
+  const openAddModal = () => {
+    setIsAddModalOpen(true)
+  }
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false)
+  }
+
   return (
     <CategoryContext.Provider
       value={{
+        // Data
         categories,
         loading,
         error: error ? (error as Error).message : null,
+
+        // Mutations
         createCategory,
         updateCategory,
         deleteCategory,
+
+        // Loading states
+        isCreating: createCategoryMutation.isPending,
+        isUpdating: updateCategoryMutation.isPending,
+        isDeleting: deleteCategoryMutation.isPending,
+
+        // Modal state
+        selectedCategory,
+        setSelectedCategory,
+        isViewModalOpen,
+        setIsViewModalOpen,
+        isEditModalOpen,
+        setIsEditModalOpen,
+        isDeleteModalOpen,
+        setIsDeleteModalOpen,
+        isAddModalOpen,
+        setIsAddModalOpen,
+
+        // Modal actions
+        openViewModal,
+        closeViewModal,
+        openEditModal,
+        closeEditModal,
+        openDeleteModal,
+        closeDeleteModal,
+        openAddModal,
+        closeAddModal,
+
+        // Refetch
         refetchCategories,
       }}
     >

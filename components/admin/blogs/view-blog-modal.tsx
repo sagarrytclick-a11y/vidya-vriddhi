@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Blog } from '@/hook/useBlogs'
+import { Blog } from '@/contexts/blog-context'
 import { Calendar, Eye, Image as ImageIcon } from 'lucide-react'
 
 interface ViewBlogModalProps {
