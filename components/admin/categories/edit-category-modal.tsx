@@ -231,8 +231,8 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
                           <ImageIcon className="h-6 w-6 text-slate-400" />
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-white truncate">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white break-all" title={uploadedImage || formData.categoryImageUrl}>
                           {uploadedImage || formData.categoryImageUrl}
                         </p>
                         <p className="text-xs text-slate-400">Image uploaded to ImageKit</p>

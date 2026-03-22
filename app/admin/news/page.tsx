@@ -51,9 +51,8 @@ export default function NewsPage() {
     closeEditModal()
   }
 
-  const handleDeleteNews = async (id: string) => {
-    await deleteNews(id)
-    closeDeleteModal()
+  const handleDeleteNews = async (newsItem: any) => {
+    openDeleteModal(newsItem)
   }
 
   const filteredNews = news.filter(newsItem =>
@@ -203,7 +202,7 @@ export default function NewsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteNews(newsItem.id)}
+                              onClick={() => handleDeleteNews(newsItem)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

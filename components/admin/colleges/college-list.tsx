@@ -1,17 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { Plus, Search, Eye, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loading } from '@/components/ui/loading'
 import { AddCollegeModal } from './add-college-modal'
 import { ViewCollegeModal } from './view-college-modal'
+import { DeleteCollegeModal } from './delete-college-modal'
 import { useCollegeContext } from '@/contexts/college-context'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
-import { Plus, Search, Edit, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react'
 import { College, CollegeFormData } from '@/types/college'
 
 export function CollegeList() {
@@ -30,12 +29,16 @@ export function CollegeList() {
     closeViewModal,
     openEditModal,
     closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
     isAddModalOpen,
     isViewModalOpen,
     isEditModalOpen,
+    isDeleteModalOpen,
     selectedCollege,
     isCreating,
-    isUpdating
+    isUpdating,
+    isDeleting
   } = useCollegeContext()
   
   const { countries } = useCountryContext()
@@ -67,15 +70,8 @@ export function CollegeList() {
     }
   }
 
-  const handleDeleteCollege = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this college?')) {
-      try {
-        await deleteCollege(id)
-        closeViewModal()
-      } catch (error) {
-        console.error('Failed to delete college:', error)
-      }
-    }
+  const handleDeleteCollege = async (college: College) => {
+    openDeleteModal(college)
   }
 
   if (isLoading && colleges.length === 0) {
@@ -185,7 +181,7 @@ export function CollegeList() {
                           <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-slate-700" onClick={() => openEditModal(college)}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => handleDeleteCollege(college.id)}>
+                          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => handleDeleteCollege(college)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -217,7 +213,23 @@ export function CollegeList() {
         }}
         college={selectedCollege}
         onEdit={(college) => openEditModal(college)}
-        onDelete={handleDeleteCollege}
+        onDelete={(college) => openDeleteModal(college)}
+      />
+
+      {/* Delete College Modal */}
+      <DeleteCollegeModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        college={selectedCollege}
+        onDelete={async (id: string) => {
+          try {
+            await deleteCollege(id)
+            closeDeleteModal()
+          } catch (error) {
+            console.error('Failed to delete college:', error)
+          }
+        }}
+        isDeleting={isDeleting}
       />
 
       {/* Edit College Modal */}
