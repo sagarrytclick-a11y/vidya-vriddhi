@@ -127,106 +127,91 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = collegeSchema.parse(body)
 
-    // Use transaction for better performance and data consistency
-    const result = await db.$transaction(async (tx) => {
-      // Create college without relations first
-      const college = await tx.college.create({
-        data: {
-          name: validatedData.name,
-          slug: validatedData.slug,
-          description: validatedData.description,
-          active: validatedData.active,
-          countryId: validatedData.countryId,
-          cityId: validatedData.cityId,
-          establishment_year: validatedData.establishment_year,
-          Countryranking: validatedData.Countryranking,
-          Internationalranking: validatedData.Internationalranking,
-          features: validatedData.features,
-          imageURL: validatedData.imageURL,
-          logoURL: validatedData.logoURL,
-          keyHighlights: validatedData.keyHighlights,
-          documentsRequired: validatedData.documentsRequired,
-          feesStructure: validatedData.feesStructure,
-          admissionProcess: validatedData.admissionProcess,
-          whyChooseUs: validatedData.whyChooseUs,
-          campusHighlights: validatedData.campusHighlights,
-        }
-      })
+    // Prepare create data with relations
+    const createData: any = {
+      name: validatedData.name,
+      slug: validatedData.slug,
+      description: validatedData.description,
+      active: validatedData.active,
+      countryId: validatedData.countryId,
+      cityId: validatedData.cityId,
+      establishment_year: validatedData.establishment_year,
+      Countryranking: validatedData.Countryranking,
+      Internationalranking: validatedData.Internationalranking,
+      features: validatedData.features,
+      imageURL: validatedData.imageURL,
+      logoURL: validatedData.logoURL,
+      keyHighlights: validatedData.keyHighlights,
+      documentsRequired: validatedData.documentsRequired,
+      feesStructure: validatedData.feesStructure,
+      admissionProcess: validatedData.admissionProcess,
+      whyChooseUs: validatedData.whyChooseUs,
+      campusHighlights: validatedData.campusHighlights,
+    }
 
-      // Add relations if provided
-      if (validatedData.categories && validatedData.categories.length > 0) {
-        await tx.college.update({
-          where: { id: college.id },
-          data: {
-            categories: {
-              connect: validatedData.categories.map((id: string) => ({ id }))
-            }
-          }
-        })
+    // Add relations to create data if provided
+    if (validatedData.categories && validatedData.categories.length > 0) {
+      createData.categories = {
+        connect: validatedData.categories.map((id: string) => ({ id }))
       }
+    }
 
-      if (validatedData.exams && validatedData.exams.length > 0) {
-        await tx.college.update({
-          where: { id: college.id },
-          data: {
-            exams: {
-              connect: validatedData.exams.map((id: string) => ({ id }))
-            }
-          }
-        })
+    if (validatedData.exams && validatedData.exams.length > 0) {
+      createData.exams = {
+        connect: validatedData.exams.map((id: string) => ({ id }))
       }
+    }
 
-      if (validatedData.courses && validatedData.courses.length > 0) {
-        await tx.college.update({
-          where: { id: college.id },
-          data: {
-            courses: {
-              connect: validatedData.courses.map((id: string) => ({ id }))
-            }
-          }
-        })
+    if (validatedData.courses && validatedData.courses.length > 0) {
+      createData.courses = {
+        connect: validatedData.courses.map((id: string) => ({ id }))
       }
+    }
 
-      // Fetch the complete college with relations
-      return await tx.college.findUnique({
-        where: { id: college.id },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          active: true,
-          establishment_year: true,
-          Countryranking: true,
-          Internationalranking: true,
-          logoURL: true,
-          imageURL: true,
-          createdAt: true,
-          updatedAt: true,
-          city: {
-            select: {
-              id: true,
-              name: true,
-              slug: true
-            }
-          },
-          country: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              flagEmoji: true
-            }
-          },
-          _count: {
-            select: {
-              categories: true,
-              courses: true,
-              exams: true
-            }
+    // Single create operation without transaction
+    const college = await db.college.create({
+      data: createData
+    })
+
+    // Fetch the complete college with relations
+    const result = await db.college.findUnique({
+      where: { id: college.id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        active: true,
+        establishment_year: true,
+        Countryranking: true,
+        Internationalranking: true,
+        logoURL: true,
+        imageURL: true,
+        createdAt: true,
+        updatedAt: true,
+        city: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        },
+        country: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            flagEmoji: true
+          }
+        },
+        _count: {
+          select: {
+            categories: true,
+            courses: true,
+            exams: true
           }
         }
-      })
+      }
     })
 
     return NextResponse.json(result, { status: 201 })

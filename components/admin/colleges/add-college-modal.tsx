@@ -165,25 +165,22 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         // Fetch exams
         const examsResponse = await fetch('/api/exams')
         if (examsResponse.ok) {
-          const examsResult = await examsResponse.json()
-          const examsData = examsResult.exams || examsResult || []
-          setExams(examsData)
+          const examsData = await examsResponse.json()
+          setExams(Array.isArray(examsData) ? examsData : [])
         }
 
         // Fetch categories
         const categoriesResponse = await fetch('/api/categories')
         if (categoriesResponse.ok) {
-          const categoriesResult = await categoriesResponse.json()
-          const categoriesData = categoriesResult.categories || categoriesResult || []
-          setCategories(categoriesData)
+          const categoriesData = await categoriesResponse.json()
+          setCategories(Array.isArray(categoriesData) ? categoriesData : [])
         }
 
         // Fetch courses
         const coursesResponse = await fetch('/api/courses')
         if (coursesResponse.ok) {
-          const coursesResult = await coursesResponse.json()
-          const coursesData = coursesResult.courses || coursesResult || []
-          setCourses(coursesData)
+          const coursesData = await coursesResponse.json()
+          setCourses(Array.isArray(coursesData) ? coursesData : [])
         }
       } catch (error) {
         console.error('Error fetching data:', error)

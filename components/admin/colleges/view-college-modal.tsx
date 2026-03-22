@@ -10,7 +10,7 @@ interface ViewCollegeModalProps {
   onClose: () => void
   college: any
   onEdit?: (college: any) => void
-  onDelete?: (id: string) => void
+  onDelete?: (college: any) => void
 }
 
 export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }: ViewCollegeModalProps) {
@@ -233,7 +233,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
               </Button>
             )}
             {onDelete && (
-              <Button variant="destructive" onClick={() => onDelete(college.id)} className="bg-red-600 hover:bg-red-700 text-white">
+              <Button variant="destructive" onClick={() => onDelete(college)} className="bg-red-600 hover:bg-red-700 text-white">
                 Delete College
               </Button>
             )}

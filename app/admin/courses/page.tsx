@@ -51,9 +51,8 @@ export default function CoursesPage() {
     closeEditModal()
   }
 
-  const handleDeleteCourse = async (id: string) => {
-    await deleteCourse(id)
-    closeDeleteModal()
+  const handleDeleteCourse = async (course: any) => {
+    openDeleteModal(course)
   }
 
   const filteredCourses = courses.filter(course =>
@@ -188,7 +187,7 @@ export default function CoursesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteCourse(course.id)}
+                              onClick={() => handleDeleteCourse(course)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

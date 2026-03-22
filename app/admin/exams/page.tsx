@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AddExamModal, ExamFormData } from '@/components/admin/exams/add-exam-modal'
 import { ViewExamModal } from '@/components/admin/exams/view-exam-modal'
+import { DeleteExamModal } from '@/components/admin/exams/delete-exam-modal'
 import { LoadingTable } from '@/components/ui/loading'
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useExamContext } from '@/contexts/exam-context'
@@ -28,12 +29,16 @@ export default function ExamsPage() {
     closeViewModal,
     openEditModal,
     closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
     isAddModalOpen,
     isViewModalOpen,
     isEditModalOpen,
+    isDeleteModalOpen,
     selectedExam,
     isCreating,
-    isUpdating
+    isUpdating,
+    isDeleting
   } = useExamContext()
 
   const handleCreateExam = async (data: ExamFormData) => {
@@ -48,10 +53,8 @@ export default function ExamsPage() {
     }
   }
 
-  const handleDeleteExam = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this exam?')) {
-      await deleteExam(id)
-    }
+  const handleDeleteExam = async (exam: any) => {
+    openDeleteModal(exam)
   }
 
   const handleSearch = (value: string) => {
@@ -158,7 +161,7 @@ export default function ExamsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteExam(exam.id)}
+                              onClick={() => handleDeleteExam(exam)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -193,6 +196,21 @@ export default function ExamsPage() {
           isOpen={isViewModalOpen}
           onClose={closeViewModal}
           exam={selectedExam}
+        />
+
+        <DeleteExamModal
+          isOpen={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          exam={selectedExam}
+          onDelete={async (id: string) => {
+            try {
+              await deleteExam(id)
+              closeDeleteModal()
+            } catch (error) {
+              console.error('Failed to delete exam:', error)
+            }
+          }}
+          isDeleting={isDeleting}
         />
       </div>
     </AdminLayout>

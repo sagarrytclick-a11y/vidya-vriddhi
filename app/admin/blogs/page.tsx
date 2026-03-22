@@ -51,9 +51,8 @@ export default function BlogsPage() {
     closeEditModal()
   }
 
-  const handleDeleteBlog = async (id: string) => {
-    await deleteBlog(id)
-    closeDeleteModal()
+  const handleDeleteBlog = async (blog: Blog) => {
+    openDeleteModal(blog)
   }
 
   const filteredBlogs = blogs.filter(blog =>
@@ -203,7 +202,7 @@ export default function BlogsPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteBlog(blog.id)}
+                              onClick={() => handleDeleteBlog(blog)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

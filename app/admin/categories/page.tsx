@@ -45,9 +45,8 @@ export default function CategoriesPage() {
     closeAddModal()
   }
 
-  const handleDeleteCategory = async (id: string) => {
-    await deleteCategory(id)
-    closeDeleteModal()
+  const handleDeleteCategory = async (category: any) => {
+    openDeleteModal(category)
   }
 
   const handleUpdateCategory = async (data: any) => {
@@ -177,7 +176,7 @@ export default function CategoriesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteCategory(category.id)}
+                              onClick={() => handleDeleteCategory(category)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
