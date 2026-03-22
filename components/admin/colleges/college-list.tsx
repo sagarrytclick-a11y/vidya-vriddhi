@@ -8,34 +8,50 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loading } from '@/components/ui/loading'
 import { AddCollegeModal } from './add-college-modal'
 import { ViewCollegeModal } from './view-college-modal'
-import { useColleges } from '@/hook/useColleges'
-import { useCountries } from '@/hook/useCountries'
-import { useCities } from '@/hook/useCities'
+import { useCollegeContext } from '@/contexts/college-context'
+import { useCountryContext } from '@/contexts/country-context'
+import { useCityContext } from '@/contexts/city-context'
 import { Plus, Search, Edit, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react'
 import { College, CollegeFormData } from '@/types/college'
 
 export function CollegeList() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [selectedCollege, setSelectedCollege] = useState<College | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { colleges, isLoading, error, createCollege, updateCollege, deleteCollege } = useColleges()
-  const { countries } = useCountries()
-  const { cities } = useCities()
+  const { 
+    colleges, 
+    isLoading, 
+    error, 
+    createCollege, 
+    updateCollege, 
+    deleteCollege,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    selectedCollege,
+    isCreating,
+    isUpdating
+  } = useCollegeContext()
+  
+  const { countries } = useCountryContext()
+  const { cities } = useCityContext()
 
   const filteredColleges = colleges
-    .filter(college =>
+    .filter((college: College) =>
       college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       college.slug.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+    .sort((a: College, b: College) => (a.displayOrder || 0) - (b.displayOrder || 0))
 
   const handleAddCollege = async (data: CollegeFormData) => {
     try {
       await createCollege(data)
-      setIsAddModalOpen(false)
+      closeAddModal()
     } catch (error) {
       console.error('Failed to create college:', error)
     }
@@ -45,9 +61,7 @@ export function CollegeList() {
     if (!selectedCollege) return
     try {
       await updateCollege(selectedCollege.id, data)
-      setIsViewModalOpen(false)
-      setSelectedCollege(null)
-      setIsEditing(false)
+      closeViewModal()
     } catch (error) {
       console.error('Failed to update college:', error)
     }
@@ -57,24 +71,11 @@ export function CollegeList() {
     if (window.confirm('Are you sure you want to delete this college?')) {
       try {
         await deleteCollege(id)
-        setIsViewModalOpen(false)
-        setSelectedCollege(null)
+        closeViewModal()
       } catch (error) {
         console.error('Failed to delete college:', error)
       }
     }
-  }
-
-  const openViewModal = (college: any) => {
-    setSelectedCollege(college)
-    setIsViewModalOpen(true)
-    setIsEditing(false)
-  }
-
-  const openEditModal = (college: any) => {
-    setSelectedCollege(college)
-    setIsViewModalOpen(true)
-    setIsEditing(true)
   }
 
   if (isLoading && colleges.length === 0) {
@@ -93,7 +94,7 @@ export function CollegeList() {
         <div>
           <h1 className="text-2xl font-bold text-white">Colleges Management</h1>
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button onClick={openAddModal} className="bg-blue-600 hover:bg-blue-700 text-white">
           <Plus className="w-4 h-4 mr-2" />
           Add College
         </Button>
@@ -201,37 +202,35 @@ export function CollegeList() {
       {/* Add College Modal */}
       <AddCollegeModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={closeAddModal}
         onSubmit={handleAddCollege}
+        isSubmitting={isCreating}
         countries={countries}
         cities={cities}
       />
 
-      {/* View/Edit College Modal */}
+      {/* View College Modal */}
       <ViewCollegeModal
-        isOpen={isViewModalOpen}
+        isOpen={isViewModalOpen && !isEditModalOpen}
         onClose={() => {
-          setIsViewModalOpen(false)
-          setSelectedCollege(null)
-          setIsEditing(false)
+          closeViewModal()
         }}
         college={selectedCollege}
-        onEdit={isEditing ? undefined : (college) => openEditModal(college)}
-        onDelete={isEditing ? undefined : handleDeleteCollege}
+        onEdit={(college) => openEditModal(college)}
+        onDelete={handleDeleteCollege}
       />
 
-      {/* Edit College Modal (shown when editing) */}
-      {isEditing && selectedCollege && (
+      {/* Edit College Modal */}
+      {isEditModalOpen && selectedCollege && (
         <AddCollegeModal
-          isOpen={isViewModalOpen}
+          isOpen={true}
           onClose={() => {
-            setIsViewModalOpen(false)
-            setSelectedCollege(null)
-            setIsEditing(false)
+            closeEditModal()
           }}
           onSubmit={handleEditCollege}
           initialData={selectedCollege}
           isEdit={true}
+          isSubmitting={isUpdating}
           countries={countries}
           cities={cities}
         />

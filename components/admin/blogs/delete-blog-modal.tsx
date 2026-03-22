@@ -1,10 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
-import { useBlogs } from '@/hook/useBlogs'
-import { Blog } from '@/hook/useBlogs'
+import { useBlogContext } from '@/contexts/blog-context'
+import { Blog } from '@/contexts/blog-context'
 
 interface DeleteBlogModalProps {
   isOpen: boolean
@@ -13,7 +14,7 @@ interface DeleteBlogModalProps {
 }
 
 export function DeleteBlogModal({ isOpen, onClose, blog }: DeleteBlogModalProps) {
-  const { deleteBlog, isDeleting } = useBlogs()
+  const { deleteBlog, isDeleting } = useBlogContext()
 
   const handleDelete = async () => {
     if (!blog) return
@@ -23,7 +24,7 @@ export function DeleteBlogModal({ isOpen, onClose, blog }: DeleteBlogModalProps)
       onClose()
     } catch (error) {
       console.error('Failed to delete blog:', error)
-      // Error is already handled by the hook with toast notification
+      // Error is already handled by the context with toast notification
     }
   }
 

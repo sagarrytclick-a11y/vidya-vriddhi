@@ -5,62 +5,56 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AddCategoryModal, CategoryFormData } from '@/components/admin/categories/add-category-modal'
+import { AddCategoryModal } from '@/components/admin/categories/add-category-modal'
 import { ViewCategoryModal } from '@/components/admin/categories/view-category-modal'
 import { EditCategoryModal } from '@/components/admin/categories/edit-category-modal'
 import { DeleteCategoryModal } from '@/components/admin/categories/delete-category-modal'
 import { LoadingTable } from '@/components/ui/loading'
-import { useCategories, CreateCategoryData } from '@/hook/useCategories'
+import { useCategoryContext, CategoryFormData } from '@/contexts/category-context'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
 
 export default function CategoriesPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const { categories, isLoading, error, createCategory, deleteCategory, updateCategory, isUpdating } = useCategories()
+  
+  const {
+    categories,
+    loading,
+    error,
+    createCategory,
+    deleteCategory,
+    updateCategory,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    selectedCategory,
+    isCreating,
+    isUpdating
+  } = useCategoryContext()
 
-  const handleCreateCategory = async (data: CreateCategoryData) => {
+  const handleCreateCategory = async (data: CategoryFormData) => {
     await createCategory(data)
+    closeAddModal()
   }
 
-  const handleDeleteCategory = (category: any) => {
-    setSelectedCategory(category)
-    setIsDeleteModalOpen(true)
-  }
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedCategory(null)
-  }
-
-  const handleViewCategory = (category: any) => {
-    setSelectedCategory(category)
-    setIsViewModalOpen(true)
-  }
-
-  const handleEditCategory = (category: any) => {
-    setSelectedCategory(category)
-    setIsEditModalOpen(true)
-  }
-
-  const handleCloseViewModal = () => {
-    setIsViewModalOpen(false)
-    setSelectedCategory(null)
-  }
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false)
-    setSelectedCategory(null)
+  const handleDeleteCategory = async (id: string) => {
+    await deleteCategory(id)
+    closeDeleteModal()
   }
 
   const handleUpdateCategory = async (data: any) => {
     if (!selectedCategory) return
     try {
-      await updateCategory({ id: selectedCategory.id, ...data })
-      handleCloseEditModal()
+      await updateCategory(selectedCategory.id, { id: selectedCategory.id, ...data })
+      closeEditModal()
     } catch (error) {
       console.error('Failed to update category:', error)
     }
@@ -86,7 +80,7 @@ export default function CategoriesPage() {
           <Button 
             size="lg" 
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={openAddModal}
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Category
@@ -109,10 +103,10 @@ export default function CategoriesPage() {
             <CardTitle className="text-white">All Categories</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {loading ? (
               <LoadingTable text="Loading categories..." />
             ) : error ? (
-              <div className="text-center py-8 text-red-400">Error: {error?.message || 'An error occurred'}</div>
+                <div className="text-center py-8 text-red-400">Error: {error || 'An error occurred'}</div>
             ) : filteredCategories.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 {searchTerm ? 'No categories found matching your search.' : 'No categories found. Create your first category!'}
@@ -167,7 +161,7 @@ export default function CategoriesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
-                              onClick={() => handleViewCategory(category)}
+                              onClick={() => openViewModal(category)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -175,7 +169,7 @@ export default function CategoriesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-green-400 hover:text-green-300 hover:bg-slate-700"
-                              onClick={() => handleEditCategory(category)}
+                              onClick={() => openEditModal(category)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -183,7 +177,7 @@ export default function CategoriesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteCategory(category)}
+                              onClick={() => handleDeleteCategory(category.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -200,20 +194,20 @@ export default function CategoriesPage() {
 
         <AddCategoryModal
           isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={closeAddModal}
           onSubmit={handleCreateCategory}
-          isSubmitting={isLoading}
+          isSubmitting={isCreating}
         />
 
         <ViewCategoryModal
           isOpen={isViewModalOpen}
-          onClose={handleCloseViewModal}
+          onClose={closeViewModal}
           category={selectedCategory}
         />
 
         <EditCategoryModal
           isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
+          onClose={closeEditModal}
           category={selectedCategory}
           onUpdate={handleUpdateCategory}
           isUpdating={isUpdating}
@@ -221,7 +215,7 @@ export default function CategoriesPage() {
 
         <DeleteCategoryModal
           isOpen={isDeleteModalOpen}
-          onClose={handleCloseDeleteModal}
+          onClose={closeDeleteModal}
           category={selectedCategory}
         />
       </div>

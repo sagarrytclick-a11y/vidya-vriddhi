@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useEffect, useRef } from 'react'
-import { useBlogs, Blog, BlogFormData } from '@/hook/useBlogs'
+import { useBlogContext, Blog, BlogFormData } from '@/contexts/blog-context'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
 
@@ -16,11 +16,10 @@ interface EditBlogModalProps {
   isOpen: boolean
   onClose: () => void
   blog: Blog | null
-  onUpdate: (id: string, data: Partial<BlogFormData>) => Promise<void>
-  isUpdating?: boolean
 }
 
-export function EditBlogModal({ isOpen, onClose, blog, onUpdate, isUpdating = false }: EditBlogModalProps) {
+export function EditBlogModal({ isOpen, onClose, blog }: EditBlogModalProps) {
+  const { updateBlog, isUpdating } = useBlogContext()
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -67,7 +66,7 @@ export function EditBlogModal({ isOpen, onClose, blog, onUpdate, isUpdating = fa
     }
 
     try {
-      await onUpdate(blog.id, formData)
+      await updateBlog(blog.id, formData)
       onClose()
     } catch (error) {
       console.error('Failed to update blog:', error)

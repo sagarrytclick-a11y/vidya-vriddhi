@@ -24,40 +24,34 @@ const fetchColleges = async (search?: string): Promise<College[]> => {
 
   const data = await response.json()
 
-  // Transform data to match expected format
+  // Transform data to match expected format - optimized for list view
   return data.map((college: any) => ({
     id: college.id,
     name: college.name,
     slug: college.slug,
     description: college.description,
     active: college.active,
-    countryId: college.countryId,
-    cityId: college.cityId,
-    createdAt: new Date(college.createdAt).toLocaleDateString(),
-    updatedAt: new Date(college.updatedAt).toLocaleDateString(),
+    countryId: college.country?.id || '',
+    cityId: college.city?.id || '',
+    createdAt: college.createdAt,
+    updatedAt: college.updatedAt,
     establishment_year: college.establishment_year,
     features: college.features || [],
     imageURL: college.imageURL,
     logoURL: college.logoURL,
     Countryranking: college.Countryranking,
     Internationalranking: college.Internationalranking,
-    documentsRequired: college.documentsRequired,
-    feesStructure: college.feesStructure,
-    galleryImages: college.galleryImages,
-    admissionProcess: college.admissionProcess,
-    whyChooseUs: college.whyChooseUs,
-    overview: college.overview,
-    keyHighlights: college.keyHighlights,
-    ranking: college.ranking,
-    campusHighlights: college.campusHighlights,
-    bannerUrl: college.bannerUrl,
-    aboutContent: college.aboutContent,
-    displayOrder: college.displayOrder,
+    // Include relation counts for display
+    categoriesCount: college._count?.categories || 0,
+    coursesCount: college._count?.courses || 0,
+    examsCount: college._count?.exams || 0,
+    // Include basic relation data for display
     city: college.city,
     country: college.country,
-    categories: college.categories || [],
-    courses: college.courses || [],
-    exams: college.exams || []
+    // Empty arrays for compatibility - will be fetched when needed
+    categories: [],
+    courses: [],
+    exams: []
   }))
 }
 

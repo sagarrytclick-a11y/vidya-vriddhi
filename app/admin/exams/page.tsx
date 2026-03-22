@@ -10,40 +10,41 @@ import { AddExamModal, ExamFormData } from '@/components/admin/exams/add-exam-mo
 import { ViewExamModal } from '@/components/admin/exams/view-exam-modal'
 import { LoadingTable } from '@/components/ui/loading'
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
-import { useExams } from '@/hook/useExams'
+import { useExamContext } from '@/contexts/exam-context'
 
 export default function ExamsPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [editingExam, setEditingExam] = useState<any>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [viewingExam, setViewingExam] = useState<any>(null)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
   
-  const { exams, isLoading, error, refetchExams, createExam, updateExam, deleteExam } = useExams()
+  const {
+    exams,
+    isLoading,
+    error,
+    createExam,
+    updateExam,
+    deleteExam,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    selectedExam,
+    isCreating,
+    isUpdating
+  } = useExamContext()
 
   const handleCreateExam = async (data: ExamFormData) => {
-    setIsCreating(true)
-    try {
-      await createExam(data)
-      setIsAddModalOpen(false)
-    } finally {
-      setIsCreating(false)
-    }
+    await createExam(data)
+    closeAddModal()
   }
 
   const handleEditExam = async (data: ExamFormData) => {
-    if (editingExam) {
-      setIsUpdating(true)
-      try {
-        await updateExam(editingExam.id, data)
-        setIsEditModalOpen(false)
-        setEditingExam(null)
-      } finally {
-        setIsUpdating(false)
-      }
+    if (selectedExam) {
+      await updateExam(selectedExam.id, data)
+      closeEditModal()
     }
   }
 
@@ -53,21 +54,8 @@ export default function ExamsPage() {
     }
   }
 
-  const openEditModal = (exam: any) => {
-    console.log('Opening edit modal with exam:', exam)
-    setEditingExam(exam)
-    setIsEditModalOpen(true)
-  }
-
-  const openViewModal = (exam: any) => {
-    console.log('Opening view modal with exam:', exam)
-    setViewingExam(exam)
-    setIsViewModalOpen(true)
-  }
-
   const handleSearch = (value: string) => {
     setSearchTerm(value)
-    refetchExams()
   }
 
   const filteredExams = exams.filter(exam =>
@@ -83,7 +71,7 @@ export default function ExamsPage() {
           <Button 
             size="lg" 
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={openAddModal}
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Exam
@@ -130,7 +118,7 @@ export default function ExamsPage() {
                   <tbody>
                     {filteredExams.map((exam) => (
                       <tr key={exam.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                        <td className="py-3 px-4 text-white font-medium">{exam.name},</td>
+                        <td className="py-3 px-4 text-white font-medium">{exam.name}</td>
                         <td className="py-3 px-4 text-gray-400 text-sm">{exam.shortName}</td>
                         <td className="py-3 px-4">
                           <Badge variant="outline" className="border-blue-500 text-blue-400">
@@ -187,30 +175,24 @@ export default function ExamsPage() {
 
         <AddExamModal
           isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={closeAddModal}
           onSubmit={handleCreateExam}
           isSubmitting={isCreating}
         />
 
         <AddExamModal
           isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false)
-            setEditingExam(null)
-          }}
+          onClose={closeEditModal}
           onSubmit={handleEditExam}
-          initialData={editingExam}
+          initialData={selectedExam}
           isEdit={true}
           isSubmitting={isUpdating}
         />
 
         <ViewExamModal
           isOpen={isViewModalOpen}
-          onClose={() => {
-            setIsViewModalOpen(false)
-            setViewingExam(null)
-          }}
-          exam={viewingExam}
+          onClose={closeViewModal}
+          exam={selectedExam}
         />
       </div>
     </AdminLayout>

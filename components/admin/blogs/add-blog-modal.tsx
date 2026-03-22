@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef } from 'react'
-import { useBlogs, BlogFormData } from '@/hook/useBlogs'
+import { useBlogContext, BlogFormData } from '@/contexts/blog-context'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
 
@@ -18,7 +18,7 @@ interface AddBlogModalProps {
 }
 
 export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
-  const { createBlog, isCreating } = useBlogs()
+  const { createBlog, isCreating } = useBlogContext()
   
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',

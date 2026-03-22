@@ -9,56 +9,51 @@ import { AddCourseModal } from '@/components/admin/courses/add-course-modal'
 import { ViewCourseModal } from '@/components/admin/courses/view-course-modal'
 import { EditCourseModal } from '@/components/admin/courses/edit-course-modal'
 import { DeleteCourseModal } from '@/components/admin/courses/delete-course-modal'
-import { LoadingPage, LoadingTable } from '@/components/ui/loading'
-import { useCourses, Course, CourseFormData } from '@/hook/useCourses'
+import { LoadingPage } from '@/components/ui/loading'
+import { useCourseContext } from '@/contexts/course-context'
+import { Course, CourseFormData } from '@/hook/useCourses'
 import { Search, Plus, Trash2, Eye, Edit, Building } from 'lucide-react'
 
 export default function CoursesPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const { courses, isLoading, error, createCourse, deleteCourse, updateCourse, isUpdating } = useCourses()
+  
+  const {
+    courses,
+    isLoading,
+    error,
+    createCourse,
+    updateCourse,
+    deleteCourse,
+    openAddModal,
+    closeAddModal,
+    openViewModal,
+    closeViewModal,
+    openEditModal,
+    closeEditModal,
+    openDeleteModal,
+    closeDeleteModal,
+    isAddModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    selectedCourse,
+    isCreating,
+    isUpdating
+  } = useCourseContext()
 
   const handleCreateCourse = async (data: CourseFormData) => {
     await createCourse(data)
-  }
-
-  const handleViewCourse = (course: Course) => {
-    setSelectedCourse(course)
-    setIsViewModalOpen(true)
-  }
-
-  const handleEditCourse = (course: Course) => {
-    setSelectedCourse(course)
-    setIsEditModalOpen(true)
-  }
-
-  const handleDeleteCourse = (course: Course) => {
-    setSelectedCourse(course)
-    setIsDeleteModalOpen(true)
-  }
-
-  const handleCloseViewModal = () => {
-    setIsViewModalOpen(false)
-    setSelectedCourse(null)
-  }
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false)
-    setSelectedCourse(null)
-  }
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedCourse(null)
+    closeAddModal()
   }
 
   const handleUpdateCourse = async (id: string, data: Partial<CourseFormData>) => {
     await updateCourse(id, data)
-    handleCloseEditModal()
+    closeEditModal()
+  }
+
+  const handleDeleteCourse = async (id: string) => {
+    await deleteCourse(id)
+    closeDeleteModal()
   }
 
   const filteredCourses = courses.filter(course =>
@@ -95,7 +90,7 @@ export default function CoursesPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">Courses</h1>
           <Button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={openAddModal}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -177,7 +172,7 @@ export default function CoursesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
-                              onClick={() => handleViewCourse(course)}
+                              onClick={() => openViewModal(course)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -185,7 +180,7 @@ export default function CoursesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-green-400 hover:text-green-300 hover:bg-slate-700"
-                              onClick={() => handleEditCourse(course)}
+                              onClick={() => openEditModal(course)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -193,7 +188,7 @@ export default function CoursesPage() {
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
-                              onClick={() => handleDeleteCourse(course)}
+                              onClick={() => handleDeleteCourse(course.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -210,19 +205,19 @@ export default function CoursesPage() {
 
         <AddCourseModal
           isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={closeAddModal}
           onSubmit={handleCreateCourse}
         />
 
         <ViewCourseModal
           isOpen={isViewModalOpen}
-          onClose={handleCloseViewModal}
+          onClose={closeViewModal}
           course={selectedCourse}
         />
 
         <EditCourseModal
           isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
+          onClose={closeEditModal}
           course={selectedCourse}
           onUpdate={handleUpdateCourse}
           isUpdating={isUpdating}
@@ -230,7 +225,7 @@ export default function CoursesPage() {
 
         <DeleteCourseModal
           isOpen={isDeleteModalOpen}
-          onClose={handleCloseDeleteModal}
+          onClose={closeDeleteModal}
           course={selectedCourse}
         />
       </div>
