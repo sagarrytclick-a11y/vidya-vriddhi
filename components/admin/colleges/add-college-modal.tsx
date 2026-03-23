@@ -23,75 +23,9 @@ interface AddCollegeModalProps {
 }
 
 export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = false, initialData, isEdit = false, countries = [], cities = [] }: AddCollegeModalProps) {
-  const [formData, setFormData] = useState<CollegeFormData>(initialData || {
-    name: '',
-    slug: '',
-    description: '',
-    establishment_year: undefined,
-    Countryranking: undefined,
-    Internationalranking: undefined,
-    active: false,
-    features: [],
-    logoURL: '',
-    imageURL: '',
-    overview: null,
-    keyHighlights: {
-      title: "Key Highlights",
-      description: "",
-      features: []
-    },
-    documentsRequired: {
-      title: "Documents Required",
-      description: "",
-      documents: []
-    },
-    feesStructure: {
-      title: "Fees Structure",
-      description: "",
-      courses: []
-    },
-    admissionProcess: {
-      title: "Admission Process",
-      description: "",
-      steps: []
-    },
-    whyChooseUs: {
-      title: "Why Choose Us",
-      description: "",
-      features: []
-    },
-    campusHighlights: {
-      title: "Campus Highlights",
-      description: "",
-      highlights: []
-    },
-    countryId: '',
-    cityId: '',
-    exams: [],
-    categories: [],
-    courses: []
-  })
-
-  const [newFeature, setNewFeature] = useState('')
-  const [newKeyHighlightFeature, setNewKeyHighlightFeature] = useState('')
-  const [newDocument, setNewDocument] = useState('')
-  const [newCourse, setNewCourse] = useState({ course_name: '', duration: '', annual_tuition_fee: '' })
-  const [newWhyChooseUsFeature, setNewWhyChooseUsFeature] = useState({ title: '', description: '' })
-  const [newAdmissionStep, setNewAdmissionStep] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const logoInputRef = useRef<HTMLInputElement>(null)
-  const campusImageInputRef = useRef<HTMLInputElement>(null)
-  
-  // Dynamic data states
-  const [exams, setExams] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [courses, setCourses] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-
-  // Update form data when initialData changes (for edit mode)
-  useEffect(() => {
+  const getInitialFormData = () => {
     if (initialData && isEdit) {
-      setFormData({
+      return {
         // Basic fields
         name: initialData.name || '',
         slug: initialData.slug || '',
@@ -136,15 +70,91 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           highlights: []
         },
         
-        // Relations
-        countryId: initialData.countryId || '',
-        cityId: initialData.cityId || '',
-        exams: initialData.exams?.map((exam: any) => exam.id) || [],
-        categories: initialData.categories?.map((cat: any) => cat.id) || [],
-        courses: initialData.courses?.map((course: any) => course.id) || []
-      })
+        // Relations - ensure proper mapping from objects to IDs
+        countryId: initialData.countryId || initialData.country?.id || '',
+        cityId: initialData.cityId || initialData.city?.id || '',
+        exams: initialData.exams?.map((exam: any) => exam.id || exam).filter(Boolean) || [],
+        categories: initialData.categories?.map((cat: any) => cat.id || cat).filter(Boolean) || [],
+        courses: initialData.courses?.map((course: any) => course.id || course).filter(Boolean) || []
+      }
     }
-  }, [initialData, isEdit])
+    
+    // Default form data for create mode
+    return {
+      name: '',
+      slug: '',
+      description: '',
+      establishment_year: undefined,
+      Countryranking: undefined,
+      Internationalranking: undefined,
+      active: false,
+      features: [],
+      logoURL: '',
+      imageURL: '',
+      overview: null,
+      keyHighlights: {
+        title: "Key Highlights",
+        description: "",
+        features: []
+      },
+      documentsRequired: {
+        title: "Documents Required",
+        description: "",
+        documents: []
+      },
+      feesStructure: {
+        title: "Fees Structure",
+        description: "",
+        courses: []
+      },
+      admissionProcess: {
+        title: "Admission Process",
+        description: "",
+        steps: []
+      },
+      whyChooseUs: {
+        title: "Why Choose Us",
+        description: "",
+        features: []
+      },
+      campusHighlights: {
+        title: "Campus Highlights",
+        description: "",
+        highlights: []
+      },
+      countryId: '',
+      cityId: '',
+      exams: [],
+      categories: [],
+      courses: []
+    }
+  }
+
+  const [formData, setFormData] = useState<CollegeFormData>(getInitialFormData())
+
+  const [newFeature, setNewFeature] = useState('')
+  const [newKeyHighlightFeature, setNewKeyHighlightFeature] = useState('')
+  const [newDocument, setNewDocument] = useState('')
+  const [newCourse, setNewCourse] = useState({ course_name: '', duration: '', annual_tuition_fee: '' })
+  const [newWhyChooseUsFeature, setNewWhyChooseUsFeature] = useState({ title: '', description: '' })
+  const [newAdmissionStep, setNewAdmissionStep] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const campusImageInputRef = useRef<HTMLInputElement>(null)
+  
+  // Dynamic data states
+  const [exams, setExams] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [courses, setCourses] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+
+  // Update form data when initialData changes (for edit mode)
+  useEffect(() => {
+    if (isOpen) {
+      const newFormData = getInitialFormData()
+      setFormData(newFormData)
+    }
+  }, [initialData, isEdit, isOpen])
 
   // Generate slug from name
   useEffect(() => {

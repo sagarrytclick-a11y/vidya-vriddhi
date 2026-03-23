@@ -35,7 +35,7 @@ interface CollegeContextType {
   // Modal actions
   openViewModal: (college: College) => void
   closeViewModal: () => void
-  openEditModal: (college: College) => void
+  openEditModal: (college: College) => Promise<void>
   closeEditModal: () => void
   openDeleteModal: (college: College) => void
   closeDeleteModal: () => void
@@ -84,9 +84,26 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
     setSelectedCollege(null)
   }
 
-  const openEditModal = (college: College) => {
-    setSelectedCollege(college)
-    setIsEditModalOpen(true)
+  const openEditModal = async (college: College) => {
+    try {
+      // Fetch complete college data with all relations
+      const response = await fetch(`/api/colleges/${college.id}`)
+      if (response.ok) {
+        const completeCollege = await response.json()
+        setSelectedCollege(completeCollege)
+        setIsEditModalOpen(true)
+      } else {
+        console.error('Failed to fetch complete college data')
+        // Fallback to basic college data
+        setSelectedCollege(college)
+        setIsEditModalOpen(true)
+      }
+    } catch (error) {
+      console.error('Error fetching college data:', error)
+      // Fallback to basic college data
+      setSelectedCollege(college)
+      setIsEditModalOpen(true)
+    }
   }
 
   const closeEditModal = () => {
