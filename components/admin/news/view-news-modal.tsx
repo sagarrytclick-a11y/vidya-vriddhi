@@ -78,11 +78,11 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-400">Status</label>
-              <p className="text-white mt-1">
+              <div className="text-white mt-1">
                 <Badge variant={news.active ? "default" : "secondary"}>
                   {news.active ? "Active" : "Inactive"}
                 </Badge>
-              </p>
+              </div>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-400">Created</label>

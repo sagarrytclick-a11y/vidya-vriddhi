@@ -1,0 +1,146 @@
+'use client'
+
+import React, { useState, useRef, useEffect } from 'react'
+import { Search, TrendingUp, X } from 'lucide-react'
+
+interface SearchOverlayProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const popularSearches = [
+    { name: 'IIMA', category: 'College', trending: true },
+    { name: 'IIT Bombay', category: 'College', trending: true },
+    { name: 'AIIMS Delhi', category: 'College', trending: true },
+    { name: 'JEE Main', category: 'Exam', trending: true },
+    { name: 'GATE', category: 'Exam', trending: true },
+    { name: 'CAT', category: 'Exam', trending: true },
+    { name: 'Master of Business Administration (MBA)', category: 'Course', trending: true },
+    { name: 'Bachelor of Technology (B.Tech)', category: 'Course', trending: false },
+    { name: 'NEET', category: 'Exam', trending: true },
+    { name: 'Delhi University', category: 'College', trending: false }
+  ]
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, onClose])
+
+  const handleItemClick = (item: string) => {
+    console.log('Searching for:', item)
+    // Add search logic here
+    onClose()
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Search</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Search Section */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="relative mb-8">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="What Are You Looking For?"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-14 pr-4 py-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-xl"
+          />
+        </div>
+
+        {/* Popular Searches */}
+        <div className="bg-gray-50 rounded-lg p-6">
+          <div className="flex items-center space-x-2 mb-6">
+            <TrendingUp className="w-6 h-6 text-orange-500" />
+            <h3 className="text-xl font-semibold text-gray-900">Popular Searches</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {popularSearches.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => handleItemClick(item.name)}
+                className="flex items-center justify-between p-4 text-left hover:bg-white rounded-lg transition-colors group border border-gray-200 hover:border-orange-300"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                  <div>
+                    <span className="text-gray-900 group-hover:text-orange-600 font-medium text-base">
+                      {item.name}
+                    </span>
+                    <span className="text-gray-500 text-sm ml-2 block">
+                      {item.category}
+                    </span>
+                  </div>
+                </div>
+                {item.trending && (
+                  <span className="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">
+                    Trending
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick Links */}
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="flex flex-wrap gap-4">
+              <span className="text-base text-gray-600 font-medium">Quick links:</span>
+              {['Engineering Colleges', 'MBA Colleges', 'Medical Colleges', 'Law Colleges'].map((link, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleItemClick(link)}
+                  className="text-base text-orange-500 hover:text-orange-600 font-medium"
+                >
+                  {link}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default SearchOverlay

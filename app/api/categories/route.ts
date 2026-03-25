@@ -1,15 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const categories = await db.category.findMany({
-      orderBy: {
-        name: 'asc'
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const search = searchParams.get('search') || ''
+
+    const skip = (page - 1) * limit
+
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { slug: { contains: search, mode: 'insensitive' as const } },
+            { description: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Get total count and categories in parallel
+    const [total, categories] = await Promise.all([
+      db.category.count({ where }),
+      db.category.findMany({
+        where,
+        orderBy: {
+          name: 'asc'
+        },
+        skip,
+        take: limit
+      })
+    ])
+    
+    return NextResponse.json({
+      categories,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
       }
     })
-    
-    return NextResponse.json(categories)
   } catch (error) {
     console.error('Error fetching categories:', error)
     return NextResponse.json(

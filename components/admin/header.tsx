@@ -3,8 +3,30 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { LogOut, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        router.push('/admin/login')
+      } else {
+        console.error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
   return (
     <div className="bg-slate-800 text-white px-8 py-6 border-b border-slate-700">
       <div className="flex justify-between items-center">
@@ -30,7 +52,10 @@ export function Header() {
                 <User className="h-4 w-4" />
                 <span>Admin User</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2 hover:bg-slate-700 text-red-400">
+              <DropdownMenuItem 
+                className="flex items-center gap-2 hover:bg-slate-700 text-red-400 cursor-pointer"
+                onClick={handleLogout}
+              >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>

@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef } from 'react'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface AddCategoryModalProps {
   isOpen: boolean
@@ -58,7 +59,7 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
     e.preventDefault()
     
     if (!formData.name.trim()) {
-      alert('Please enter a category name')
+      toast.error('Please enter a category name')
       return
     }
 
@@ -78,7 +79,7 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
       }
     } catch (error) {
       console.error('Failed to create category:', error)
-      alert('Failed to create category')
+      toast.error('Failed to create category')
     }
   }
 
@@ -86,12 +87,12 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
     if (!file) return
     
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      toast.error('Please select an image file')
       return
     }
     
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      alert('Image size should be less than 5MB')
+      toast.error('Image size should be less than 5MB')
       return
     }
     
@@ -115,7 +116,7 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
       setFormData(prev => ({ ...prev, categoryImageUrl: data.url }))
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Failed to upload image')
+      toast.error('Failed to upload image')
     } finally {
       setUploadingImage(false)
     }

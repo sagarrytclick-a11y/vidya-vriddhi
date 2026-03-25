@@ -11,7 +11,7 @@ import { NewsProvider } from "@/contexts/news-context";
 import { BlogProvider } from "@/contexts/blog-context";
 import { ExamProvider } from "@/contexts/exam-context";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +26,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vidya Vridhi",
   description: "Get Your College",
-  icons : {
-    icon : '/logo.png'
-  } 
+  icons: {
+    icon: '/logo.png'
+  }
 };
 
 export default function RootLayout({
@@ -43,21 +43,21 @@ export default function RootLayout({
       >
         <QueryProvider>
           <CategoryProvider>
-          <ExamProvider>
-          <BlogProvider>
-          <NewsProvider>
-          <CourseProvider>  
-          <CountryProvider>
-            <CityProvider>
-              <CategoryProvider>
-                {children}
-              </CategoryProvider>
-            </CityProvider>
-          </CountryProvider>
-          </CourseProvider>
-          </NewsProvider>
-          </BlogProvider>
-          </ExamProvider>
+            <ExamProvider>
+              <BlogProvider>
+                <NewsProvider>
+                  <CourseProvider>
+                    <CountryProvider>
+                      <CityProvider>
+                        <CategoryProvider>
+                          {children}
+                        </CategoryProvider>
+                      </CityProvider>
+                    </CountryProvider>
+                  </CourseProvider>
+                </NewsProvider>
+              </BlogProvider>
+            </ExamProvider>
           </CategoryProvider>
         </QueryProvider>
       </body>

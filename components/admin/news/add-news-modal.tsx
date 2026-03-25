@@ -11,6 +11,7 @@ import { useState, useRef } from 'react'
 import { useNews, NewsFormData } from '@/hook/useNews'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export type { NewsFormData }
 
@@ -39,17 +40,17 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
     e.preventDefault()
     
     if (!formData.title.trim()) {
-      alert('Please enter a news title')
+      toast.error('Please enter a news title')
       return
     }
     
     if (!formData.slug.trim()) {
-      alert('Please enter a news slug')
+      toast.error('Please enter a news slug')
       return
     }
     
     if (!formData.content.trim()) {
-      alert('Please enter news content')
+      toast.error('Please enter news content')
       return
     }
 
@@ -59,6 +60,7 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
       } else {
         await createNews(formData)
       }
+      toast.success(`News "${formData.title}" created successfully`)
       onClose()
       setFormData({
         title: '',
@@ -73,6 +75,7 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
       }
     } catch (error) {
       console.error('Failed to create news:', error)
+      // Toast error is already handled by the hook
     }
   }
 
@@ -80,12 +83,12 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
     if (!file) return
     
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      toast.error('Please select an image file')
       return
     }
     
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      alert('Image size should be less than 5MB')
+      toast.error('Image size should be less than 5MB')
       return
     }
     

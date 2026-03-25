@@ -1,8 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, ReactNode, useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useCategories, CreateCategoryData, UpdateCategoryData } from '@/hook/useCategories'
 import { CategoryFormData } from '@/components/admin/categories/add-category-modal'
 
 export type { CategoryFormData }
@@ -18,13 +17,13 @@ export interface Category {
   updatedAt: string
 }
 
-// Query keys for consistent cache management
-export const categoryKeys = {
-  all: ['categories'] as const,
-  lists: () => [...categoryKeys.all, 'list'] as const,
-  list: (filters: Record<string, unknown>) => [...categoryKeys.lists(), filters] as const,
-  details: () => [...categoryKeys.all, 'detail'] as const,
-  detail: (id: string) => [...categoryKeys.details(), id] as const,
+export interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
 }
 
 interface CategoryContextType {
@@ -32,10 +31,19 @@ interface CategoryContextType {
   categories: Category[]
   loading: boolean
   error: string | null
+  pagination: PaginationInfo
+
+  // Pagination state
+  currentPage: number
+  setCurrentPage: (page: number) => void
+  limit: number
+  setLimit: (limit: number) => void
+  searchTerm: string
+  setSearchTerm: (term: string) => void
 
   // Mutations
-  createCategory: (data: CategoryFormData) => Promise<void>
-  updateCategory: (id: string, data: Partial<CategoryFormData>) => Promise<void>
+  createCategory: (data: CreateCategoryData) => Promise<Category>
+  updateCategory: (data: UpdateCategoryData) => Promise<Category>
   deleteCategory: (id: string) => Promise<void>
 
   // Loading states
@@ -71,65 +79,7 @@ interface CategoryContextType {
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined)
 
-// API functions
-const fetchCategories = async (): Promise<Category[]> => {
-  const response = await fetch('/api/categories')
-  if (!response.ok) {
-    throw new Error('Failed to fetch categories')
-  }
-  return response.json()
-}
-
-const createCategoryApi = async (data: CategoryFormData): Promise<Category> => {
-  const response = await fetch('/api/categories', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-
-  const responseData = await response.json()
-
-  if (!response.ok) {
-    throw new Error(responseData.error || 'Failed to create category')
-  }
-
-  return responseData
-}
-
-const updateCategoryApi = async ({ id, data }: { id: string; data: Partial<CategoryFormData> }): Promise<Category> => {
-  const response = await fetch(`/api/categories/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-
-  const responseData = await response.json()
-
-  if (!response.ok) {
-    throw new Error(responseData.error || 'Failed to update category')
-  }
-
-  return responseData
-}
-
-const deleteCategoryApi = async (id: string): Promise<void> => {
-  const response = await fetch(`/api/categories/${id}`, {
-    method: 'DELETE',
-  })
-
-  if (!response.ok) {
-    const responseData = await response.json()
-    throw new Error(responseData.error || 'Failed to delete category')
-  }
-}
-
 export function CategoryProvider({ children }: { children: ReactNode }) {
-  const queryClient = useQueryClient()
-
   // Modal state
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
@@ -137,70 +87,25 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Use custom hook for data fetching
   const {
-    data: categories = [],
+    categories,
+    pagination,
     isLoading: loading,
     error,
     refetch: refetchCategories,
-  } = useQuery({
-    queryKey: categoryKeys.lists(),
-    queryFn: fetchCategories,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  })
-
-  const createCategoryMutation = useMutation({
-    mutationFn: createCategoryApi,
-    onSuccess: (newCategory) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) => [
-        newCategory,
-        ...oldCategories,
-      ])
-      toast.success('Category created successfully!')
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create category')
-    },
-  })
-
-  const updateCategoryMutation = useMutation({
-    mutationFn: updateCategoryApi,
-    onSuccess: (updatedCategory) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) =>
-        oldCategories.map((category) =>
-          category.id === updatedCategory.id ? updatedCategory : category
-        )
-      )
-      toast.success('Category updated successfully!')
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update category')
-    },
-  })
-
-  const deleteCategoryMutation = useMutation({
-    mutationFn: deleteCategoryApi,
-    onSuccess: (_, deletedId) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) =>
-        oldCategories.filter((category) => category.id !== deletedId)
-      )
-      toast.success('Category deleted successfully!')
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete category')
-    },
-  })
-
-  const createCategory = async (data: CategoryFormData) => {
-    await createCategoryMutation.mutateAsync(data)
-  }
-
-  const updateCategory = async (id: string, data: Partial<CategoryFormData>) => {
-    await updateCategoryMutation.mutateAsync({ id, data })
-  }
-
-  const deleteCategory = async (id: string) => {
-    await deleteCategoryMutation.mutateAsync(id)
-  }
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    isCreating,
+    isUpdating,
+    isDeleting
+  } = useCategories(currentPage, limit, searchTerm)
 
   // Modal actions
   const openViewModal = (category: Category) => {
@@ -247,7 +152,16 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         // Data
         categories,
         loading,
-        error: error ? (error as Error).message : null,
+        error: error ? error.message : null,
+        pagination,
+
+        // Pagination state
+        currentPage,
+        setCurrentPage,
+        limit,
+        setLimit,
+        searchTerm,
+        setSearchTerm,
 
         // Mutations
         createCategory,
@@ -255,9 +169,9 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         deleteCategory,
 
         // Loading states
-        isCreating: createCategoryMutation.isPending,
-        isUpdating: updateCategoryMutation.isPending,
-        isDeleting: deleteCategoryMutation.isPending,
+        isCreating,
+        isUpdating,
+        isDeleting,
 
         // Modal state
         selectedCategory,

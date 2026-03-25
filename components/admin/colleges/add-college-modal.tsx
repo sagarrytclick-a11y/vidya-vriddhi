@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState, useRef, useEffect } from 'react'
 import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
 import { CollegeFormData } from '@/types/college'
+import { toast } from 'sonner'
 
 interface AddCollegeModalProps {
   isOpen: boolean
@@ -206,7 +207,16 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSubmit(formData)
+    
+    try {
+      await onSubmit(formData)
+      const action = isEdit ? 'updated' : 'created'
+      toast.success(`College "${formData.name}" ${action} successfully`)
+      onClose()
+    } catch (error) {
+      console.error(`Failed to ${isEdit ? 'update' : 'create'} college:`, error)
+      toast.error(error instanceof Error ? error.message : `Failed to ${isEdit ? 'update' : 'create'} college`)
+    }
   }
 
   const handleInputChange = (field: keyof CollegeFormData, value: any) => {

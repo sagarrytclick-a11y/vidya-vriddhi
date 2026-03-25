@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface DeleteCollegeModalProps {
   isOpen: boolean
@@ -15,7 +16,15 @@ interface DeleteCollegeModalProps {
 export function DeleteCollegeModal({ isOpen, onClose, college, onDelete, isDeleting = false }: DeleteCollegeModalProps) {
   const handleDelete = async () => {
     if (!college) return
-    await onDelete(college.id)
+    
+    try {
+      await onDelete(college.id)
+      toast.success(`College "${college.name}" deleted successfully`)
+      onClose()
+    } catch (error) {
+      console.error('Failed to delete college:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to delete college')
+    }
   }
 
   if (!college) return null
