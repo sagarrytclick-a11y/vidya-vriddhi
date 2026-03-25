@@ -14,6 +14,20 @@ export interface UpdateCategoryData extends CreateCategoryData {
   id: string
 }
 
+export interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
+export interface CategoriesResponse {
+  categories: Category[]
+  pagination: PaginationInfo
+}
+
 // Query keys for consistent cache management
 export const categoryKeys = {
   all: ['categories'] as const,
@@ -24,8 +38,16 @@ export const categoryKeys = {
 }
 
 // API functions
-const fetchCategories = async (): Promise<Category[]> => {
-  const response = await fetch('/api/categories')
+const fetchCategories = async ({ queryKey }: { queryKey: readonly unknown[] }): Promise<CategoriesResponse> => {
+  const [, filters] = queryKey as [string, { page: number; limit: number; search: string }]
+  const { page = 1, limit = 10, search = '' } = filters
+  
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    search
+  })
+  const response = await fetch(`/api/categories?${params}`)
   if (!response.ok) {
     throw new Error('Failed to fetch categories')
   }
@@ -88,27 +110,44 @@ const deleteCategory = async (id: string): Promise<void> => {
   }
 }
 
-export function useCategories() {
+export function useCategories(page: number = 1, limit: number = 10, search: string = '') {
   const queryClient = useQueryClient()
 
   const {
-    data: categories = [],
+    data: categoriesData,
     isLoading: loading,
     error,
     refetch,
   } = useQuery({
-    queryKey: categoryKeys.lists(),
+    queryKey: categoryKeys.list({ page, limit, search }),
     queryFn: fetchCategories,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
+  const categories = categoriesData?.categories || []
+  const pagination = categoriesData?.pagination || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  }
+
   const createCategoryMutation = useMutation({
     mutationFn: createCategory,
     onSuccess: (newCategory) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) => [
-        newCategory,
-        ...oldCategories,
-      ])
+      queryClient.setQueryData(categoryKeys.list({ page, limit, search }), (oldData: CategoriesResponse | undefined) => {
+        if (!oldData) return oldData
+        return {
+          ...oldData,
+          categories: [newCategory, ...oldData.categories],
+          pagination: {
+            ...oldData.pagination,
+            total: oldData.pagination.total + 1
+          }
+        }
+      })
       toast.success('Category created successfully!')
     },
     onError: (error: Error) => {
@@ -119,11 +158,15 @@ export function useCategories() {
   const updateCategoryMutation = useMutation({
     mutationFn: updateCategory,
     onSuccess: (updatedCategory) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) =>
-        oldCategories.map((category) =>
-          category.id === updatedCategory.id ? updatedCategory : category
-        )
-      )
+      queryClient.setQueryData(categoryKeys.list({ page, limit, search }), (oldData: CategoriesResponse | undefined) => {
+        if (!oldData) return oldData
+        return {
+          ...oldData,
+          categories: oldData.categories.map((category) =>
+            category.id === updatedCategory.id ? updatedCategory : category
+          )
+        }
+      })
       toast.success('Category updated successfully!')
     },
     onError: (error: Error) => {
@@ -134,9 +177,17 @@ export function useCategories() {
   const deleteCategoryMutation = useMutation({
     mutationFn: deleteCategory,
     onSuccess: (_, deletedId) => {
-      queryClient.setQueryData(categoryKeys.lists(), (oldCategories: Category[] = []) =>
-        oldCategories.filter((category) => category.id !== deletedId)
-      )
+      queryClient.setQueryData(categoryKeys.list({ page, limit, search }), (oldData: CategoriesResponse | undefined) => {
+        if (!oldData) return oldData
+        return {
+          ...oldData,
+          categories: oldData.categories.filter((category) => category.id !== deletedId),
+          pagination: {
+            ...oldData.pagination,
+            total: oldData.pagination.total - 1
+          }
+        }
+      })
       toast.success('Category deleted successfully!')
     },
     onError: (error: Error) => {
@@ -147,6 +198,7 @@ export function useCategories() {
   return {
     // Data
     categories,
+    pagination,
     isLoading: loading,
     error,
 
