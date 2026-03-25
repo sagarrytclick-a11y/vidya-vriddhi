@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Prisma } from '@prisma/client'
 import { toast } from 'sonner'
 
 export interface City {
