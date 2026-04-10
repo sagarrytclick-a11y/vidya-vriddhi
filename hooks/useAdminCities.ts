@@ -98,7 +98,7 @@ async function deleteCity(id: string): Promise<void> {
   }
 }
 
-export function useCities() {
+export function useAdminCities() {
   const queryClient = useQueryClient()
 
   const {
@@ -172,7 +172,7 @@ export function useCities() {
 }
 
 // Hook for single city
-export function useCity(id: string) {
+export function useAdminCity(id: string) {
   return useQuery({
     queryKey: cityKeys.detail(id),
     queryFn: () => fetchCity(id),

@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { City } from '@/hook/useCities'
+import { City } from '@/hooks/useAdminCities'
 
 interface ViewCityModalProps {
   isOpen: boolean

@@ -7,8 +7,12 @@
   "build": "prisma generate && next build",
   "start": "next start",
   "lint": "next lint",
-  "postinstall": "prisma generate"
-} , 
+  "postinstall": "prisma generate",
+  "seed": "npx tsx prisma/seed.ts"
+},
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  } , 
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.0.0",
     "@hugeicons/react": "^1.1.6",

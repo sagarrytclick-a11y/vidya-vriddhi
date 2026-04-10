@@ -148,7 +148,7 @@ const deleteExam = async (id: string): Promise<void> => {
 }
 
 // Main hook
-export function useExams(search?: string) {
+export function useAdminExams(search?: string) {
   const queryClient = useQueryClient()
 
   // Fetch all exams
@@ -226,7 +226,7 @@ export function useExams(search?: string) {
 }
 
 // Hook for single exam
-export function useExam(id: string) {
+export function useAdminExam(id: string) {
   return useQuery({
     queryKey: examKeys.detail(id),
     queryFn: () => fetchExam(id),

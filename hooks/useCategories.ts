@@ -47,11 +47,26 @@ const fetchCategories = async ({ queryKey }: { queryKey: readonly unknown[] }): 
     limit: limit.toString(),
     search
   })
-  const response = await fetch(`/api/categories?${params}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch categories')
+  const url = `/api/categories?${params}`
+  console.log('🔄 Fetching categories from:', url)
+  
+  try {
+    const response = await fetch(url)
+    console.log('📡 Response status:', response.status, response.statusText)
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ Response not OK:', errorText)
+      throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    console.log('✅ API Response data:', data)
+    return data
+  } catch (err) {
+    console.error('❌ Fetch error:', err)
+    throw err
   }
-  return response.json()
 }
 
 const createCategory = async (categoryData: CreateCategoryData): Promise<Category> => {
@@ -122,7 +137,11 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
     queryKey: categoryKeys.list({ page, limit, search }),
     queryFn: fetchCategories,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: 'always',
+    retry: 3,
   })
+
+  console.log('useCategories Hook:', { categoriesData, loading, error, page, limit, search })
 
   const categories = categoriesData?.categories || []
   const pagination = categoriesData?.pagination || {

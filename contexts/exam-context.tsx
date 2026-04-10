@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useExams, ExamFormData } from '@/hook/useExams'
+import { useAdminExams, ExamFormData } from '@/hooks/useAdminExams'
 
 interface Exam {
   id: string
@@ -87,7 +87,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
     isUpdating,
     isDeleting,
     refetchExams,
-  } = useExams()
+  } = useAdminExams()
 
   // Modal state
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null)

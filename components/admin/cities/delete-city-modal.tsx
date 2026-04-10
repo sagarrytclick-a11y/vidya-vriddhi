@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useCityContext } from '@/contexts/city-context'
-import { City } from '@/hook/useCities'
+import { City } from '@/hooks/useAdminCities'
 
 interface DeleteCityModalProps {
   isOpen: boolean

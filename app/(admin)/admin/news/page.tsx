@@ -11,7 +11,7 @@ import { EditNewsModal } from '@/components/admin/news/edit-news-modal'
 import { DeleteNewsModal } from '@/components/admin/news/delete-news-modal'
 import { LoadingPage, LoadingTable } from '@/components/ui/loading'
 import { useNewsContext } from '@/contexts/news-context'
-import { News } from '@/hook/useNews'
+import { News } from '@/hooks/useAdminNews'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
 
 export default function NewsPage() {

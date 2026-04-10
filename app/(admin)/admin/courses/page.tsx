@@ -11,7 +11,7 @@ import { EditCourseModal } from '@/components/admin/courses/edit-course-modal'
 import { DeleteCourseModal } from '@/components/admin/courses/delete-course-modal'
 import { LoadingPage } from '@/components/ui/loading'
 import { useCourseContext } from '@/contexts/course-context'
-import { Course, CourseFormData } from '@/hook/useCourses'
+import { Course, CourseFormData } from '@/hooks/useAdminCourses'
 import { Search, Plus, Trash2, Eye, Edit, Building } from 'lucide-react'
 
 export default function CoursesPage() {

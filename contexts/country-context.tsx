@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useCountries } from '@/hook/useCountries'
-import { Country, CreateCountryData, UpdateCountryData } from '@/hook/useCountries'
+import { useAdminCountries } from '@/hooks/useAdminCountries'
+import { Country, CreateCountryData, UpdateCountryData } from '@/hooks/useAdminCountries'
 
 interface CountryContextType {
   // Data
@@ -60,7 +60,7 @@ export function CountryProvider({ children }: CountryProviderProps) {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useCountries()
+  } = useAdminCountries()
 
   // Modal state
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)

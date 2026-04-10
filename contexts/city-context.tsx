@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useCities } from '@/hook/useCities'
-import { City, CreateCityData, UpdateCityData } from '@/hook/useCities'
+import { useAdminCities } from '@/hooks/useAdminCities'
+import { City, CreateCityData, UpdateCityData } from '@/hooks/useAdminCities'
 
 interface CityContextType {
   // Data
@@ -60,7 +60,7 @@ export function CityProvider({ children }: CityProviderProps) {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useCities()
+  } = useAdminCities()
 
   // Modal state
   const [selectedCity, setSelectedCity] = useState<City | null>(null)

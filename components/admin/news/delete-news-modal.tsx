@@ -3,8 +3,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
-import { useNews } from '@/hook/useNews'
-import { News } from '@/hook/useNews'
+import { useAdminNews } from '@/hooks/useAdminNews'
+import { News } from '@/hooks/useAdminNews'
 
 interface DeleteNewsModalProps {
   isOpen: boolean
@@ -13,7 +13,7 @@ interface DeleteNewsModalProps {
 }
 
 export function DeleteNewsModal({ isOpen, onClose, news }: DeleteNewsModalProps) {
-  const { deleteNews, isDeleting } = useNews()
+  const { deleteNews, isDeleting } = useAdminNews()
 
   const handleDelete = async () => {
     if (!news) return

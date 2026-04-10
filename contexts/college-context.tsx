@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useColleges } from '@/hook/useColleges'
+import { useColleges } from '@/hooks/useColleges'
 import { College, CollegeFormData } from '@/types/college'
 
 interface CollegeContextType {

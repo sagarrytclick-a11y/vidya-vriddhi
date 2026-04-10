@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState } from 'react'
-import { CourseFormData } from '@/hook/useCourses'
+import { CourseFormData } from '@/hooks/useAdminCourses'
 import { generateSlug } from '@/lib/utils'
 
 interface AddCourseModalProps {

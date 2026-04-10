@@ -1,31 +1,32 @@
 'use client'
 
-import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
-import { useCategoryContext } from '@/contexts/category-context'
-import { Category } from '@/contexts/category-context'
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  active: boolean
+  categoryImageUrl: string | null
+  createdAt: string
+  updatedAt: string
+}
 
 interface DeleteCategoryModalProps {
   isOpen: boolean
   onClose: () => void
   category: Category | null
+  onDelete: () => void
+  isDeleting?: boolean
 }
 
-export function DeleteCategoryModal({ isOpen, onClose, category }: DeleteCategoryModalProps) {
-  const { deleteCategory, isDeleting } = useCategoryContext()
-
+export function DeleteCategoryModal({ isOpen, onClose, category, onDelete, isDeleting = false }: DeleteCategoryModalProps) {
   const handleDelete = async () => {
     if (!category) return
-
-    try {
-      await deleteCategory(category.id)
-      onClose()
-    } catch (error) {
-      console.error('Failed to delete category:', error)
-      // Error is already handled by the context with toast notification
-    }
+    onDelete()
   }
 
   if (!category) return null

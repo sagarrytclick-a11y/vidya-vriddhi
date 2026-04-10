@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useEffect, useRef } from 'react'
-import { useNews, News, NewsFormData } from '@/hook/useNews'
+import { useAdminNews, News, NewsFormData } from '@/hooks/useAdminNews'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
 
@@ -31,6 +31,7 @@ export function EditNewsModal({ isOpen, onClose, news, onUpdate, isUpdating = fa
   
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const { updateNews } = useAdminNews()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {

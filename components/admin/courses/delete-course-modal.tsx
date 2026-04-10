@@ -4,8 +4,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
-import { useCourses } from '@/hook/useCourses'
-import { Course } from '@/hook/useCourses'
+import { useAdminCourses } from '@/hooks/useAdminCourses'
+import { Course } from '@/hooks/useAdminCourses'
 
 interface DeleteCourseModalProps {
   isOpen: boolean
@@ -14,7 +14,7 @@ interface DeleteCourseModalProps {
 }
 
 export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModalProps) {
-  const { deleteCourse, isDeleting } = useCourses()
+  const { deleteCourse, isDeleting } = useAdminCourses()
 
   const handleDelete = async () => {
     if (!course) return

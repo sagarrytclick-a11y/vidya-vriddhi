@@ -105,7 +105,7 @@ const deleteCountry = async (id: string): Promise<void> => {
 export { createCountry, updateCountry, deleteCountry }
 
 // Custom hook
-export function useCountries() {
+export function useAdminCountries() {
   const queryClient = useQueryClient()
 
   // Fetch countries query

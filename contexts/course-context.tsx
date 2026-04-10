@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useCourses, Course, CourseFormData } from '@/hook/useCourses'
+import { useAdminCourses, Course, CourseFormData } from '@/hooks/useAdminCourses'
 
 interface CourseContextType {
   // Data
@@ -63,7 +63,7 @@ export function CourseProvider({ children }: CourseProviderProps) {
     isUpdating,
     isDeleting,
     refetchCourses,
-  } = useCourses()
+  } = useAdminCourses()
 
   // Modal state
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)

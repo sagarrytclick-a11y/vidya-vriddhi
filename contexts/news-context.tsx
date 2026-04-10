@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, ReactNode, useState } from 'react'
-import { useNews, News, NewsFormData } from '@/hook/useNews'
+import { useAdminNews, News, NewsFormData } from '@/hooks/useAdminNews'
 
 interface NewsContextType {
   // Data
@@ -63,7 +63,7 @@ export function NewsProvider({ children }: NewsProviderProps) {
     isUpdating,
     isDeleting,
     refetchNews,
-  } = useNews()
+  } = useAdminNews()
 
   // Modal state
   const [selectedNews, setSelectedNews] = useState<News | null>(null)

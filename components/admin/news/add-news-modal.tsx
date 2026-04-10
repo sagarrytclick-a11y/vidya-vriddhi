@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef } from 'react'
-import { useNews, NewsFormData } from '@/hook/useNews'
+import { useAdminNews, NewsFormData } from '@/hooks/useAdminNews'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -22,7 +22,7 @@ interface AddNewsModalProps {
 }
 
 export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
-  const { createNews, isCreating } = useNews()
+  const { createNews, isCreating } = useAdminNews()
   
   const [formData, setFormData] = useState<NewsFormData>({
     title: '',

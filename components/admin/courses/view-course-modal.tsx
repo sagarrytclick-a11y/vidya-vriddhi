@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Course } from '@/hook/useCourses'
+import { Course } from '@/hooks/useAdminCourses'
 import { Calendar, Eye, Building } from 'lucide-react'
 
 interface ViewCourseModalProps {

@@ -11,7 +11,7 @@ import { LoadingButton } from '@/components/ui/loading'
 import { useState, useEffect, useRef } from 'react'
 import { useCityContext } from '@/contexts/city-context'
 import { useCountryContext } from '@/contexts/country-context'
-import { City } from '@/hook/useCities'
+import { City } from '@/hooks/useAdminCities'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 
 interface EditCityModalProps {

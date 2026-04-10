@@ -92,7 +92,7 @@ const deleteNews = async (id: string): Promise<void> => {
 }
 
 // Main hook
-export function useNews() {
+export function useAdminNews() {
   const queryClient = useQueryClient()
 
   // Fetch all news
@@ -172,7 +172,7 @@ export function useNews() {
 }
 
 // Hook for single news item
-export function useNewsItem(id: string) {
+export function useAdminNewsItem(id: string) {
   return useQuery({
     queryKey: newsKeys.detail(id),
     queryFn: () => fetchNewsItem(id),

@@ -94,7 +94,7 @@ const deleteCourse = async (id: string): Promise<void> => {
 }
 
 // Main hook
-export function useCourses() {
+export function useAdminCourses() {
   const queryClient = useQueryClient()
 
   // Fetch all courses
@@ -174,7 +174,7 @@ export function useCourses() {
 }
 
 // Hook for single course
-export function useCourse(id: string) {
+export function useAdminCourse(id: string) {
   return useQuery({
     queryKey: courseKeys.detail(id),
     queryFn: () => fetchCourse(id),

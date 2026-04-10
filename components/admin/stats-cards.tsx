@@ -13,14 +13,14 @@ import {
   Newspaper,
   Loader2
 } from 'lucide-react'
-import { useColleges } from '@/hook/useColleges'
+import { useColleges } from '@/hooks/useColleges'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
 import { useCategoryContext } from '@/contexts/category-context'
-import { useCourses } from '@/hook/useCourses'
-import { useExams } from '@/hook/useExams'
+import { useAdminCourses } from '@/hooks/useAdminCourses'
+import { useAdminExams } from '@/hooks/useAdminExams'
 import { useBlogContext } from '@/contexts/blog-context'
-import { useNews } from '@/hook/useNews'
+import { useAdminNews } from '@/hooks/useAdminNews'
 
 interface StatCard {
   title: string
@@ -35,10 +35,10 @@ export function StatsCards() {
   const { countries, isLoading: countriesLoading } = useCountryContext()
   const { cities, isLoading: citiesLoading } = useCityContext()
   const { categories, loading: categoriesLoading } = useCategoryContext()
-  const { courses, isLoading: coursesLoading } = useCourses()
-  const { exams, isLoading: examsLoading } = useExams()
+  const { courses, isLoading: coursesLoading } = useAdminCourses()
+  const { exams, isLoading: examsLoading } = useAdminExams()
   const { blogs, loading: blogsLoading } = useBlogContext()
-  const { news, isLoading: newsLoading } = useNews()
+  const { news, isLoading: newsLoading } = useAdminNews()
 
   const statsData: StatCard[] = [
     {

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, ReactNode, useState } from 'react'
-import { useCategories, CreateCategoryData, UpdateCategoryData } from '@/hook/useCategories'
+import { useCategories, CreateCategoryData, UpdateCategoryData } from '@/hooks/useCategories'
 import { CategoryFormData } from '@/components/admin/categories/add-category-modal'
 
 export type { CategoryFormData }
@@ -106,6 +106,9 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
     isUpdating,
     isDeleting
   } = useCategories(currentPage, limit, searchTerm)
+
+  // Debug logging
+  console.log('CategoryContext Hook Data:', { categories, categoriesLength: categories?.length, loading, error, pagination })
 
   // Modal actions
   const openViewModal = (category: Category) => {

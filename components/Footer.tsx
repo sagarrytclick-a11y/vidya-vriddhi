@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ChevronUp, Facebook, Instagram, Twitter, Youtube, Linkedin, Rss, Mail, Phone, MapPin } from 'lucide-react'
-import { SITE_IDENTITY } from '@/app/site-identity'
+import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 
 const Footer = () => {
   const [showScrollTop, setShowScrollTop] = useState(false)

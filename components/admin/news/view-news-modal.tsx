@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { News } from '@/hook/useNews'
+import { News } from '@/hooks/useAdminNews'
 import { Calendar, Eye, Image as ImageIcon } from 'lucide-react'
 
 interface ViewNewsModalProps {

@@ -10,9 +10,6 @@ import { CourseProvider } from "@/contexts/course-context";
 import { NewsProvider } from "@/contexts/news-context";
 import { BlogProvider } from "@/contexts/blog-context";
 import { ExamProvider } from "@/contexts/exam-context";
-import FloatingActions from "@/components/FloatingActions";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -52,11 +49,7 @@ export default function RootLayout({
                   <CourseProvider>
                     <CountryProvider>
                       <CityProvider>
-                        <CategoryProvider>
-                          <Navbar />
-                          {children}
-                          <Footer/>
-                        </CategoryProvider>
+                        {children}
                       </CityProvider>
                     </CountryProvider>
                   </CourseProvider>
@@ -64,7 +57,6 @@ export default function RootLayout({
               </BlogProvider>
             </ExamProvider>
           </CategoryProvider>
-          <FloatingActions />
         </QueryProvider>
       </body>
     </html>

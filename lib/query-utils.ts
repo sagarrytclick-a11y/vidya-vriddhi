@@ -1,12 +1,12 @@
 import { QueryClient } from '@tanstack/react-query'
-import { collegeKeys } from '@/hook/useColleges'
-import { countryKeys } from '@/hook/useCountries'
-import { cityKeys } from '@/hook/useCities'
-import { categoryKeys } from '@/hook/useCategories'
-import { courseKeys } from '@/hook/useCourses'
-import { examKeys } from '@/hook/useExams'
-import { blogKeys } from '@/hook/useBlogs'
-import { newsKeys } from '@/hook/useNews'
+import { collegeKeys } from '@/hooks/useColleges'
+import { countryKeys } from '@/hooks/useAdminCountries'
+import { cityKeys } from '@/hooks/useAdminCities'
+import { categoryKeys } from '@/hooks/useCategories'
+import { courseKeys } from '@/hooks/useAdminCourses'
+import { examKeys } from '@/hooks/useAdminExams'
+import { blogKeys } from '@/hooks/useBlogs'
+import { newsKeys } from '@/hooks/useAdminNews'
 
 // Centralized query invalidation utilities
 export const queryInvalidation = {
