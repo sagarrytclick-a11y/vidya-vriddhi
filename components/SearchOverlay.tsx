@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Search, TrendingUp, X } from 'lucide-react'
+import { Search, TrendingUp, X, Building, FileText, Newspaper, BookOpen, ChevronRight } from 'lucide-react'
+import { useSearch } from '@/hooks/useSearch'
+import { useRouter } from 'next/navigation'
 
 interface SearchOverlayProps {
   isOpen: boolean
@@ -11,6 +13,10 @@ interface SearchOverlayProps {
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+
+  // Use search hook with debounced query
+  const { data: searchResults, isLoading } = useSearch(searchQuery, 10)
 
   const popularSearches = [
     { name: 'IIMA', category: 'College', trending: true },
@@ -51,10 +57,48 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen, onClose])
 
-  const handleItemClick = (item: string) => {
-    console.log('Searching for:', item)
-    // Add search logic here
+  const handleItemClick = (result: any) => {
+    // Navigate based on type
+    if (result.type === 'College') {
+      router.push(`/colleges/${result.slug}`)
+    } else if (result.type === 'Exam') {
+      router.push(`/exams/${result.slug}`)
+    } else if (result.type === 'News') {
+      router.push(`/news/${result.slug}`)
+    } else if (result.type === 'Course') {
+      router.push(`/courses/${result.slug}`)
+    }
     onClose()
+  }
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'College':
+        return Building
+      case 'Exam':
+        return FileText
+      case 'News':
+        return Newspaper
+      case 'Course':
+        return BookOpen
+      default:
+        return Search
+    }
+  }
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'College':
+        return 'bg-blue-100 text-blue-600'
+      case 'Exam':
+        return 'bg-green-100 text-green-600'
+      case 'News':
+        return 'bg-purple-100 text-purple-600'
+      case 'Course':
+        return 'bg-orange-100 text-orange-600'
+      default:
+        return 'bg-gray-100 text-gray-600'
+    }
   }
 
   if (!isOpen) return null
@@ -88,56 +132,125 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           />
         </div>
 
-        {/* Popular Searches */}
-        <div className="bg-gray-50 rounded-lg p-6">
-          <div className="flex items-center space-x-2 mb-6">
-            <TrendingUp className="w-6 h-6 text-orange-500" />
-            <h3 className="text-xl font-semibold text-gray-900">Popular Searches</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {popularSearches.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => handleItemClick(item.name)}
-                className="flex items-center justify-between p-4 text-left hover:bg-white rounded-lg transition-colors group border border-gray-200 hover:border-orange-300"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
-                  <div>
-                    <span className="text-gray-900 group-hover:text-orange-600 font-medium text-base">
-                      {item.name}
-                    </span>
-                    <span className="text-gray-500 text-sm ml-2 block">
-                      {item.category}
-                    </span>
-                  </div>
+        {/* Search Results */}
+        {searchQuery && (
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            {isLoading ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Searching...</p>
+              </div>
+            ) : searchResults && searchResults.length > 0 ? (
+              <div>
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                  <p className="text-sm text-gray-600">Found {searchResults.length} results</p>
                 </div>
-                {item.trending && (
-                  <span className="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">
-                    Trending
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+                <div className="divide-y divide-gray-100">
+                  {searchResults.map((result) => {
+                    const TypeIcon = getTypeIcon(result.type)
+                    const typeColor = getTypeColor(result.type)
 
-          {/* Quick Links */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex flex-wrap gap-4">
-              <span className="text-base text-gray-600 font-medium">Quick links:</span>
-              {['Engineering Colleges', 'MBA Colleges', 'Medical Colleges', 'Law Colleges'].map((link, index) => (
+                    return (
+                      <button
+                        key={result.id}
+                        onClick={() => handleItemClick(result)}
+                        className="w-full flex items-center space-x-4 p-4 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        {/* Image */}
+                        <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                          {result.image ? (
+                            <img
+                              src={result.image}
+                              alt={result.name}
+                              className="w-full h-full object-contain p-1"
+                            />
+                          ) : (
+                            <TypeIcon className="w-7 h-7 text-gray-400" />
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h4 className="text-base font-semibold text-gray-900 truncate">{result.name}</h4>
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${typeColor}`}>
+                              {result.type}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            {result.flag && <span>{result.flag}</span>}
+                            <span className="truncate">{result.additionalInfo}</span>
+                          </div>
+                        </div>
+
+                        {/* Arrow */}
+                        <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center">
+                <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600">No results found for "{searchQuery}"</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Popular Searches - Show only when no search query */}
+        {!searchQuery && (
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center space-x-2 mb-6">
+              <TrendingUp className="w-6 h-6 text-orange-500" />
+              <h3 className="text-xl font-semibold text-gray-900">Popular Searches</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {popularSearches.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => handleItemClick(link)}
-                  className="text-base text-orange-500 hover:text-orange-600 font-medium"
+                  onClick={() => setSearchQuery(item.name)}
+                  className="flex items-center justify-between p-4 text-left hover:bg-white rounded-lg transition-colors group border border-gray-200 hover:border-orange-300"
                 >
-                  {link}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                    <div>
+                      <span className="text-gray-900 group-hover:text-orange-600 font-medium text-base">
+                        {item.name}
+                      </span>
+                      <span className="text-gray-500 text-sm ml-2 block">
+                        {item.category}
+                      </span>
+                    </div>
+                  </div>
+                  {item.trending && (
+                    <span className="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">
+                      Trending
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
+
+            {/* Quick Links */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex flex-wrap gap-4">
+                <span className="text-base text-gray-600 font-medium">Quick links:</span>
+                {['Engineering Colleges', 'MBA Colleges', 'Medical Colleges', 'Law Colleges'].map((link, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSearchQuery(link)}
+                    className="text-base text-orange-500 hover:text-orange-600 font-medium"
+                  >
+                    {link}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

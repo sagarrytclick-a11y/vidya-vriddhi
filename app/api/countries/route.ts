@@ -11,11 +11,31 @@ const countrySchema = z.object({
   active: z.boolean().default(false)
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const excludeIndia = searchParams.get('excludeIndia') === 'true'
+    
+    const whereClause = excludeIndia ? {
+      NOT: {
+        name: {
+          equals: 'India',
+          mode: 'insensitive' as const
+        }
+      }
+    } : {}
+
     const countries = await db.country.findMany({
+      where: whereClause,
       orderBy: {
         createdAt: 'desc'
+      },
+      include: {
+        _count: {
+          select: {
+            colleges: true
+          }
+        }
       }
     })
 

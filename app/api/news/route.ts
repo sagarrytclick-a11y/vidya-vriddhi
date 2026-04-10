@@ -10,9 +10,13 @@ const createNewsSchema = z.object({
   active: z.boolean().default(false),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '10')
+
     const news = await db.news.findMany({
+      take: limit,
       orderBy: {
         createdAt: 'desc',
       },

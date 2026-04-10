@@ -12,9 +12,13 @@ const createCitySchema = z.object({
   countryId: z.string().min(1, 'Country ID is required'),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '10')
+    
     const cities = await db.city.findMany({
+      take: limit,
       include: {
         country: {
           select: {
@@ -24,6 +28,11 @@ export async function GET() {
             flagEmoji: true,
           },
         },
+        _count: {
+          select: {
+            colleges: true
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc',

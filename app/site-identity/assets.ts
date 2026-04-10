@@ -6,7 +6,7 @@ export const SITE_ASSETS = {
   logo: {
     main: "/logo.png",
     favicon: "/logo.png",
-    appleTouchIcon: "/logo.png",
+    appleTouchIcon: "/apple-touch-icon.png",
   },
 
   // PWA icons

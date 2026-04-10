@@ -10,6 +10,9 @@ import { CourseProvider } from "@/contexts/course-context";
 import { NewsProvider } from "@/contexts/news-context";
 import { BlogProvider } from "@/contexts/blog-context";
 import { ExamProvider } from "@/contexts/exam-context";
+import FloatingActions from "@/components/FloatingActions";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -24,7 +27,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vidya Vridhi",
+  title: "Vidya Vridhi - Get Your College",
   description: "Get Your College",
   icons: {
     icon: '/logo.png'
@@ -50,7 +53,9 @@ export default function RootLayout({
                     <CountryProvider>
                       <CityProvider>
                         <CategoryProvider>
+                          <Navbar />
                           {children}
+                          <Footer/>
                         </CategoryProvider>
                       </CityProvider>
                     </CountryProvider>
@@ -59,6 +64,7 @@ export default function RootLayout({
               </BlogProvider>
             </ExamProvider>
           </CategoryProvider>
+          <FloatingActions />
         </QueryProvider>
       </body>
     </html>

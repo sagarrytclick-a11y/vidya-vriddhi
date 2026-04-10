@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
+    const limit = parseInt(searchParams.get('limit') || '10')
     
     const exams = await db.exam.findMany({
       where: {
@@ -64,8 +65,22 @@ export async function GET(request: NextRequest) {
         ]
       },
       orderBy: { createdAt: 'desc' },
-      include: {
-        colleges: true
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        shortName: true,
+        description: true,
+        conductingBody: true,
+        examMode: true,
+        examType: true,
+        frequency: true,
+        active: true,
+        examImageurl: true,
+        examDates: true,
+        createdAt: true,
+        updatedAt: true
       }
     })
 

@@ -9,17 +9,26 @@ const createCourseSchema = z.object({
   active: z.boolean().default(false),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '20')
+    
     const courses = await db.course.findMany({
       orderBy: {
         createdAt: 'desc',
       },
+      take: limit,
       include: {
         colleges: {
           select: {
             id: true,
             name: true,
+          }
+        },
+        _count: {
+          select: {
+            colleges: true
           }
         }
       }

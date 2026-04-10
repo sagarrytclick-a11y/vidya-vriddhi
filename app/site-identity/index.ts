@@ -35,6 +35,7 @@ export interface SiteIdentity {
       linkedin: string;
       facebook?: string;
       twitter?: string;
+      youtube?: string;
     };
   };
   assets: {
@@ -63,10 +64,10 @@ export interface SiteIdentity {
 }
 
 export const SITE_IDENTITY: SiteIdentity = {
-  name: "Vidya Vriddhi",
-  shortName: "Vidya Vriddhi",
-  description: "Empowering students with personalized guidance for academic and career success",
-  tagline: "Top-Ranked University for Global Career Success",
+  name: "VidyaVriddhi",
+  shortName: "VidyaVriddhi",
+  description: "Comprehensive education services and college guidance for international students",
+  tagline: "Get Your College",
   domain: "vidyavriddhi.com",
   brand: {
     primaryColor: "#ea580c", // Orange color from manifest
@@ -76,44 +77,41 @@ export const SITE_IDENTITY: SiteIdentity = {
   contact: {
     phone: {
       display: "+91-9839865347",
-      raw: "+919839865347",
-      additional: ["+91-9839865347", "+91-9839865347"]
+      raw: "+91-9569985339",
+      additional: ["+91-9839865347", "+91-9569985339"]
     },
     email: {
-      support: "Abhishek@vidyavriddhi.com",
-      admissions: "Abhishek@vidyavriddhi.com",
+      support: "support@vidyavriddhi.com",
+      admissions: "admissions@vidyavriddhi.com",
       general: "Abhishek@vidyavriddhi.com",
     },
     address: {
       office: "S0-1, Geniefolks Building (2nd Floor), Block A, Plot No. A-28, Sector 4, Noida, Uttar Pradesh - 201301",
       city: "Noida",
-      country: "Uttar Pradesh",
+      country: "Uttar Pradesh 201301",
       mapLink: "https://goo.gl/maps/example",
     },
     socials: {
-      whatsapp: "https://wa.me/9625271104",
-      instagram: "https://instagram.com/admissioncampus",
-      linkedin: "https://linkedin.com/company/admissioncampus",
+      whatsapp: "https://wa.me/919839865347",
+      instagram: "https://www.instagram.com/vidyavriddhi?igsh=N3NoeGRlOG4ycTB6",
+      linkedin: "https://www.linkedin.com/company/vidya-vriddhi/posts/?feedView=all",
+      youtube: "https://youtube.com/@vidyavriddhi-u6y?si=D6bIbwNliMCbOGtW"
     },
   },
   assets: SITE_ASSETS,
   meta: {
-    title: "Admission Campus - Your Gateway to Top Indian Universities",
-    description: "Comprehensive admission guidance for Indian universities and colleges. Expert counseling, entrance exam preparation, and career guidance for Indian students.",
+    title: "VidyaVriddhi - Get Your College",
+    description: "Comprehensive education services and college guidance for international students. Expert counseling, university admissions, and career guidance.",
     keywords: [
-      "admission guidance",
-      "Indian universities",
-      "college admissions",
-      "entrance exams",
-      "JEE preparation",
-      "NEET guidance",
-      "IIT admissions",
-      "medical colleges",
-      "engineering colleges",
+      "education",
+      "college guidance",
+      "university admissions",
+      "international students",
       "career counseling",
-      "admission campus"
+      "study abroad",
+      "education services"
     ],
-    author: "Admission Campus",
+    author: "VidyaVriddhi",
     ogImage: "/logo.png",
   },
   business: {
@@ -122,10 +120,9 @@ export const SITE_IDENTITY: SiteIdentity = {
     services: [
       "College Guidance",
       "University Admissions",
-      "Entrance Exam Preparation",
       "Career Counseling",
-      "Indian Education Support",
-      "Admission Consulting"
+      "Study Abroad Support",
+      "Educational Consulting"
     ],
   },
 };

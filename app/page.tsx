@@ -12,16 +12,18 @@ import WhyChooseUs from '@/components/WhyChooseUs'
 import Testimonials from '@/components/Testimonials'
 import FAQ from '@/components/FAQ'
 import LatestNewsStories from '@/components/LatestNewsStories'
+import CollegeListing from '@/components/CollegeListing'
 
 const page = () => {
   return (
-    <div className='h-full w-screen relative '>
-      <Navbar />
+    <div className='h-full w-full relative overflow-x-hidden'>
+
       <Hero />
       <ExplorePrograms />
       <TopColleges/>
       <UpcomingExams />
       <TopCourses />
+      <CollegeListing/>
       <TopStudyPlaces />
       <StudyAbroad />
       <Services />
@@ -29,7 +31,7 @@ const page = () => {
       <Testimonials />
       <FAQ />
       <LatestNewsStories />
-      <Footer />
+  
     </div>
   )
 }

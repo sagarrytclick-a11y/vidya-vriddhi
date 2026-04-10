@@ -1,83 +1,66 @@
 'use client'
 
 import React from 'react'
-import { ChevronLeft, ChevronRight, MapPin, ArrowRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building } from 'lucide-react'
+import { useCities } from '@/hooks/useCities'
 
-interface CityCardProps {
+interface City {
+  id: string
   name: string
-  icon: React.ReactNode
-  collegesCount: number
+  slug: string
+  cityImageURL: string | null
+  country: {
+    flagEmoji: string | null
+  }
+  _count: {
+    colleges: number
+  }
 }
 
-const CityCard: React.FC<CityCardProps> = ({ name, icon, collegesCount }) => {
+interface CityCardProps {
+  city: City
+}
+
+const CityCard: React.FC<CityCardProps> = ({ city }) => {
   return (
-    <div className="shrink-0 w-40 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all hover:scale-105 cursor-pointer group">
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 group-hover:bg-orange-100 transition-colors">
-          {icon}
+    <div className="shrink-0 w-44 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
+      {/* Image/Icon Banner */}
+      <div className="h-32 bg-gradient-to-br from-orange-100 via-orange-50 to-blue-50 relative overflow-hidden">
+        {city.cityImageURL ? (
+          <img
+            src={city.cityImageURL}
+            alt={city.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+              <MapPin className="w-8 h-8" />
+            </div>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+      </div>
+      
+      {/* Content */}
+      <div className="p-4 text-center">
+        <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors line-clamp-1">{city.name}</h3>
+        <div className="flex items-center justify-center gap-1.5 text-sm text-gray-600">
+          <Building className="w-3.5 h-3.5 text-orange-500" />
+          <span className="font-medium">{city._count.colleges}</span>
+          <span className="text-gray-400">Colleges</span>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{name}</h3>
-          <p className="text-sm text-gray-600">{collegesCount} Colleges</p>
-        </div>
+        {city.country.flagEmoji && (
+          <div className="mt-2 text-2xl">{city.country.flagEmoji}</div>
+        )}
       </div>
     </div>
   )
 }
 
 const TopStudyPlaces: React.FC = () => {
-  const cities = [
-    {
-      name: 'Delhi NCR',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 856
-    },
-    {
-      name: 'Bangalore',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 623
-    },
-    {
-      name: 'Hyderabad',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 445
-    },
-    {
-      name: 'Pune',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 389
-    },
-    {
-      name: 'Mumbai',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 367
-    },
-    {
-      name: 'Chennai',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 298
-    },
-    {
-      name: 'Kolkata',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 276
-    },
-    {
-      name: 'Jaipur',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 234
-    },
-    {
-      name: 'Lucknow',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 198
-    },
-    {
-      name: 'Ahmedabad',
-      icon: <MapPin className="w-8 h-8" />,
-      collegesCount: 187
-    }
-  ]
+  // Fetch cities using custom hook
+  const { data: cities, isLoading, error } = useCities(10)
 
   const scrollLeft = () => {
     const element = document.getElementById('cities-scroll-container')
@@ -104,33 +87,60 @@ const TopStudyPlaces: React.FC = () => {
           </button>
         </div>
 
-        {/* Cities Horizontal Scroll */}
-        <div className="relative">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={scrollLeft}
-              className="p-2 rounded-full bg-white shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <div
-              id="cities-scroll-container"
-              className="flex space-x-4 overflow-x-auto pb-4 scroll-smooth flex-1"
-            >
-              {cities.map((city, index) => (
-                <CityCard key={index} {...city} />
-              ))}
-            </div>
-            
-            <button
-              onClick={scrollRight}
-              className="p-2 rounded-full bg-white shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
-            >
-              <ChevronRight className="w-5 h-5 text-gray-600" />
-            </button>
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
           </div>
-        </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
+            <MapIcon className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+            <p className="text-gray-700 font-medium">Unable to load cities</p>
+            <p className="text-gray-500 text-sm mt-1">Please try again later</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && cities && cities.length === 0 && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+            <MapIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-700 font-medium">No cities found</p>
+            <p className="text-gray-500 text-sm mt-1">Cities will appear here once added to the database</p>
+          </div>
+        )}
+
+        {/* Cities Horizontal Scroll */}
+        {!isLoading && !error && cities && cities.length > 0 && (
+          <div className="relative">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={scrollLeft}
+                className="p-3 rounded-full bg-white shadow-lg border border-gray-200 hover:bg-gray-50 hover:shadow-xl transition-all"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-700" />
+              </button>
+              
+              <div
+                id="cities-scroll-container"
+                className="flex space-x-6 overflow-x-auto pb-6 scroll-smooth flex-1"
+              >
+                {cities.map((city) => (
+                  <CityCard key={city.id} city={city} />
+                ))}
+              </div>
+              
+              <button
+                onClick={scrollRight}
+                className="p-3 rounded-full bg-white shadow-lg border border-gray-200 hover:bg-gray-50 hover:shadow-xl transition-all"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-700" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
