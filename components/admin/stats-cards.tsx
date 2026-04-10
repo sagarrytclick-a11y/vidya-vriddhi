@@ -16,7 +16,7 @@ import {
 import { useColleges } from '@/hooks/useColleges'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
-import { useCategoryContext } from '@/contexts/category-context'
+import { useCategoryCount } from '@/hooks/useCategories'
 import { useAdminCourses } from '@/hooks/useAdminCourses'
 import { useAdminExams } from '@/hooks/useAdminExams'
 import { useBlogContext } from '@/contexts/blog-context'
@@ -34,7 +34,7 @@ export function StatsCards() {
   const { colleges, isLoading: collegesLoading } = useColleges()
   const { countries, isLoading: countriesLoading } = useCountryContext()
   const { cities, isLoading: citiesLoading } = useCityContext()
-  const { categories, loading: categoriesLoading } = useCategoryContext()
+  const { count: categoryCount, isLoading: categoriesLoading } = useCategoryCount()
   const { courses, isLoading: coursesLoading } = useAdminCourses()
   const { exams, isLoading: examsLoading } = useAdminExams()
   const { blogs, loading: blogsLoading } = useBlogContext()
@@ -78,7 +78,7 @@ export function StatsCards() {
     },
     {
       title: 'Categories',
-      value: categories.length,
+      value: categoryCount,
       description: 'Content categories',
       icon: Folder,
       color: 'text-pink-400'

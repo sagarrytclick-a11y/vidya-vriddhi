@@ -35,6 +35,7 @@ export const categoryKeys = {
   list: (filters: Record<string, unknown>) => [...categoryKeys.lists(), filters] as const,
   details: () => [...categoryKeys.all, 'detail'] as const,
   detail: (id: string) => [...categoryKeys.details(), id] as const,
+  count: () => [...categoryKeys.all, 'count'] as const,
 }
 
 // API functions
@@ -123,6 +124,18 @@ const deleteCategory = async (id: string): Promise<void> => {
   if (!response.ok) {
     throw new Error(data.error || 'Failed to delete category')
   }
+}
+
+const fetchCategoryCount = async (): Promise<number> => {
+  const url = '/api/categories?page=1&limit=1'
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch category count: ${response.status}`)
+  }
+
+  const data = await response.json()
+  return data.pagination?.total || 0
 }
 
 export function useCategories(page: number = 1, limit: number = 10, search: string = '') {
@@ -235,3 +248,24 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
     isDeleting: deleteCategoryMutation.isPending,
   }
 }
+
+export function useCategoryCount() {
+  const {
+    data: count,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: categoryKeys.count(),
+    queryFn: fetchCategoryCount,
+    staleTime: 5 * 60 * 1000, // 5  minutes
+    refetchOnMount: 'always',
+    retry: 3,
+  })
+
+  return {
+    count: count || 0,
+    isLoading,
+    error,
+  }
+}
+

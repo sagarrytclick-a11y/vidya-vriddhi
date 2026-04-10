@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,90 +14,143 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-
-// Types
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  active: boolean
-  categoryImageUrl: string | null
-  createdAt: string
-}
-
-interface PaginationInfo {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNext: boolean
-  hasPrev: boolean
-}
-
-// Simple fetch function
-const fetchCategories = async (page: number, limit: number, search: string) => {
-  const params = new URLSearchParams({ page: String(page), limit: String(limit), search })
-  const res = await fetch(`/api/admin/categories?${params}`)
-  if (!res.ok) throw new Error('Failed to fetch')
-  return res.json()
-}
+import { useAdminCategories, Category, CreateCategoryData, UpdateCategoryData } from '@/hooks/useAdminCategories'
 
 // Add Category Modal
-function AddCategoryModal({ isOpen, onClose, onSuccess }: { isOpen: boolean; onClose: () => void; onSuccess: () => void }) {
+function AddCategoryModal({ isOpen, onClose, onSuccess, createCategory, isCreating }: { isOpen: boolean; onClose: () => void; onSuccess: () => void; createCategory: (data: CreateCategoryData) => Promise<Category>; isCreating: boolean }) {
   const [formData, setFormData] = useState({ name: '', slug: '', description: '', categoryImageUrl: '', active: true })
-  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData
+      })
+
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      setFormData(prev => ({ ...prev, categoryImageUrl: data.url }))
+      toast.success('Image uploaded!')
+    } catch (err) {
+      toast.error('Failed to upload image')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleImageUpload(file)
+  }
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, categoryImageUrl: '' }))
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.slug) return
-    setLoading(true)
     try {
-      const res = await fetch('/api/admin/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      if (!res.ok) throw new Error('Failed to create')
-      toast.success('Category created!')
+      await createCategory(formData)
       onSuccess()
       onClose()
       setFormData({ name: '', slug: '', description: '', categoryImageUrl: '', active: true })
     } catch (err) {
-      toast.error('Failed to create category')
-    } finally {
-      setLoading(false)
+      // Error is handled by the hook
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white">
+      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
         <DialogHeader><DialogTitle>Add Category</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label>Name</Label>
-            <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })} className="bg-slate-700 border-slate-600" required />
-          </div>
-          <div>
-            <Label>Slug</Label>
-            <Input value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="bg-slate-700 border-slate-600" required />
-          </div>
-          <div>
-            <Label>Description</Label>
-            <Textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="bg-slate-700 border-slate-600" rows={3} />
-          </div>
-          <div>
-            <Label>Image URL</Label>
-            <Input value={formData.categoryImageUrl} onChange={e => setFormData({ ...formData, categoryImageUrl: e.target.value })} className="bg-slate-700 border-slate-600" placeholder="https://..." />
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox checked={formData.active} onCheckedChange={checked => setFormData({ ...formData, active: checked as boolean })} />
-            <Label>Active</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <Label>Name</Label>
+              <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })} className="bg-slate-700 border-slate-600" required />
+            </div>
+            <div className="col-span-2">
+              <Label>Slug</Label>
+              <Input value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="bg-slate-700 border-slate-600" required />
+            </div>
+            <div className="col-span-2">
+              <Label>Description</Label>
+              <Textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="bg-slate-700 border-slate-600" rows={3} />
+            </div>
+            <div className="col-span-2">
+              <Label>Category Image</Label>
+              <div className="space-y-3">
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-slate-600 rounded-lg p-4">
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" id="addCategoryImageUpload" />
+                  <label htmlFor="addCategoryImageUpload" className="flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700/50 transition-colors">
+                    {uploading ? (
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <div className="animate-spin h-5 w-5 border-2 border-slate-400 border-t-transparent rounded-full" />
+                        Uploading...
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                        <span className="text-sm text-slate-300">Click to upload image</span>
+                        <span className="text-xs text-slate-500 mt-1">PNG, JPG, GIF up to 5MB</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+
+                {/* Image Preview */}
+                {formData.categoryImageUrl && (
+                  <div className="relative group">
+                    <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
+                      <img src={formData.categoryImageUrl} alt="Category" className="w-16 h-16 object-cover rounded" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white truncate">{formData.categoryImageUrl}</p>
+                        <p className="text-xs text-slate-400">Image uploaded</p>
+                      </div>
+                      <button type="button" onClick={removeImage} className="p-1 text-slate-400 hover:text-red-400 transition-colors">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Or enter URL manually */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-slate-600"></div>
+                  <span className="text-xs text-slate-400">OR</span>
+                  <div className="flex-1 h-px bg-slate-600"></div>
+                </div>
+                <Input type="url" value={formData.categoryImageUrl} onChange={e => setFormData({ ...formData, categoryImageUrl: e.target.value })} className="bg-slate-700 border-slate-600" placeholder="https://example.com/image.jpg" />
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="flex items-center gap-2">
+                <Checkbox checked={formData.active} onCheckedChange={checked => setFormData({ ...formData, active: checked as boolean })} />
+                <Label>Active</Label>
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create'}</Button>
+            <Button type="submit" disabled={isCreating}>{isCreating ? 'Creating...' : 'Create'}</Button>
           </div>
         </form>
       </DialogContent>
@@ -106,9 +159,8 @@ function AddCategoryModal({ isOpen, onClose, onSuccess }: { isOpen: boolean; onC
 }
 
 // Edit Category Modal with Image Upload
-function EditCategoryModal({ isOpen, onClose, category, onSuccess }: { isOpen: boolean; onClose: () => void; category: Category | null; onSuccess: () => void }) {
+function EditCategoryModal({ isOpen, onClose, category, onSuccess, updateCategory, isUpdating }: { isOpen: boolean; onClose: () => void; category: Category | null; onSuccess: () => void; updateCategory: (data: UpdateCategoryData) => Promise<Category>; isUpdating: boolean }) {
   const [formData, setFormData] = useState({ name: '', slug: '', description: '', categoryImageUrl: '', active: true })
-  const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -168,21 +220,12 @@ function EditCategoryModal({ isOpen, onClose, category, onSuccess }: { isOpen: b
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!category) return
-    setLoading(true)
     try {
-      const res = await fetch(`/api/admin/categories/${category.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      if (!res.ok) throw new Error('Failed to update')
-      toast.success('Category updated!')
+      await updateCategory({ id: category.id, ...formData })
       onSuccess()
       onClose()
     } catch (err) {
-      toast.error('Failed to update category')
-    } finally {
-      setLoading(false)
+      // Error is handled by the hook
     }
   }
 
@@ -262,7 +305,7 @@ function EditCategoryModal({ isOpen, onClose, category, onSuccess }: { isOpen: b
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={loading}>{loading ? 'Updating...' : 'Update'}</Button>
+            <Button type="submit" disabled={isUpdating}>{isUpdating ? 'Updating...' : 'Update'}</Button>
           </div>
         </form>
       </DialogContent>
@@ -312,11 +355,6 @@ function DeleteCategoryModal({ isOpen, onClose, category, onConfirm, loading }: 
 
 // Main Page
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [pagination, setPagination] = useState<PaginationInfo>({
-    page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false
-  })
-  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [search, setSearch] = useState('')
@@ -326,39 +364,71 @@ export default function CategoriesPage() {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isViewOpen, setIsViewOpen] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const loadCategories = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await fetchCategories(page, limit, search)
-      setCategories(data.categories || [])
-      setPagination(data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false })
-    } catch (err) {
-      toast.error('Failed to load categories')
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }, [page, limit, search])
+  const { categories, pagination, isLoading, refetch } = useAdminCategories(page, limit, search)
 
-  useEffect(() => {
-    loadCategories()
-  }, [loadCategories])
+  console.log('📋 [Page] Categories data:', { categories, categoriesLength: categories.length, pagination, isLoading, page, limit, search })
 
   const handleDelete = async () => {
     if (!selectedCategory) return
-    setDeleteLoading(true)
+    setIsDeleting(true)
     try {
-      const res = await fetch(`/api/admin/categories/${selectedCategory.id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to delete')
+      const response = await fetch(`/api/categories/${selectedCategory.id}`, {
+        method: 'DELETE'
+      })
+      if (!response.ok) throw new Error('Failed to delete')
       toast.success('Category deleted')
       setIsDeleteOpen(false)
-      loadCategories()
+      refetch()
     } catch (err) {
       toast.error('Failed to delete category')
     } finally {
-      setDeleteLoading(false)
+      setIsDeleting(false)
+    }
+  }
+
+  const handleCreateCategory = async (data: CreateCategoryData): Promise<Category> => {
+    setIsCreating(true)
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Failed to create')
+      toast.success('Category created!')
+      refetch()
+      return result
+    } catch (err) {
+      toast.error('Failed to create category')
+      throw err
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  const handleUpdateCategory = async (data: UpdateCategoryData): Promise<Category> => {
+    setIsUpdating(true)
+    try {
+      const response = await fetch(`/api/categories/${data.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Failed to update')
+      toast.success('Category updated!')
+      refetch()
+      return result
+    } catch (err) {
+      toast.error('Failed to update category')
+      throw err
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -393,7 +463,7 @@ export default function CategoriesPage() {
             <CardTitle className="text-white">All Categories</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {isLoading ? (
               <LoadingTable text="Loading categories..." />
             ) : categories.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
@@ -471,10 +541,10 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-        <AddCategoryModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSuccess={loadCategories} />
+        <AddCategoryModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSuccess={refetch} createCategory={handleCreateCategory} isCreating={isCreating} />
         <ViewCategoryModal isOpen={isViewOpen} onClose={() => setIsViewOpen(false)} category={selectedCategory} />
-        <EditCategoryModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} category={selectedCategory} onSuccess={loadCategories} />
-        <DeleteCategoryModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} category={selectedCategory} onConfirm={handleDelete} loading={deleteLoading} />
+        <EditCategoryModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} category={selectedCategory} onSuccess={refetch} updateCategory={handleUpdateCategory} isUpdating={isUpdating} />
+        <DeleteCategoryModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} category={selectedCategory} onConfirm={handleDelete} loading={isDeleting} />
       </div>
     </AdminLayout>
   )
