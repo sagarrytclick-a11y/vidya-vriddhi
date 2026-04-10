@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Check if the path is an admin route
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/admin/dashboard')) {
     // Skip middleware for login page itself
     if (pathname === '/admin/login') {
       return NextResponse.next()
@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
 
     // If no token or invalid token, redirect to login
     if (!token || !verifyAuthToken(token)) {
-      const loginUrl = new URL('/admin/login', request.url)
+      const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
     }

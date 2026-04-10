@@ -9,10 +9,10 @@ import TopStudyPlaces from '@/components/TopStudyPlaces'
 import StudyAbroad from '@/components/StudyAbroad'
 import Services from '@/components/Services'
 import WhyChooseUs from '@/components/WhyChooseUs'
-import Testimonials from '@/components/Testimonials'
 import FAQ from '@/components/FAQ'
 import LatestNewsStories from '@/components/LatestNewsStories'
 import CollegeListing from '@/components/CollegeListing'
+import { InfiniteMovingCardsDemo } from '@/components/MovingCards'
 
 const page = () => {
   return (
@@ -28,7 +28,7 @@ const page = () => {
       <StudyAbroad />
       <Services />
       <WhyChooseUs />
-      <Testimonials />
+      <InfiniteMovingCardsDemo />
       <FAQ />
       <LatestNewsStories />
   
