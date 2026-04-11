@@ -77,13 +77,6 @@ const fetchBlogs = async (): Promise<Blog[]> => {
   return response.json()
 }
 
-const fetchBlog = async (id: string): Promise<Blog> => {
-  const response = await fetch(`/api/blogs/${id}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch blog')
-  }
-  return response.json()
-}
 
 const createBlog = async (data: BlogFormData): Promise<Blog> => {
   const response = await fetch('/api/blogs', {

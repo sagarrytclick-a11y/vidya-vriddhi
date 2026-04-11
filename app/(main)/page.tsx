@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 import Hero from '@/components/Hero'
 import ExplorePrograms from '@/components/ExplorePrograms'
 import TopColleges from '@/components/TopColleges'

@@ -51,72 +51,65 @@ const CollegeListing: React.FC = () => {
 
         {/* Grid */}
         {!isLoading && !error && colleges.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {colleges.map((college) => (
               <div
                 key={college.id}
                 onClick={() => handleCollegeClick(college.slug)}
-                className="group cursor-pointer bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:border-orange-200 transition-all duration-500 hover:-translate-y-2 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-12px_rgba(249,115,22,0.15)]"
+                className="group cursor-pointer bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-lg"
               >
-                {/* Image Header Area */}
-                <div className="relative h-52 w-full overflow-hidden">
+                {/* Campus Image */}
+                <div className="relative h-48 w-full overflow-hidden">
                   <img
                     src={college.imageURL || 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop'} 
                     alt="Campus"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  {/* Soft Gradient Overlay for text readability on top images */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/10" />
-                  
-                  {/* Floating Rank Badge */}
                   {college.Countryranking && (
-                    <div className="absolute top-4 left-4 backdrop-blur-md bg-orange-600/90 text-white px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg">
-                      <Award className="w-3.5 h-3.5" />
-                      RANK #{college.Countryranking}
+                    <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Award className="w-3 h-3" />
+                      Rank #{college.Countryranking}
                     </div>
                   )}
                 </div>
 
-                {/* Content Body */}
-                <div className="p-8 pt-0 relative">
-                  {/* Logo Overlay - White theme with clean border */}
-                  <div className="relative -mt-12 mb-5 inline-block">
-                    <div className="w-24 h-24 rounded-2xl bg-white border-4 border-white p-3 shadow-xl overflow-hidden group-hover:border-orange-50 transition-colors">
+                {/* Content */}
+                <div className="p-5">
+                  {/* Logo and Name */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-14 h-14 rounded-lg bg-gray-50 p-2 border border-gray-100 shrink-0">
                       <img
                         src={college.logoURL || '/placeholder-logo.png'}
                         alt={college.name}
                         className="w-full h-full object-contain"
                       />
                     </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2">
+                        {college.name}
+                      </h3>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-orange-500" />
+                          {college.city?.name}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Globe className="w-3.5 h-3.5 text-gray-400" />
+                          {college.country?.name}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                    {college.name}
-                  </h3>
-
-                  <div className="flex flex-wrap items-center gap-4 mb-5">
-                    <div className="flex items-center text-gray-500 text-sm bg-gray-50 px-3 py-1 rounded-lg">
-                      <MapPin className="w-4 h-4 mr-1.5 text-orange-500" />
-                      {college.city?.name}
-                    </div>
-                    <div className="flex items-center text-gray-500 text-sm bg-gray-50 px-3 py-1 rounded-lg">
-                      <Globe className="w-4 h-4 mr-1.5 text-orange-400" />
-                      {college.country?.name}
-                    </div>
-                  </div>
-
-                  <p className="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3">
-                    {college.description || "A premier global institution recognized for excellence in academic research, innovative teaching methods, and strong industry placements."}
+                  {/* Description */}
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4">
+                    {college.description || "A premier institution recognized for academic excellence and strong industry placements."}
                   </p>
 
-                  {/* Footer Action - Clean and Minimal */}
-                  <div className="flex items-center justify-between pt-5 border-t border-gray-50">
-                    <span className="text-sm font-bold text-gray-400 group-hover:text-orange-600 transition-colors uppercase tracking-wider">
-                      Explore Campus
-                    </span>
-                    <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center group-hover:bg-orange-500 transition-all duration-300">
-                      <ChevronRight className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
-                    </div>
+                  {/* View Button */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <span className="text-sm font-medium text-gray-500">View Details</span>
+                    <ChevronRight className="w-5 h-5 text-orange-500 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </div>
