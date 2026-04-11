@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen } from 'lucide-react'
+import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
 
 interface Course {
@@ -74,7 +74,7 @@ const TopCourses: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900">Top Courses</h2>
           <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
             <span>View all courses</span>
-            <ArrowRight className="w-5 h-5" />
+             <ExternalLink className="w-5 h-5" />
           </button>
         </div>
 

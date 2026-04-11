@@ -1,23 +1,37 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronDown, User, ArrowRight, Search } from 'lucide-react'
+import SearchOverlay from './SearchOverlay'
+import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [showSearchBar, setShowSearchBar] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const { openModal } = useAdmissionModal()
 
- const mainNavItems = [
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show search bar after scrolling past hero section (approx 500px)
+      setShowSearchBar(window.scrollY > 500)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const mainNavItems = [
     {
-        name : "All colleges",
-        hasDropdown: true,
-        dropdownContent: {
-            colleges: ['IIT Bombay', 'IIT Delhi', 'IIT Madras', 'IIT Kanpur', 'BITS Pilani', 'NIT Trichy', 'VIT Vellore'],
-            exams: ['JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE', 'SRMJEEE'],
-            predictors: ['JEE Main Rank Predictor', 'JEE Advanced Predictor', 'COMEDK Predictor'],
-            viewAllLink: 'View all Engineering colleges',
-        },
+      name: "All colleges",
+      hasDropdown: true,
+      dropdownContent: {
+        colleges: ['IIT Bombay', 'IIT Delhi', 'IIT Madras', 'IIT Kanpur', 'BITS Pilani', 'NIT Trichy', 'VIT Vellore'],
+        exams: ['JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE', 'SRMJEEE'],
+        predictors: ['JEE Main Rank Predictor', 'JEE Advanced Predictor', 'COMEDK Predictor'],
+        viewAllLink: 'View all Engineering colleges',
+      },
     },
     {
       name: 'Engineering',
@@ -92,24 +106,40 @@ const Navbar = () => {
   ]
 
   return (
-    <div className="w-full shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-50 w-full shadow-sm">
       {/* Top Navbar: VidyaVriddhi Blue/Dark Theme */}
       <nav className="bg-slate-900 px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
-             <div className="bg-white p-1.5 rounded-lg">
-                <Image src={'/logo.png'} height={100} width={100} alt="VidyaVriddhi Logo" />
-             </div>
+            <div className="bg-white p-1.5 rounded-lg">
+              <Image src={'/logo.png'} height={100} width={100} alt="VidyaVriddhi Logo" />
+            </div>
           </div>
 
-          <Link href="/login">
-            <button className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm">
-              <User size={16} />
-              <span>Admin Login</span>
+
+          {/* Search Bar - appears on scroll */}
+          <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-5 py-3 rounded-lg transition-all mr-3 w-[600px]"
+            >
+              <Search className="w-5 h-5 text-gray-400" />
+              <span className="text-base">Search colleges, exams...</span>
             </button>
-          </Link>
+          </div>
+
+          <button 
+            onClick={() => openModal()}
+            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+          >
+            <span>Get Guidance</span>
+          </button>
+
         </div>
       </nav>
+
+      {/* Search Overlay */}
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Secondary Navigation: Dropdowns logic fixed here */}
       <div className="bg-white border-b border-gray-100">
@@ -122,20 +152,19 @@ const Navbar = () => {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {/* Trigger Button */}
-              <button 
-                className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none ${
-                  activeDropdown === item.name ? 'text-orange-500' : 'text-gray-600 hover:text-orange-500'
-                }`}
+              <button
+                className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none ${activeDropdown === item.name ? 'text-orange-500' : 'text-gray-600 hover:text-orange-500'
+                  }`}
               >
                 <span>{item.name}</span>
                 {item.hasDropdown && (
                   <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
                 )}
               </button>
-              
+
               {/* Fixed Dropdown: Absolute positioning */}
               {item.hasDropdown && activeDropdown === item.name && (
-                <div 
+                <div
                   className="absolute top-full left-1/2 -translate-x-1/2 w-[550px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-[100] p-6 animate-in fade-in slide-in-from-top-2 duration-200"
                 >
                   <div className="grid grid-cols-3 gap-8">
@@ -179,7 +208,7 @@ const Navbar = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* View All Footer */}
                   {item.dropdownContent.viewAllLink && (
                     <div className="mt-6 pt-4 border-t border-gray-50">

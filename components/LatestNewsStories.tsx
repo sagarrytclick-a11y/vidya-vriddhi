@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Calendar, ArrowRight, ChevronRight, Newspaper } from 'lucide-react'
+import { Calendar, ArrowRight, ChevronRight, Newspaper, ExternalLink } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 
 interface News {
@@ -74,7 +74,7 @@ const LatestNewsStories: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900">Latest News & Stories</h2>
           <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
             <span>View all news</span>
-            <ArrowRight className="w-5 h-5" />
+             <ExternalLink className="w-5 h-5" />
           </button>
         </div>
 

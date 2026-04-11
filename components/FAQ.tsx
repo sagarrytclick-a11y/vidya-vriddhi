@@ -68,13 +68,13 @@ const FAQ: React.FC = () => {
     }
   ]
 
-  const filteredFAQs = activeCategory === 'All' 
-    ? faqData 
+  const filteredFAQs = activeCategory === 'All'
+    ? faqData
     : faqData.filter(item => item.category === activeCategory)
 
   const toggleItem = (index: number) => {
-    setOpenItems(prev => 
-      prev.includes(index) 
+    setOpenItems(prev =>
+      prev.includes(index)
         ? prev.filter(i => i !== index)
         : [...prev, index]
     )
@@ -82,7 +82,7 @@ const FAQ: React.FC = () => {
 
   return (
     <div className="bg-white py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
@@ -104,11 +104,10 @@ const FAQ: React.FC = () => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                activeCategory === category
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === category
+                ? 'bg-orange-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
             >
               {category}
             </button>
@@ -143,7 +142,7 @@ const FAQ: React.FC = () => {
                     )}
                   </div>
                 </button>
-                
+
                 {isOpen && (
                   <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                     <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
