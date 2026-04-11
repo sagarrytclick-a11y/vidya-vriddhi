@@ -30,8 +30,7 @@ export function TrendingInsights() {
           {/* Left Side - Trending Blogs */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <BookOpen className="w-6 h-6 text-slate-700" />
-              <h2 className="text-2xl font-bold text-slate-800">Trending Education Insights</h2>
+              <h2 className="text-4xl font-bold text-slate-800">Trending Education Insights</h2>
             </div>
 
             <div className="space-y-6">
@@ -53,7 +52,7 @@ export function TrendingInsights() {
                 blogs.slice(0, 4).map((blog) => (
                   <article
                     key={blog.id}
-                    className="flex gap-4 group cursor-pointer border-b border-slate-100 pb-6 last:border-0"
+                    className="flex gap-4 group cursor-pointer border-b border-black pb-6 last:border-0"
                   >
                     <div className="flex-1">
                       <Link href={`/blogs/${blog.slug}`} className="block">

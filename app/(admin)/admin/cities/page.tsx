@@ -56,22 +56,22 @@ export default function CitiesPage() {
 
   return (
     <AdminLayout>
-      <AddCityModal 
-        isOpen={isAddModalOpen} 
-        onClose={closeAddModal} 
+      <AddCityModal
+        isOpen={isAddModalOpen}
+        onClose={closeAddModal}
       />
       <ViewCityModal isOpen={isViewModalOpen} onClose={closeViewModal} city={selectedCity} />
-      <EditCityModal 
-        isOpen={isEditModalOpen} 
-        onClose={closeEditModal} 
-        city={selectedCity} 
+      <EditCityModal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        city={selectedCity}
       />
-      <DeleteCityModal 
-        isOpen={isDeleteModalOpen} 
-        onClose={closeDeleteModal} 
-        city={selectedCity} 
+      <DeleteCityModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        city={selectedCity}
       />
-      
+
       <div className="p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -120,11 +120,10 @@ export default function CitiesPage() {
                         {city.features.length > 0 ? city.features.slice(0, 2).join(', ') + (city.features.length > 2 ? '...' : '') : 'No features'}
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          city.active 
-                            ? 'bg-green-900 text-green-300' 
+                        <span className={`px-2 py-1 text-xs rounded-full ${city.active
+                            ? 'bg-green-900 text-green-300'
                             : 'bg-gray-700 text-gray-300'
-                        }`}>
+                          }`}>
                           {city.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronUp, Facebook, Instagram, Twitter, Youtube, Linkedin, Rss, Mail, Phone, MapPin } from 'lucide-react'
 import { SITE_IDENTITY } from '@/app/(main)/site-identity'
@@ -73,13 +74,13 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Colleges</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">M.B.A</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">B.Tech/B.E</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">MCA</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">BCA</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">M.Tech</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">MA</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">BA</a></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">M.B.A</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">B.Tech/B.E</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MCA</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">BCA</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">M.Tech</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MA</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">BA</Link></li>
               </ul>
             </div>
 
@@ -87,13 +88,13 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Universities</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Engineering</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Management</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Medical</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Law</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Commerce</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Science</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Arts</a></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Engineering</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Management</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Medical</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Law</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Commerce</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Science</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Arts</Link></li>
               </ul>
             </div>
 
@@ -101,13 +102,13 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Exam</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">CAT</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">GATE</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Jee-Main</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">NEET</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">XAT</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">CLAT</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">MAT</a></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">CAT</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">GATE</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Jee-Main</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">NEET</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">XAT</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">CLAT</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MAT</Link></li>
               </ul>
             </div>
 
@@ -115,13 +116,13 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Study Abroad</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Canada</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">USA</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">UK</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">UAE</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Australia</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Germany</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Sweden</a></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Canada</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">USA</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">UK</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">UAE</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Australia</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Germany</Link></li>
+                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Sweden</Link></li>
               </ul>
             </div>
 
@@ -131,12 +132,12 @@ const Footer = () => {
           {/* Other Links */}
           <div className="border-t border-gray-800 mt-8 pt-8">
             <div className="flex flex-wrap justify-center gap-6 mb-8">
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</a>
-              <a href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</a>
-              <a href="/advertising" className="text-gray-300 hover:text-white transition-colors">Advertising</a>
-              <a href="/careers" className="text-gray-300 hover:text-white transition-colors">Career</a>
-              <a href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</a>
-              <a href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
+              <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</Link>
+              <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link>
+              <Link href="/advertising" className="text-gray-300 hover:text-white transition-colors">Advertising</Link>
+              <Link href="/careers" className="text-gray-300 hover:text-white transition-colors">Career</Link>
+              <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</Link>
+              <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link>
             </div>
 
             {/* Disclaimer */}

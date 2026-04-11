@@ -13,26 +13,26 @@ const Hero = () => {
     const [displayedSubtitle, setDisplayedSubtitle] = useState("")
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     
-    const slides = [
-        {
-            image: "https://i.pinimg.com/1200x/87/0a/9f/870a9fd2c38d42373301bd563c4c055b.jpg",
-            title: "Explore Top Colleges, Exams, Results & More",
-            subtitle: "Search from 1000+ colleges worldwide",
-            collegeName: "Technical University of Munich"
-        },
-        {
-            image: "https://i.pinimg.com/1200x/93/72/da/9372da992291ceb01345624c9efed85b.jpg",
-            title: "Global Career Opportunities",
-            subtitle: "Explore opportunities in top countries",
-            collegeName: "University of Toronto"
-        },
-        {
-            image: "https://i.pinimg.com/1200x/2d/08/8c/2d088c85755726cb50647c7c5eb3c0f9.jpg",
-            title: "Your Gateway to Excellence",
-            subtitle: "Pursue medical education globally",
-            collegeName: "National University of Singapore"
-        }
-    ]
+const slides = [
+    {
+        image: "https://i.pinimg.com/1200x/46/43/f8/4643f8e7ec4b3bd90e949b544bf6da15.jpg",
+        title: "Engineering Excellence in India",
+        subtitle: "India's #1 Ranked Engineering Institute",
+        collegeName: "IIT Madras (Indian Institute of Technology)"
+    },
+    {
+        image: "https://i.pinimg.com/736x/a3/ac/fd/a3acfd3f00a404f9ab17eb89ae5cc8f0.jpg",
+        title: "Nurturing Global Business Leaders",
+        subtitle: "Explore Top-Tier Management Programs",
+        collegeName: "IIM Ahmedabad (Indian Institute of Management)"
+    },
+    {
+        image: "https://i.pinimg.com/1200x/79/f9/4e/79f94eb175c510f6ac8fd9d87e5ba43c.jpg",
+        title: "Center for Advanced Research",
+        subtitle: "Pursue Science and Innovation in India",
+        collegeName: "IISc Bangalore (Indian Institute of Science)"
+    }
+];
 
     // Combined Typing Logic for Title & Subtitle
     useEffect(() => {

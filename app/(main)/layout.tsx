@@ -13,7 +13,9 @@ export default function MainLayout({
   return (
     <AdmissionModalProvider>
       <Navbar />
-      {children}
+      <div className="pt-28">
+        {children}
+      </div>
       <Footer />
       <FloatingActions />
       <MarqueeStrip />

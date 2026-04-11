@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen } from 'lucide-react'
+import Image from 'next/image'
+import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone, Mail, Globe } from 'lucide-react'
 
 const AboutPage = () => {
   return (
@@ -20,8 +21,8 @@ const AboutPage = () => {
               <GraduationCap className="w-6 h-6 text-orange-500" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">About Vidya Vridhi</h1>
-              <p className="text-gray-600">Empowering students to achieve their educational dreams</p>
+              <h1 className="text-2xl font-bold text-gray-900">About Vidya Vriddhi</h1>
+              <p className="text-gray-600">Your trusted partner in educational excellence</p>
             </div>
           </div>
         </div>
@@ -30,55 +31,135 @@ const AboutPage = () => {
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Mission Section */}
+        {/* What We Do Section */}
         <section className="mb-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                To democratize access to quality education by providing comprehensive, accurate, and personalized guidance to students at every step of their academic journey.
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-8 md:p-12 text-white">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Do</h2>
+              <p className="text-lg md:text-xl text-orange-100 max-w-4xl mx-auto leading-relaxed">
+                At Vidya Vriddhi, we provide comprehensive career counseling and admission guidance 
+                to help students secure placements at their dream universities across India and abroad. 
+                Our expert counselors work closely with each student to understand their aspirations, 
+                analyze their strengths, and craft personalized pathways to academic success.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-8 h-8 text-orange-500" />
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Target className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Accessibility</h3>
-                <p className="text-gray-600 text-sm">Making educational resources accessible to every student regardless of their background</p>
+                <h3 className="font-bold text-xl mb-2">Personalized Counseling</h3>
+                <p className="text-orange-100 text-sm">
+                  One-on-one guidance tailored to your academic profile, interests, and career goals
+                </p>
               </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-orange-500" />
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Personalization</h3>
-                <p className="text-gray-600 text-sm">Tailored guidance based on individual student profiles and aspirations</p>
+                <h3 className="font-bold text-xl mb-2">Nationwide Reach</h3>
+                <p className="text-orange-100 text-sm">
+                  Connecting students with top universities across the country and international institutions
+                </p>
               </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-8 h-8 text-orange-500" />
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Excellence</h3>
-                <p className="text-gray-600 text-sm">Maintaining highest standards of accuracy and reliability in all information</p>
+                <h3 className="font-bold text-xl mb-2">Proven Results</h3>
+                <p className="text-orange-100 text-sm">
+                  95% success rate in helping students secure admissions to their preferred institutions
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Story Section */}
+        {/* Office & Founder Section */}
+        <section className="mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Office Photo */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="relative h-64 w-full">
+                <Image
+                  src="/about/image-4.jpg"
+                  alt="Vidya Vriddhi Office"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center space-x-2 mb-3">
+                  <MapPin className="w-5 h-5 text-orange-500" />
+                  <h3 className="text-xl font-bold text-gray-900">Our Headquarters</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Located in the heart of Bangalore, our modern office serves as the central hub 
+                  where our expert counselors work tirelessly to guide students toward their academic dreams. 
+                  The welcoming environment reflects our commitment to making every student feel supported 
+                  throughout their educational journey.
+                </p>
+                <div className="text-sm text-gray-500">
+                  <p><strong>Address:</strong> 123 Education Hub, Koramangala, Bangalore - 560034</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Founder Photo */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="relative h-64 w-full">
+                <Image
+                  src="/about/founder.png"
+                  alt="Abhishek Tiwari - Founder & CEO"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Abhishek Tiwari</h3>
+                <p className="text-orange-500 font-medium mb-3">Founder & Chief Executive Officer</p>
+                <p className="text-gray-600 mb-4">
+                  With over 8 years of experience in education and career counseling, Dr. Sharma 
+                  founded Vidya Vriddhi with a vision to democratize access to quality higher education. 
+                  His passion for mentoring young minds has helped thousands of students find their 
+                  path to success at premier institutions across the nation.
+                </p>
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                  <span className="flex items-center space-x-1">
+                    <Mail className="w-4 h-4" />
+                    <span>info@vidyavriddhi.com</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Our Story Section */}
         <section className="mb-12">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Journey</h2>
             <div className="prose prose-lg max-w-none text-gray-700">
               <p className="mb-4">
-                Vidya Vridhi was born from a simple observation: millions of Indian students struggle with making informed educational decisions due to lack of reliable, comprehensive information and personalized guidance.
+                Vidya Vriddhi was born from a powerful realization: every student deserves access 
+                to expert guidance that can transform their educational aspirations into reality. 
+                Founded in 2018 by Abhishek Tiwari, our organization emerged from the urgent need 
+                to bridge the gap between talented students and their dream institutions.
               </p>
               <p className="mb-4">
-                Founded in 2020 by a team of education enthusiasts and technology experts, Vidya Vridhi started as a small initiative to help students navigate the complex landscape of Indian education. Today, we've grown into one of India's most trusted educational platforms, serving over 50,000 students across the country.
+                What started as a small counseling center in Bangalore has grown into a nationally 
+                recognized educational consultancy. We have successfully guided over 50,000 students 
+                through the complex admission processes of India's top universities and international 
+                institutions. Our comprehensive services include career assessment, college selection, 
+                application assistance, interview preparation, and scholarship guidance.
               </p>
               <p>
-                Our journey has been driven by countless success stories - students who found their dream colleges, secured admissions to prestigious institutions, and embarked on fulfilling careers with our guidance. These stories fuel our passion to continuously innovate and improve our services.
+                Our team of certified counselors combines deep industry knowledge with genuine empathy 
+                for each student's unique situation. We understand that choosing the right educational 
+                path is one of life's most significant decisions, and we take that responsibility seriously. 
+                Every success story - from a student securing admission to IIT to another winning a 
+                scholarship at a prestigious international university - fuels our commitment to excellence.
               </p>
             </div>
           </div>
@@ -87,15 +168,15 @@ const AboutPage = () => {
         {/* Values Section */}
         <section className="mb-12">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Values</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Core Values</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center shrink-0">
-                  <BookOpen className="w-6 h-6 text-orange-500" />
+                  <Users className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Student-First Approach</h3>
-                  <p className="text-gray-600">Every decision we make is guided by what's best for our students' future</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">Student-First Philosophy</h3>
+                  <p className="text-gray-600">Every recommendation we make prioritizes the student's best interests and long-term success</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -103,8 +184,17 @@ const AboutPage = () => {
                   <Award className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Integrity</h3>
-                  <p className="text-gray-600">We maintain complete transparency and honesty in all our interactions</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">Unwavering Integrity</h3>
+                  <p className="text-gray-600">Transparent, honest guidance with no hidden agendas or misleading promises</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center shrink-0">
+                  <BookOpen className="w-6 h-6 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Continuous Innovation</h3>
+                  <p className="text-gray-600">Leveraging the latest tools and methodologies to deliver cutting-edge counseling</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -112,17 +202,8 @@ const AboutPage = () => {
                   <Target className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Innovation</h3>
-                  <p className="text-gray-600">Continuously evolving our platform to serve students better</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center shrink-0">
-                  <Users className="w-6 h-6 text-orange-500" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Empathy</h3>
-                  <p className="text-gray-600">Understanding and addressing the unique challenges each student faces</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">Results-Driven Approach</h3>
+                  <p className="text-gray-600">Focused on measurable outcomes - admissions secured and dreams achieved</p>
                 </div>
               </div>
             </div>
@@ -140,69 +221,52 @@ const AboutPage = () => {
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold mb-2">500+</div>
-                <p className="text-orange-100">Partner Colleges</p>
+                <p className="text-orange-100">Partner Institutions</p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold mb-2">95%</div>
-                <p className="text-orange-100">Success Rate</p>
+                <p className="text-orange-100">Admission Success</p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold mb-2">4.9/5</div>
-                <p className="text-orange-100">User Rating</p>
+                <p className="text-orange-100">Student Rating</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Team Section */}
-        <section className="mb-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Leadership Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold text-gray-900">Dr. Rajesh Kumar</h3>
-                <p className="text-gray-600 text-sm mb-2">Founder & CEO</p>
-                <p className="text-gray-500 text-xs">20+ years in education technology</p>
-              </div>
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold text-gray-900">Priya Sharma</h3>
-                <p className="text-gray-600 text-sm mb-2">Co-Founder & COO</p>
-                <p className="text-gray-500 text-xs">Expert in student counseling</p>
-              </div>
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4"></div>
-                <h3 className="font-semibold text-gray-900">Amit Patel</h3>
-                <p className="text-gray-600 text-sm mb-2">CTO</p>
-                <p className="text-gray-500 text-xs">15+ years in tech innovation</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
 
         {/* Contact Section */}
         <section className="mb-12">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Visit Us</h2>
             <p className="text-gray-700 mb-6">
-              We'd love to hear from you! Whether you're a student, parent, or educational institution, we're here to help.
+              Ready to take the first step toward your dream university? Visit our office for a 
+              personalized counseling session. Whether you are a student, parent, or educational 
+              institution, we are here to guide you every step of the way.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Contact Information</h3>
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                  <Phone className="w-5 h-5 text-orange-500" />
+                  <span>Contact Information</span>
+                </h3>
                 <div className="space-y-2 text-gray-600">
-                  <p><strong>Email:</strong> info@vidyavridhi.com</p>
-                  <p><strong>Phone:</strong> +91 80123 45678</p>
-                  <p><strong>Address:</strong> Bangalore, Karnataka, India</p>
+                  <p><strong>Email:</strong> info@vidyavriddhi.com</p>
+                  <p><strong>Phone:</strong> +91 80 1234 5678</p>
+                  <p><strong>Mobile:</strong> +91 98765 43210</p>
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Office Hours</h3>
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 text-orange-500" />
+                  <span>Office Hours</span>
+                </h3>
                 <div className="space-y-2 text-gray-600">
-                  <p><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM</p>
-                  <p><strong>Saturday:</strong> 10:00 AM - 4:00 PM</p>
-                  <p><strong>Sunday:</strong> Closed</p>
+                  <p><strong>Monday - Saturday:</strong> 9:00 AM - 7:00 PM</p>
+                  <p><strong>Sunday:</strong> 10:00 AM - 2:00 PM (Online Only)</p>
+                  <p className="text-orange-500 font-medium">Walk-ins welcome!</p>
                 </div>
               </div>
             </div>
