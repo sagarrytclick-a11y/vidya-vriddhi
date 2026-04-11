@@ -101,7 +101,7 @@ export default function CitiesPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-700">
-                    <th className="text-left py-3 px-4 text-gray-300 font-medium">City Description</th>
+                    <th className="text-left py-3 px-4 text-gray-300 font-medium">City Name</th>
                     <th className="text-left py-3 px-4 text-gray-300 font-medium">Country</th>
                     <th className="text-left py-3 px-4 text-gray-300 font-medium">Features</th>
                     <th className="text-left py-3 px-4 text-gray-300 font-medium">Status</th>
@@ -112,7 +112,7 @@ export default function CitiesPage() {
                 <tbody>
                   {cities.map((city) => (
                     <tr key={city.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                      <td className="py-3 px-4 text-white">{city.description || 'No description'}</td>
+                      <td className="py-3 px-4 text-white">{city.name || 'No name'}</td>
                       <td className="py-3 px-4 text-white">
                         {city.country?.flagEmoji} {city.country?.name || 'N/A'}
                       </td>

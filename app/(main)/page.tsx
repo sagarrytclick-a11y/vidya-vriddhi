@@ -10,19 +10,19 @@ import StudyAbroad from '@/components/StudyAbroad'
 import Services from '@/components/Services'
 import WhyChooseUs from '@/components/WhyChooseUs'
 import FAQ from '@/components/FAQ'
-import LatestNewsStories from '@/components/LatestNewsStories'
+import { TrendingInsights } from '@/components/TrendingInsights'
 import CollegeListing from '@/components/CollegeListing'
 import { InfiniteMovingCardsDemo } from '@/components/MovingCards'
 
 const page = () => {
   return (
     <div className='h-full w-full relative overflow-x-hidden'>
-
       <Hero />
       <ExplorePrograms />
       <TopColleges/>
       <UpcomingExams />
       <TopCourses />
+      <TrendingInsights />
       <CollegeListing/>
       <TopStudyPlaces />
       <StudyAbroad />
@@ -30,8 +30,6 @@ const page = () => {
       <WhyChooseUs />
       <InfiniteMovingCardsDemo />
       <FAQ />
-      <LatestNewsStories />
-  
     </div>
   )
 }

@@ -99,7 +99,7 @@ const Hero = () => {
     }
 
     return (
-        <section className="relative h-150 w-full flex items-center justify-center overflow-hidden">
+        <section className="relative h-[700px] w-full flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <div
                     className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"

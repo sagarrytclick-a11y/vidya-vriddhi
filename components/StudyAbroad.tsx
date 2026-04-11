@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Globe, DollarSign, Building, ChevronRight, ArrowRight, Map as MapIcon } from 'lucide-react'
+import { Globe, DollarSign, Building, ChevronRight, ArrowRight, Map as MapIcon, ExternalLink } from 'lucide-react'
 import { useCountries } from '@/hooks/useCountries'
 
 interface Country {
@@ -97,7 +97,7 @@ const StudyAbroad: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900">Study Abroad</h2>
           <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
             <span>View all countries</span>
-            <ArrowRight className="w-5 h-5" />
+             <ExternalLink className="w-5 h-5" />
           </button>
         </div>
 

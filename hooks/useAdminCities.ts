@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 export interface City {
   id: string
   description: string | null
+  name: string | null
   cityImageURL: string | null
   features: string[]
   active: boolean
