@@ -1,4 +1,3 @@
-
 import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import Link from 'next/link'
@@ -29,7 +28,7 @@ interface SearchParams {
   page?: string
 }
 
-async function getColleges(searchParams: SearchParams) {
+async function getCollegesRaw(searchParams: SearchParams) {
   const page = parseInt(searchParams.page || '1')
   const limit = 10
   const skip = (page - 1) * limit
@@ -165,6 +164,16 @@ async function getColleges(searchParams: SearchParams) {
   }
 }
 
+function getColleges(searchParams: SearchParams) {
+  const cacheKey = JSON.stringify(searchParams)
+  const cachedFn = unstable_cache(
+    async () => getCollegesRaw(searchParams),
+    ['colleges-list', cacheKey],
+    { revalidate: 3600 }
+  )
+  return cachedFn()
+}
+
 async function getFiltersDataRaw() {
   const [categories, courses, cities, exams] = await Promise.all([
     db.category.findMany({
@@ -200,6 +209,11 @@ const getFiltersData = unstable_cache(
   ['colleges-filters-data'],
   { revalidate: 3600 }
 )
+
+export async function generateStaticParams() {
+  // Pre-render default state: no filters, page 1
+  return [{ page: '1' }]
+}
 
 function buildFilterUrl(baseUrl: string, currentParams: SearchParams, newParams: Partial<SearchParams>) {
   const params = new URLSearchParams()
