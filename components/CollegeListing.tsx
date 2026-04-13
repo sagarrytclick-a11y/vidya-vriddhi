@@ -4,6 +4,7 @@ import React from 'react'
 import { GraduationCap, MapPin, Award, Building2, ChevronRight, Globe } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const CollegeListing: React.FC = () => {
   const { data: collegesData, isLoading, error } = useIndianColleges(1, 6)
@@ -85,9 +86,12 @@ const CollegeListing: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2">
+                      <Link
+                        href={`/colleges/${college.slug}`}
+                        className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 block"
+                      >
                         {college.name}
-                      </h3>
+                      </Link>
                       <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-orange-500" />

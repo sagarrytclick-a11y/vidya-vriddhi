@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
+import Link from 'next/link'
 
 interface College {
   id: string
@@ -49,10 +50,10 @@ const TopColleges: React.FC = () => {
             <h2 className="text-3xl font-bold text-gray-900">Top Indian Colleges</h2>
             <p className="text-sm text-gray-500 mt-1">Ranked by national performance</p>
           </div>
-          <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+          <Link href="/colleges" className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
             <span>Explore all colleges</span>
             <ExternalLink className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
 
         {/* Loading State */}
@@ -127,9 +128,12 @@ const TopColleges: React.FC = () => {
                                 className="w-10 h-10 rounded-lg object-contain"
                               />
                             )}
-                            <div className="text-sm font-semibold text-black hover:text-orange-500 cursor-pointer">
+                            <Link
+                              href={`/colleges/${college.slug}`}
+                              className="text-sm font-semibold text-black hover:text-orange-500 cursor-pointer"
+                            >
                               {college.name}
-                            </div>
+                            </Link>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

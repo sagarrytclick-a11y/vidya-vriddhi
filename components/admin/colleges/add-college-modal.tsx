@@ -181,10 +181,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         }
 
         // Fetch categories
-        const categoriesResponse = await fetch('/api/categories')
+        const categoriesResponse = await fetch('/api/categories?limit=100')
+        console.log('Categories response status:', categoriesResponse.status)
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
-          setCategories(Array.isArray(categoriesData) ? categoriesData : [])
+          console.log('Categories data:', categoriesData)
+          // API returns { categories: [...], pagination: {...} }
+          const categoriesArray = categoriesData.categories || categoriesData
+          console.log('Extracted categories array:', categoriesArray, 'Is array:', Array.isArray(categoriesArray))
+          setCategories(Array.isArray(categoriesArray) ? categoriesArray : [])
+        } else {
+          console.error('Categories fetch failed:', categoriesResponse.status)
         }
 
         // Fetch courses
@@ -614,24 +621,28 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <div>
               <Label htmlFor="categories">Categories</Label>
               <div className="space-y-2">
-                {categories.map((category) => (
-                  <div key={category.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`category-${category.id}`}
-                      checked={formData.categories?.includes(category.id) || false}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          handleInputChange('categories', [...(formData.categories || []), category.id])
-                        } else {
-                          handleInputChange('categories', formData.categories?.filter(id => id !== category.id) || [])
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`category-${category.id}`} className="text-sm text-white">
-                      {category.name}
-                    </Label>
-                  </div>
-                ))}
+                {categories.length === 0 ? (
+                  <p className="text-sm text-gray-400">No categories found. Please add categories first.</p>
+                ) : (
+                  categories.map((category) => (
+                    <div key={category.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`category-${category.id}`}
+                        checked={formData.categories?.includes(category.id) || false}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleInputChange('categories', [...(formData.categories || []), category.id])
+                          } else {
+                            handleInputChange('categories', formData.categories?.filter(id => id !== category.id) || [])
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`category-${category.id}`} className="text-sm text-white">
+                        {category.name}
+                      </Label>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

@@ -50,7 +50,7 @@ const FloatingActions: React.FC = () => {
         {/* WhatsApp Button */}
         <button
           onClick={handleWhatsAppClick}
-          className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group"
+          className="w-14 h-14 py-4 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group"
           title="Chat on WhatsApp"
         >
           <MessageCircle className="w-7 h-7 text-white" />
