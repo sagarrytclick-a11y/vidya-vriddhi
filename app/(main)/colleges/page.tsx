@@ -1,7 +1,9 @@
+
 import { Metadata } from 'next'
-import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import Link from 'next/link'
+import Image from 'next/image'
+import { unstable_cache } from 'next/cache'
 import { ChevronRight, MapPin, Building2, GraduationCap, Award, BookOpen } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +16,8 @@ export const metadata: Metadata = {
   title: 'Indian Colleges | Vidya Vriddhi',
   description: 'Explore top colleges and universities across India. Find the best Indian institutions for your education journey.',
 }
+
+export const revalidate = 3600
 
 interface SearchParams {
   category?: string
@@ -161,7 +165,7 @@ async function getColleges(searchParams: SearchParams) {
   }
 }
 
-async function getFiltersData() {
+async function getFiltersDataRaw() {
   const [categories, courses, cities, exams] = await Promise.all([
     db.category.findMany({
       where: { active: true },
@@ -190,6 +194,12 @@ async function getFiltersData() {
 
   return { categories, courses, cities, exams }
 }
+
+const getFiltersData = unstable_cache(
+  getFiltersDataRaw,
+  ['colleges-filters-data'],
+  { revalidate: 3600 }
+)
 
 function buildFilterUrl(baseUrl: string, currentParams: SearchParams, newParams: Partial<SearchParams>) {
   const params = new URLSearchParams()
@@ -430,14 +440,16 @@ export default async function CollegesPage({
                 {colleges.map((college) => (
                   <Card key={college.id} className="overflow-hidden hover:shadow-md transition-shadow">
                     <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row">
+                      <Link href={`/colleges/${college.slug}`} className="flex flex-col md:flex-row">
                         {/* Logo Section */}
                         <div className="p-4 md:w-24 shrink-0">
                           <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
                             {college.logoURL ? (
-                              <img
+                              <Image
                                 src={college.logoURL}
                                 alt={college.name}
+                                width={64}
+                                height={64}
                                 className="w-full h-full object-contain"
                               />
                             ) : (
@@ -450,12 +462,9 @@ export default async function CollegesPage({
                         <div className="flex-1 p-4 pt-0 md:pt-4">
                           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                             <div className="flex-1">
-                              <Link
-                                href={`/colleges/${college.slug}`}
-                                className="text-[20px] font-semibold text-gray-900 mb-1 block hover:text-blue-600"
-                              >
+                              <h3 className="text-[20px] font-semibold text-gray-900 mb-1 block group-hover:text-blue-600">
                                 {college.name}
-                              </Link>
+                              </h3>
                               <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-4 h-4" />
@@ -495,16 +504,12 @@ export default async function CollegesPage({
                               </div>
 
                               {/* Quick Links */}
-                              <div className="flex gap-4 mt-3 text-sm">
-                                <Link href={`/colleges/${college.slug}/admission`} className="text-blue-600 hover:text-blue-700">
-                                  Admission
-                                </Link>
-                                <Link href={`/colleges/${college.slug}/courses`} className="text-blue-600 hover:text-blue-700">
-                                  Courses
-                                </Link>
-                                <Link href={`/colleges/${college.slug}/scholarship`} className="text-blue-600 hover:text-blue-700">
-                                  Scholarship
-                                </Link>
+                              <div className="flex gap-4 mt-3 text-sm text-blue-600">
+                                <span>Admission</span>
+                                <span>•</span>
+                                <span>Courses</span>
+                                <span>•</span>
+                                <span>Scholarship</span>
                               </div>
                             </div>
 
@@ -512,10 +517,10 @@ export default async function CollegesPage({
                             <CollegeActionButtons collegeSlug={college.slug} />
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
