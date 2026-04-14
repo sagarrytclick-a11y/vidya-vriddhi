@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { CheckCircle, Users, Award, Clock, Headphones, TrendingUp } from 'lucide-react'
+import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 interface FeatureProps {
   icon: React.ReactNode
@@ -26,6 +27,7 @@ const Feature: React.FC<FeatureProps> = ({ icon, title, description, stats }) =>
 }
 
 const WhyChooseUs: React.FC = () => {
+  const { openModal } = useAdmissionModal()
   const features = [
     {
       icon: <CheckCircle className="w-8 h-8 text-orange-500" />,
@@ -118,10 +120,10 @@ const WhyChooseUs: React.FC = () => {
               Join thousands of successful students who have transformed their careers with our guidance
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+              <button onClick={() => openModal()} className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
                 Get Free Counseling
               </button>
-              <button className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+              <button onClick={() => openModal()} className="px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors font-medium">
                 Download Brochure
               </button>
             </div>

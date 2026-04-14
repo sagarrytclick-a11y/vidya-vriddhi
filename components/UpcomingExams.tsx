@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { Calendar, Clock, ExternalLink, FileText } from 'lucide-react'
 import { useExams } from '@/hooks/useExams'
 
@@ -12,6 +13,7 @@ interface Exam {
   examMode: 'ONLINE' | 'OFFLINE' | 'HYBRID'
   examDates: any
   examImageurl: string | null
+  slug: string
 }
 
 interface ExamCardProps {
@@ -54,9 +56,11 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
             )}
           </div>
           
-          <button className="mt-3 w-full py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg transition-colors">
-            Exam Info &gt;
-          </button>
+          <Link href={`/exams/${exam.slug}`} className="mt-3 block w-full">
+            <button className="w-full py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg transition-colors">
+              Exam Info &gt;
+            </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -72,10 +76,10 @@ const UpcomingExams: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Upcoming Exams</h2>
-          <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+          <Link href="/exams" className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
             <span>View all exams</span>
             <ExternalLink className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
 
         {/* Loading State */}

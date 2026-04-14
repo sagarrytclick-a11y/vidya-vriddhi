@@ -22,13 +22,19 @@ interface City {
 }
 
 const fetchCities = async (limit: number = 10): Promise<City[]> => {
-  const response = await fetch(`/api/cities?limit=${limit}`)
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch cities')
+  try {
+    const response = await fetch(`/api/cities?limit=${limit}`)
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch cities')
+    }
+    
+    const cities = await response.json()
+    return cities
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+    return []
   }
-  
-  return response.json()
 }
 
 export const useCities = (limit: number = 10) => {
@@ -37,4 +43,13 @@ export const useCities = (limit: number = 10) => {
     queryFn: () => fetchCities(limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
+}
+
+export const useCitiesData = (limit: number = 10) => {
+  const query = useCities(limit)
+  return {
+    cities: query.data || [],
+    isLoading: query.isLoading,
+    error: query.error,
+  }
 }

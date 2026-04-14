@@ -6,6 +6,7 @@ const createBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required'),
   slug: z.string().min(1, 'Blog slug is required'),
   content: z.string().min(1, 'Blog content is required'),
+  category: z.string().min(1, 'Blog category is required'),
   imageUrl: z.string().url().optional(),
   active: z.boolean().default(false),
 })

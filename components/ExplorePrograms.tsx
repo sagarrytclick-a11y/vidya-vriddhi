@@ -12,6 +12,7 @@ import {
   Star,
 } from "lucide-react";
 import { useCollegesByCourse } from "@/hooks/useCollegesByCourse";
+import Link from "next/link";
 
 interface College {
   id: string;
@@ -159,10 +160,12 @@ const CollegeCard: React.FC<CollegeCardProps> = ({ college }) => {
         </div>
 
         {/* Action Button */}
-        <button className="mt-auto w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2">
-          <span>View Details</span>
-          <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-        </button>
+        <Link href={`/colleges/${college.slug}`}>
+          <button className="mt-auto w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2">
+            <span>View Details</span>
+            <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </Link>
       </div>
     </div>
   );
@@ -235,10 +238,12 @@ const ExplorePrograms: React.FC = () => {
                   <p className="text-sm text-gray-500 mb-6 leading-relaxed flex-1">
                     Explore top colleges across all streams by location, eligibility, infrastructure, and rankings
                   </p>
-                  <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
-                    <span>Browse All Colleges</span>
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  <Link href="/colleges">
+                    <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
+                      <span>Browse All Colleges</span>
+                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </Link>
                 </div>
               </div>
               <div className="group flex flex-col bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
@@ -256,11 +261,14 @@ const ExplorePrograms: React.FC = () => {
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">JEE</span>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">NEET</span>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">CUET</span>
-                  </div>
-                  <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
-                    <span>Explore Exams</span>
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                 
+                 </div>
+                  <Link href="/exams">
+                    <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
+                      <span>Explore Exams</span>
+                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </Link>
                 </div>
               </div>
               <div className="group flex flex-col bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
