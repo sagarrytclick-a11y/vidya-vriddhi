@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 interface Exam {
   id: string
@@ -299,6 +300,7 @@ export default function ExamsListClient({ exams }: ExamsListClientProps) {
 }
 
 function ExamCard({ exam }: { exam: Exam }) {
+  const { openModal } = useAdmissionModal()
   const examDates = exam.examDates as any
   const importantDates = examDates?.importantDates || []
   const resultDate = importantDates.find((d: any) => d.event?.toLowerCase().includes('result'))?.date
@@ -351,7 +353,7 @@ function ExamCard({ exam }: { exam: Exam }) {
 
           {/* Action Buttons */}
           <div className="shrink-0 flex flex-col gap-2">
-            <Button className="bg-slate-800 py-4 text-white text-[16px] px-6">
+            <Button onClick={() => openModal(exam.name)} className="bg-slate-800 py-4 text-white text-[16px] px-6">
               Apply Now <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <Button variant="outline" className="text-white py-4 bg-orange-500 hover:bg-orange-600 text-[16px] px-6">

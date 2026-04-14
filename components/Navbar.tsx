@@ -18,7 +18,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       // Show search bar after scrolling past hero section (approx 500px)
-      setShowSearchBar(window.scrollY > 500)
+      setShowSearchBar(window.scrollY >30)
     }
 
     window.addEventListener('scroll', handleScroll)
