@@ -7,7 +7,7 @@ import { usePublicBlogs } from '@/hooks/usePublicBlogs'
 import { useNews } from '@/hooks/useNews'
 
 export function TrendingInsights() {
-  const { data: blogs = [], isLoading: blogsLoading } = usePublicBlogs(4)
+  const { data: blogs = [], isLoading: blogsLoading } = usePublicBlogs(3)
   const { data: news = [], isLoading: newsLoading } = useNews(5)
 
   const formatDate = (dateString: string) => {

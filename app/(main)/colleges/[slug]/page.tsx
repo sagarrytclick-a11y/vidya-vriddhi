@@ -14,6 +14,7 @@ import { NewsSidebar } from '@/components/college/NewsSidebar'
 import { RecommendedColleges } from '@/components/college/RecommendedColleges'
 import { ContactSidebar } from '@/components/college/ContactSidebar'
 import { CollegeTabs } from '@/components/college/CollegeTabs'
+import { AdmissionButton } from '@/components/ui/AdmissionButton'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -377,8 +378,9 @@ export default async function CollegeDetailPage({ params }: PageProps) {
                                 </div>
                               </div>
 
-                              {/* Action Button */}
-                              <div className="flex items-center">
+                              {/* Action Buttons */}
+                              <div className="flex flex-col gap-3">
+                                <AdmissionButton examName={college.name} variant="default" />
                                 <Button
                                   variant="outline"
                                   className="w-full h-12 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-colors group/btn"
@@ -757,12 +759,21 @@ export default async function CollegeDetailPage({ params }: PageProps) {
                 {/* Exams Section */}
                 {college.exams.length > 0 && (
                   <section className="scroll-mt-24">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Accepted Exams</h2>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-gray-900">Accepted Exams</h2>
+                      <Link href="/exams">
+                        <Button variant="outline" size="sm" className="border-gray-200 hover:bg-orange-50 hover:border-orange-200">
+                          View All Exams
+                        </Button>
+                      </Link>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {college.exams.map((exam) => (
-                        <Badge key={exam.id} variant="secondary" className="text-sm px-4 py-2">
-                          {exam.name}
-                        </Badge>
+                        <Link key={exam.id} href={`/exams/${exam.slug}`}>
+                          <Badge variant="secondary" className="text-sm px-4 py-2 hover:bg-orange-100 hover:text-orange-700 transition-colors cursor-pointer">
+                            {exam.name}
+                          </Badge>
+                        </Link>
                       ))}
                     </div>
                   </section>

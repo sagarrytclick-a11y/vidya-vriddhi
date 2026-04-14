@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-export interface Blog {
+interface Blog {
   id: string
   title: string
   slug: string
   content: string
   active: boolean
+  createdAt: Date
+  updatedAt: Date
   imageUrl: string | null
-  createdAt: string
-  updatedAt: string
 }
 
-export interface BlogFormData {
+interface BlogFormData {
   title: string
   slug: string
   content: string
@@ -31,11 +31,19 @@ export const blogKeys = {
 
 // API functions
 const fetchBlogs = async (): Promise<Blog[]> => {
-  const response = await fetch('/api/blogs')
-  if (!response.ok) {
-    throw new Error('Failed to fetch blogs')
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blogs`)
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch blogs')
+    }
+    
+    const blogs = await response.json()
+    return blogs
+  } catch (error) {
+    console.error('Error fetching blogs:', error)
+    return []
   }
-  return response.json()
 }
 
 const fetchBlog = async (id: string): Promise<Blog> => {

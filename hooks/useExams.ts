@@ -13,6 +13,10 @@ interface Exam {
   active: boolean
   examImageurl: string | null
   examDates: any
+  examPattern?: any
+  overview?: any
+  registration?: any
+  resultStatistics?: any
   createdAt: string
   updatedAt: string
 }

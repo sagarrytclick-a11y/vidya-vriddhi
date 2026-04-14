@@ -16,7 +16,7 @@ export function CollegeActions({ collegeName }: CollegeActionsProps) {
 
 
   const handleApply = () => {
-    openModal()
+    openModal(collegeName)
   }
 
   return (

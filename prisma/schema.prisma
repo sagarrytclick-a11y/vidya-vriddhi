@@ -164,7 +164,6 @@ model College {
   cityId               String
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
-  
   city                 City       @relation(fields: [cityId], references: [id])
   country              Country    @relation(fields: [countryId], references: [id])
   categories           Category[] @relation("CategoryToCollege")

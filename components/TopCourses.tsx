@@ -3,15 +3,14 @@
 import React, { useState } from 'react'
 import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
+import Link from 'next/link'
 
 interface Course {
   id: string
   name: string
   slug: string
   description: string | null
-  _count: {
-    colleges: number
-  }
+  colleges?: any
 }
 
 interface CourseCardProps {
@@ -34,7 +33,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         <div className="space-y-3 mb-4">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Building className="w-4 h-4 text-gray-400" />
-            <span>{course._count.colleges} Colleges</span>
+            <span>{course.colleges?.length || 0} Colleges</span>
           </div>
         </div>
         
@@ -51,7 +50,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
 const TopCourses: React.FC = () => {
   // Fetch courses using custom hook
-  const { data: courses, isLoading, error } = useCourses(20)
+  const { data: courses, isLoading, error } = useCourses()
 
   const scrollLeft = () => {
     const element = document.getElementById('courses-scroll-container')
@@ -72,10 +71,12 @@ const TopCourses: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Top Courses</h2>
-          <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
-            <span>View all courses</span>
-             <ExternalLink className="w-5 h-5" />
-          </button>
+          <Link href="/courses">
+            <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+              <span>View all courses</span>
+              <ExternalLink className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
 
         {/* Loading State */}

@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
+import { useAdmissionModal } from '@/contexts/admission-modal-context'
+import { AdmissionModal } from '@/components/AdmissionModal'
 
 interface FAQItem {
   question: string
@@ -12,6 +14,7 @@ interface FAQItem {
 const FAQ: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('All')
   const [openItems, setOpenItems] = useState<number[]>([])
+  const { openModal } = useAdmissionModal()
 
   const categories = ['All', 'Admissions', 'Colleges', 'Exams', 'Courses', 'Study Abroad']
 
@@ -162,7 +165,10 @@ const FAQ: React.FC = () => {
             Our expert counselors are here to help you with any queries
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+            <button 
+              onClick={() => openModal()}
+              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+            >
               Contact Counselor
             </button>
             <button className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
@@ -171,6 +177,7 @@ const FAQ: React.FC = () => {
           </div>
         </div>
       </div>
+      <AdmissionModal />
     </div>
   )
 }

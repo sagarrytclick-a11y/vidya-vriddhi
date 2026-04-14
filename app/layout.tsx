@@ -10,6 +10,7 @@ import { CourseProvider } from "@/contexts/course-context";
 import { NewsProvider } from "@/contexts/news-context";
 import { BlogProvider } from "@/contexts/blog-context";
 import { ExamProvider } from "@/contexts/exam-context";
+import { PageLoadingBar } from "@/components/ui/page-loading-bar";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PageLoadingBar />
         <QueryProvider>
           <CategoryProvider>
             <ExamProvider>
