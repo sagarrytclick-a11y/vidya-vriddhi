@@ -32,7 +32,7 @@ export const blogKeys = {
 // API functions
 const fetchBlogs = async (): Promise<Blog[]> => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blogs`)
+    const response = await fetch(`/api/blogs`)
     
     if (!response.ok) {
       throw new Error('Failed to fetch blogs')
