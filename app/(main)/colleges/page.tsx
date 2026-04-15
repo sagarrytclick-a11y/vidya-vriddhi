@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -13,6 +13,8 @@ import { SearchInput } from '@/components/SearchInput'
 import { CollegeActionButtons } from '@/components/college/CollegeActionButtons'
 import { usePublicColleges } from '@/hooks/usePublicColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
+
+export const dynamic = 'force-dynamic'
 
 function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newParams: Record<string, string | undefined>) {
   const params = new URLSearchParams(currentParams)
@@ -35,7 +37,7 @@ function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newPara
   return queryString ? `${baseUrl}?${queryString}` : baseUrl
 }
 
-export default function CollegesPage() {
+function CollegesPageContent() {
   const searchParams = useSearchParams()
   const { colleges, pagination, isLoading, error } = usePublicColleges({
     category: searchParams.get('category') || undefined,
@@ -394,5 +396,30 @@ export default function CollegesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CollegesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="flex gap-4">
+              <div className="w-72 h-96 bg-gray-200 rounded"></div>
+              <div className="flex-1 space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <CollegesPageContent />
+    </Suspense>
   )
 }
