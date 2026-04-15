@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { GraduationCap, Users, BookOpen, Award, Globe, Briefcase, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 interface ServiceCardProps {
   icon: React.ReactNode
@@ -121,10 +122,12 @@ const Services: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="inline-flex items-center space-x-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
-            <span>Explore All Services</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          <Link href="/services">
+            <button className="inline-flex items-center space-x-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+              <span>Explore All Services</span>
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
       </div>
     </div>
