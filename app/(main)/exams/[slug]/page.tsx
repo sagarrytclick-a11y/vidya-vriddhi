@@ -158,22 +158,21 @@ export default async function ExamDetailPage({ params }: PageProps) {
       </div>
 
       {/* Sticky Navigation */}
-      <div className="bg-white border-b shadow-md sticky top-0 z-40">
+     <div className="bg-white border-b shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-6 py-4 overflow-x-auto no-scrollbar">
+          <nav className="flex items-center gap-2 py-4 overflow-x-auto no-scrollbar">
             {[
               { id: 'overview', title: 'Overview', icon: <Info /> },
               { id: 'dates', title: 'Dates', icon: <Calendar /> },
               { id: 'pattern', title: 'Pattern', icon: <ClipboardList /> },
               { id: 'registration', title: 'Apply', icon: <FileCheck /> },
-              { id: 'colleges', title: 'Colleges', icon: <School /> },
             ].map((section) => (
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="group flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-orange-600 transition-colors whitespace-nowrap"
+                className="group flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-slate-600 hover:text-orange-600 hover:bg-orange-50 transition-all duration-200 whitespace-nowrap border border-transparent hover:border-orange-200"
               >
-                <span className="p-1 rounded-md bg-slate-50 group-hover:bg-orange-50 text-slate-400 group-hover:text-orange-500 transition-colors">
+                <span className="text-slate-400 group-hover:text-orange-500 transition-colors">
                   {section.icon && cloneElement(section.icon as React.ReactElement<any>, { className: "w-4 h-4" })}
                 </span>
                 {section.title}
@@ -262,6 +261,22 @@ export default async function ExamDetailPage({ params }: PageProps) {
                   <Badge className="bg-orange-500 text-white border-0">2026 Official</Badge>
                 </div>
                 <div className="p-0">
+                  {examPattern.scoreRange && (
+                    <div className="p-6 bg-orange-50 border-b border-slate-100">
+                      <div className="flex items-center gap-4">
+                        <Target className="w-5 h-5 text-orange-600" />
+                        <div>
+                          <p className="text-sm text-slate-600 font-semibold">Score Range</p>
+                          <p className="text-lg font-bold text-slate-900">{examPattern.scoreRange}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {examPattern.description && (
+                    <div className="p-6 border-b border-slate-100">
+                      <p className="text-slate-700 leading-relaxed">{examPattern.description}</p>
+                    </div>
+                  )}
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50">
@@ -283,6 +298,67 @@ export default async function ExamDetailPage({ params }: PageProps) {
                 </div>
               </div>
             </section>
+
+            {/* 5. Registration Section */}
+            {registration.description && (
+              <section id="registration" className="scroll-mt-32">
+                <Card className="border-0 bg-gradient-to-br from-slate-50 to-white shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                      <FileCheck className="w-6 h-6 text-orange-500" />
+                      Registration Process
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <p className="text-slate-700 leading-relaxed">{registration.description}</p>
+                    {registration.bulletPoints && registration.bulletPoints.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-bold text-slate-900">Required Documents:</h4>
+                        <ul className="space-y-2">
+                          {registration.bulletPoints.map((point: string, i: number) => (
+                            <li key={i} className="flex items-start gap-3 p-3 bg-white border border-slate-100 rounded-xl">
+                              <div className="mt-0.5 bg-orange-500 rounded-full p-0.5 shrink-0">
+                                <CheckCircle2 className="w-3 h-3 text-white" />
+                              </div>
+                              <span className="text-slate-700">{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </section>
+            )}
+
+            {/* 6. Result Statistics */}
+            {resultStatistics.description && (
+              <section className="scroll-mt-32">
+                <Card className="border-0 bg-slate-50 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                      <Award className="w-6 h-6 text-orange-500" />
+                      Result Statistics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {resultStatistics.totalMarks && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-6 bg-white border border-slate-100 rounded-2xl">
+                          <p className="text-sm text-slate-600 font-semibold uppercase tracking-wider">Total Marks</p>
+                          <p className="text-3xl font-extrabold text-slate-900 mt-2">{resultStatistics.totalMarks}</p>
+                        </div>
+                        <div className="p-6 bg-white border border-slate-100 rounded-2xl">
+                          <p className="text-sm text-slate-600 font-semibold uppercase tracking-wider">Passing Criteria</p>
+                          <p className="text-lg font-bold text-slate-900 mt-2">{resultStatistics.passingCriteria}</p>
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-slate-700 leading-relaxed">{resultStatistics.description}</p>
+                  </CardContent>
+                </Card>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}

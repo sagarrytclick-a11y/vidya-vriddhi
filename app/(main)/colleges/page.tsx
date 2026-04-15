@@ -1,8 +1,9 @@
-import { Metadata } from 'next'
-import { db } from '@/lib/db'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { unstable_cache } from 'next/cache'
 import { ChevronRight, MapPin, Building2, GraduationCap, Award, BookOpen } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,220 +11,11 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SearchInput } from '@/components/SearchInput'
 import { CollegeActionButtons } from '@/components/college/CollegeActionButtons'
+import { usePublicColleges } from '@/hooks/usePublicColleges'
+import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 
-export const metadata: Metadata = {
-  title: 'Indian Colleges | Vidya Vriddhi',
-  description: 'Explore top colleges and universities across India. Find the best Indian institutions for your education journey.',
-}
-
-export const revalidate = 3600
-
-interface SearchParams {
-  category?: string
-  course?: string
-  state?: string
-  city?: string
-  exam?: string
-  search?: string
-  page?: string
-}
-
-async function getCollegesRaw(searchParams: SearchParams) {
-  const page = parseInt(searchParams.page || '1')
-  const limit = 10
-  const skip = (page - 1) * limit
-
-  // Build where clause based on filters
-  const where: any = {}
-
-  // Get India country
-  const india = await db.country.findFirst({
-    where: { name: { equals: 'India', mode: 'insensitive' } }
-  })
-
-  if (india) {
-    where.countryId = india.id
-  }
-
-  // Category filter
-  if (searchParams.category) {
-    where.categories = {
-      some: {
-        slug: searchParams.category
-      }
-    }
-  }
-
-  // Course filter
-  if (searchParams.course) {
-    where.courses = {
-      some: {
-        slug: searchParams.course
-      }
-    }
-  }
-
-  // City filter
-  if (searchParams.city) {
-    where.city = {
-      slug: searchParams.city
-    }
-  }
-
-  // State filter (city belongs to country, but we don't have state model)
-  // We'll handle this by filtering cities that belong to states
-
-  // Exam filter
-  if (searchParams.exam) {
-    where.exams = {
-      some: {
-        slug: searchParams.exam
-      }
-    }
-  }
-
-  // Search filter (name or description)
-  if (searchParams.search) {
-    where.OR = [
-      { name: { contains: searchParams.search, mode: 'insensitive' } },
-      { description: { contains: searchParams.search, mode: 'insensitive' } },
-      { slug: { contains: searchParams.search, mode: 'insensitive' } }
-    ]
-  }
-
-  const [colleges, total] = await Promise.all([
-    db.college.findMany({
-      where,
-      orderBy: [
-        { Countryranking: { sort: 'asc', nulls: 'last' } },
-        { createdAt: 'desc' }
-      ],
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        active: true,
-        establishment_year: true,
-        Countryranking: true,
-        Internationalranking: true,
-        logoURL: true,
-        imageURL: true,
-        city: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          }
-        },
-        country: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          }
-        },
-        courses: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          },
-          take: 5
-        },
-        categories: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          },
-          take: 3
-        },
-        _count: {
-          select: {
-            courses: true
-          }
-        }
-      }
-    }),
-    db.college.count({ where })
-  ])
-
-  return {
-    colleges,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      hasNext: page < Math.ceil(total / limit),
-      hasPrev: page > 1
-    }
-  }
-}
-
-function getColleges(searchParams: SearchParams) {
-  const cacheKey = JSON.stringify(searchParams)
-  const cachedFn = unstable_cache(
-    async () => getCollegesRaw(searchParams),
-    ['colleges-list', cacheKey],
-    { revalidate: 3600 }
-  )
-  return cachedFn()
-}
-
-async function getFiltersDataRaw() {
-  const [categories, courses, cities, exams] = await Promise.all([
-    db.category.findMany({
-      where: { active: true },
-      orderBy: { name: 'asc' },
-      select: { id: true, name: true, slug: true }
-    }),
-    db.course.findMany({
-      where: { active: true },
-      orderBy: { name: 'asc' },
-      select: { id: true, name: true, slug: true }
-    }),
-    db.city.findMany({
-      where: {
-        country: { name: { equals: 'India', mode: 'insensitive' } },
-        active: true
-      },
-      orderBy: { name: 'asc' },
-      select: { id: true, name: true, slug: true }
-    }),
-    db.exam.findMany({
-      where: { active: true },
-      orderBy: { name: 'asc' },
-      select: { id: true, name: true, slug: true }
-    })
-  ])
-
-  return { categories, courses, cities, exams }
-}
-
-const getFiltersData = unstable_cache(
-  getFiltersDataRaw,
-  ['colleges-filters-data'],
-  { revalidate: 3600 }
-)
-
-export async function generateStaticParams() {
-  // Pre-render default state: no filters, page 1
-  return [{ page: '1' }]
-}
-
-function buildFilterUrl(baseUrl: string, currentParams: SearchParams, newParams: Partial<SearchParams>) {
-  const params = new URLSearchParams()
-
-  // Add current params except page
-  if (currentParams.category) params.set('category', currentParams.category)
-  if (currentParams.course) params.set('course', currentParams.course)
-  if (currentParams.city) params.set('city', currentParams.city)
-  if (currentParams.exam) params.set('exam', currentParams.exam)
-  if (currentParams.search) params.set('search', currentParams.search)
+function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newParams: Record<string, string | undefined>) {
+  const params = new URLSearchParams(currentParams)
 
   // Add/update new params
   Object.entries(newParams).forEach(([key, value]) => {
@@ -243,38 +35,74 @@ function buildFilterUrl(baseUrl: string, currentParams: SearchParams, newParams:
   return queryString ? `${baseUrl}?${queryString}` : baseUrl
 }
 
-export default async function CollegesPage({
-  searchParams: searchParamsPromise
-}: {
-  searchParams: Promise<SearchParams>
-}) {
-  const searchParams = await searchParamsPromise
-  const { colleges, pagination } = await getColleges(searchParams)
-  const { categories, courses, cities, exams } = await getFiltersData()
+export default function CollegesPage() {
+  const searchParams = useSearchParams()
+  const { colleges, pagination, isLoading, error } = usePublicColleges({
+    category: searchParams.get('category') || undefined,
+    course: searchParams.get('course') || undefined,
+    city: searchParams.get('city') || undefined,
+    exam: searchParams.get('exam') || undefined,
+    search: searchParams.get('search') || undefined,
+    page: searchParams.get('page') || undefined,
+  })
+  const { categories, courses: filterCourses, cities, exams, isLoading: filtersLoading } = useCollegesFilters()
 
   // Get active filter names for display
   const activeFilters: { key: string; name: string; slug: string }[] = []
-  if (searchParams.category) {
-    const cat = categories.find(c => c.slug === searchParams.category)
+  if (searchParams.get('category')) {
+    const cat = categories.find(c => c.slug === searchParams.get('category'))
     if (cat) activeFilters.push({ key: 'category', name: cat.name, slug: cat.slug })
   }
-  if (searchParams.course) {
-    const course = courses.find(c => c.slug === searchParams.course)
+  if (searchParams.get('course')) {
+    const course = filterCourses.find(c => c.slug === searchParams.get('course'))
     if (course) activeFilters.push({ key: 'course', name: course.name, slug: course.slug })
   }
-  if (searchParams.city) {
-    const city = cities.find(c => c.slug === searchParams.city)
+  if (searchParams.get('city')) {
+    const city = cities.find(c => c.slug === searchParams.get('city'))
     if (city) activeFilters.push({ key: 'city', name: city.name, slug: city.slug })
   }
-  if (searchParams.exam) {
-    const exam = exams.find(e => e.slug === searchParams.exam)
+  if (searchParams.get('exam')) {
+    const exam = exams.find(e => e.slug === searchParams.get('exam'))
     if (exam) activeFilters.push({ key: 'exam', name: exam.name, slug: exam.slug })
   }
-  if (searchParams.search) {
-    activeFilters.push({ key: 'search', name: `"${searchParams.search}"`, slug: searchParams.search })
+  if (searchParams.get('search')) {
+    activeFilters.push({ key: 'search', name: `"${searchParams.get('search')}"`, slug: searchParams.get('search') || '' })
   }
 
   const baseUrl = '/colleges'
+
+  // Show loading skeleton while data is loading
+  if (isLoading || filtersLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="flex gap-4">
+              <div className="w-72 h-96 bg-gray-200 rounded"></div>
+              <div className="flex-1 space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Colleges</h2>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -285,11 +113,11 @@ export default async function CollegesPage({
             <Link href="/" className="hover:text-blue-600">Home</Link>
             <ChevronRight className="w-4 h-4 mx-2" />
             <span className="text-gray-900 font-medium">Colleges</span>
-            {searchParams.category && (
+            {searchParams.get('category') && (
               <>
                 <ChevronRight className="w-4 h-4 mx-2" />
                 <span className="text-blue-600 font-medium">
-                  {categories.find(c => c.slug === searchParams.category)?.name}
+                  {categories.find(c => c.slug === searchParams.get('category'))?.name}
                 </span>
               </>
             )}
@@ -349,9 +177,9 @@ export default async function CollegesPage({
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Streams</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {categories.map((category) => {
-                      const isActive = searchParams.category === category.slug
-                      const count = colleges.filter(c => c.categories.some(cat => cat.id === category.id)).length
+                    {categories.map((category: any) => {
+                      const isActive = searchParams.get('category') === category.slug
+                      const count = colleges.filter((c: any) => c.categories?.some?.((cat: any) => cat.id === category.id)).length
                       return (
                         <Link
                           key={category.id}
@@ -373,8 +201,8 @@ export default async function CollegesPage({
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Courses</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {courses.slice(0, 10).map((course) => {
-                      const isActive = searchParams.course === course.slug
+                    {filterCourses.slice(0, 10).map((course: any) => {
+                      const isActive = searchParams.get('course') === course.slug
                       return (
                         <Link
                           key={course.id}
@@ -395,8 +223,8 @@ export default async function CollegesPage({
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Cities</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {cities.slice(0, 15).map((city) => {
-                      const isActive = searchParams.city === city.slug
+                    {cities.slice(0, 15).map((city: any) => {
+                      const isActive = searchParams.get('city') === city.slug
                       return (
                         <Link
                           key={city.id}
@@ -417,8 +245,8 @@ export default async function CollegesPage({
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Exams</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {exams.slice(0, 10).map((exam) => {
-                      const isActive = searchParams.exam === exam.slug
+                    {exams.slice(0, 10).map((exam: any) => {
+                      const isActive = searchParams.get('exam') === exam.slug
                       return (
                         <Link
                           key={exam.id}
@@ -496,7 +324,7 @@ export default async function CollegesPage({
 
                               {/* Categories */}
                               <div className="flex flex-wrap gap-2 mb-3">
-                                {college.categories.map((cat) => (
+                                {college.categories?.map((cat: any) => (
                                   <Badge key={cat.id} variant="secondary" className="text-xs">
                                     {cat.name}
                                   </Badge>

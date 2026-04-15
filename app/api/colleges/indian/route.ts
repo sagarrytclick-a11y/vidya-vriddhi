@@ -82,6 +82,14 @@ export async function GET(request: NextRequest) {
             },
             take: 5
           },
+          categories: {
+            select: {
+              id: true,
+              name: true,
+              slug: true
+            },
+            take: 3
+          },
           _count: {
             select: {
               categories: true,

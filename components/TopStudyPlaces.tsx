@@ -3,6 +3,7 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building, ExternalLink } from 'lucide-react'
 import { useCities } from '@/hooks/useCities'
+import Link from 'next/link'
 
 interface City {
   id: string
@@ -81,10 +82,12 @@ const TopStudyPlaces: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Top Study Places</h2>
-          <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
-            <span>Explore all cities</span>
-             <ExternalLink className="w-5 h-5" />
-          </button>
+          <Link href="/cities">
+            <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+              <span>Explore all cities</span>
+              <ExternalLink className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
 
         {/* Loading State */}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink } from 'lucide-react'
+import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink, MapPin } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
 import Link from 'next/link'
 
@@ -21,6 +21,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
     <div className="shrink-0 w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex flex-col h-full">
+      <div className="flex items-center space-x-2 text-[#94A3B8] mb-3">
+      <MapPin className="w-6 h-6 text-orange-500" />
+    </div>
+
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-tight">{course.name}</h3>
@@ -37,12 +41,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           </div>
         </div>
         
-        <div className="mt-auto pt-4 border-t border-gray-100">
-          <button className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium w-full justify-center">
-            <span>Course Overview</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+      
       </div>
     </div>
   )
