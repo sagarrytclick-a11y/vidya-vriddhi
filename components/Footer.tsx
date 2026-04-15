@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronUp, Facebook, Instagram, Twitter, Youtube, Linkedin, Rss, Mail, Phone, MapPin } from 'lucide-react'
+import { ChevronUp, Facebook, Instagram, Twitter, Youtube, Linkedin, Rss, Mail, Phone, MapPin, MessageCircle } from 'lucide-react'
 import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 
 const Footer = () => {
@@ -167,28 +167,36 @@ const Footer = () => {
 
               {/* Social Media Icons */}
               <div className="flex items-center space-x-3 ml-0 md:ml-8">
+                {SITE_IDENTITY.contact.socials.whatsapp && (
+                  <a href={SITE_IDENTITY.contact.socials.whatsapp} className="text-gray-400 hover:text-white transition-colors">
+                    <MessageCircle className="w-5 h-5" />
+                  </a>
+                )}
+                {SITE_IDENTITY.contact.socials.instagram && (
+                  <a href={SITE_IDENTITY.contact.socials.instagram} className="text-gray-400 hover:text-white transition-colors">
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                )}
+                {SITE_IDENTITY.contact.socials.linkedin && (
+                  <a href={SITE_IDENTITY.contact.socials.linkedin} className="text-gray-400 hover:text-white transition-colors">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                )}
+                {SITE_IDENTITY.contact.socials.youtube && (
+                  <a href={SITE_IDENTITY.contact.socials.youtube} className="text-gray-400 hover:text-white transition-colors">
+                    <Youtube className="w-5 h-5" />
+                  </a>
+                )}
                 {SITE_IDENTITY.contact.socials.facebook && (
                   <a href={SITE_IDENTITY.contact.socials.facebook} className="text-gray-400 hover:text-white transition-colors">
                     <Facebook className="w-5 h-5" />
                   </a>
                 )}
-                <a href={SITE_IDENTITY.contact.socials.instagram} className="text-gray-400 hover:text-white transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
                 {SITE_IDENTITY.contact.socials.twitter && (
                   <a href={SITE_IDENTITY.contact.socials.twitter} className="text-gray-400 hover:text-white transition-colors">
                     <Twitter className="w-5 h-5" />
                   </a>
                 )}
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Youtube className="w-5 h-5" />
-                </a>
-                <a href={SITE_IDENTITY.contact.socials.linkedin} className="text-gray-400 hover:text-white transition-colors">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Rss className="w-5 h-5" />
-                </a>
               </div>
             </div>
           </div>
