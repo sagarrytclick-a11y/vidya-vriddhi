@@ -10,7 +10,7 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/auth/logout', {
+      const response = await fetch('/api/admin-auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -18,7 +18,9 @@ export function Header() {
       })
 
       if (response.ok) {
-        router.push('/admin/login')
+        // Use window.location.replace() to prevent back button navigation
+        // This replaces the current page in browser history
+        window.location.replace('/admin-login')
       } else {
         console.error('Logout failed')
       }
