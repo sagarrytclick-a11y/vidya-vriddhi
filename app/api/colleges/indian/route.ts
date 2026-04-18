@@ -9,6 +9,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const skip = (page - 1) * limit
     
+    // Get filter parameters
+    const category = searchParams.get('category')
+    const course = searchParams.get('course')
+    const city = searchParams.get('city')
+    const exam = searchParams.get('exam')
+    const search = searchParams.get('search')
+    
     // Find India country (case-insensitive)
     const india = await db.country.findFirst({
       where: { 
@@ -34,12 +41,64 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Fetch Indian colleges with pagination
+    // Build where clause
+    let whereClause: any = {
+      countryId: india.id,
+      active: true
+    }
+
+    // Add search filter
+    if (search) {
+      whereClause.name = {
+        contains: search,
+        mode: 'insensitive'
+      }
+    }
+
+    // Add category filter
+    if (category) {
+      whereClause.categories = {
+        some: {
+          category: {
+            slug: category
+          }
+        }
+      }
+    }
+
+    // Add course filter
+    if (course) {
+      whereClause.courses = {
+        some: {
+          course: {
+            slug: course
+          }
+        }
+      }
+    }
+
+    // Add city filter
+    if (city) {
+      whereClause.city = {
+        slug: city
+      }
+    }
+
+    // Add exam filter
+    if (exam) {
+      whereClause.exams = {
+        some: {
+          exam: {
+            slug: exam
+          }
+        }
+      }
+    }
+
+    // Fetch Indian colleges with pagination and filters
     const [colleges, totalCount] = await Promise.all([
       db.college.findMany({
-        where: {
-          countryId: india.id
-        },
+        where: whereClause,
         orderBy: [
           { Countryranking: { sort: 'asc', nulls: 'last' } },
           { createdAt: 'desc' }
@@ -100,9 +159,7 @@ export async function GET(request: NextRequest) {
         }
       }),
       db.college.count({
-        where: {
-          countryId: india.id
-        }
+        where: whereClause
       })
     ])
 

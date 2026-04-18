@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SearchInput } from '@/components/SearchInput'
 import { CollegeActionButtons } from '@/components/college/CollegeActionButtons'
+import CompareButton from '@/components/ui/compare-button'
 import { usePublicColleges } from '@/hooks/usePublicColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 
@@ -358,7 +359,9 @@ function CollegesPageContent() {
                             </div>
 
                             {/* Action Buttons */}
-                            <CollegeActionButtons collegeSlug={college.slug} />
+                            <div className="flex gap-2">
+                              <CollegeActionButtons collegeSlug={college.slug} college={college} />
+                            </div>
                           </div>
                         </div>
                     </Link>
