@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight, Search, Menu, X } from 'lucide-react'
+import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import Link from 'next/link'
+import { UserButton, useUser } from '@clerk/nextjs'
 
 const Navbar = () => {
+  const { user, isSignedIn } = useUser()
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null)
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -153,21 +155,41 @@ const Navbar = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Get Guidance Button */}
-              <button 
-                onClick={() => openModal()}
-                className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
-              >
-                <span>Get Guidance</span>
-              </button>
+              {/* User Auth Section */}
+              {isSignedIn ? (
+                <div className="flex items-center space-x-3">
+                   <button
+                    onClick={() => openModal()}
+                    className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                  >
+                    <span>Get Guidance</span>
+                  </button>
+                  <UserButton />
+                </div>
+              ) : (
+                <>
+                  {/* Get Guidance Button */}
+                  <button
+                    onClick={() => openModal()}
+                    className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                  >
+                    <span>Get Guidance</span>
+                  </button>
 
-              {/* Mobile CTA (icon only) */}
-              <button 
-                onClick={() => openModal()}
-                className="sm:hidden p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
-              >
-                <User className="w-5 h-5" />
-              </button>
+                  {/* Mobile CTA (icon only) */}
+                  <button
+                    onClick={() => openModal()}
+                    className="sm:hidden p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                  </button>
+
+                  {/* Login Button */}
+                  <Link href="/sign-in" className="hidden sm:flex items-center space-x-2 bg-white hover:bg-gray-50 text-slate-900 px-4 py-2 rounded-lg font-semibold transition-all text-sm">
+                    <span>Login</span>
+                  </Link>
+                </>
+              )}
 
               {/* Mobile Menu Toggle */}
               <button

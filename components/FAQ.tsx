@@ -165,13 +165,15 @@ const FAQ: React.FC = () => {
             Our expert counselors are here to help you with any queries
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
+            <button
               onClick={() => openModal()}
               className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
             >
               Contact Counselor
             </button>
-            <button className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <button
+              onClick={() => openModal()}
+              className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Browse Help Center
             </button>
           </div>

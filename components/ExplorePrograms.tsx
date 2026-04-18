@@ -211,11 +211,10 @@ const ExplorePrograms: React.FC = () => {
               <button
                 key={program}
                 onClick={() => setSelectedProgram(program)}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-200 ${
-                  selectedProgram === program
+                className={`px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-200 ${selectedProgram === program
                     ? "bg-orange-500 text-white shadow-md"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {program}
               </button>
@@ -261,8 +260,8 @@ const ExplorePrograms: React.FC = () => {
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">JEE</span>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">NEET</span>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">CUET</span>
-                 
-                 </div>
+
+                  </div>
                   <Link href="/exams">
                     <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
                       <span>Explore Exams</span>
@@ -277,19 +276,22 @@ const ExplorePrograms: React.FC = () => {
                 </div>
                 <div className="flex-1 flex flex-col">
                   <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
-                    College Predictor
+                    College Compare
                   </h3>
                   <p className="text-sm text-gray-500 mb-6 leading-relaxed flex-1">
-                    Find out where you're likely to get admission based on your rank, category, and preferences
+                    Compare colleges based on fees, courses, placement, and other factors
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">JEE Predictor</span>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md">NEET Predictor</span>
                   </div>
-                  <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
-                    <span>Predict Admission</span>
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  <Link href="/compare-colleges">
+                    <button className="mt-auto flex items-center justify-between w-full px-5 py-3.5 bg-orange-500 text-white text-sm font-bold rounded-xl transition-all duration-300">
+                      <span>Compare College</span>
+                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </Link>
+
                 </div>
               </div>
             </>
