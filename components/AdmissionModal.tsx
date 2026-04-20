@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SuccessModal } from '@/components/ui/success-modal'
+import { CongratulationsModal } from '@/components/ui/congratulations-modal'
+import { z } from 'zod'
 import {
   Select,
   SelectContent,
@@ -40,6 +42,19 @@ const courses = [
   'Bachelor of Education (B.Ed)',
 ]
 
+// Zod validation schema
+const formSchema = z.object({
+  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email'),
+  phone: z.string()
+    .regex(/^\d{10}$/, 'Mobile number must be exactly 10 digits')
+    .length(10, 'Mobile number must be exactly 10 digits')
+    .refine((val) => !/^0/.test(val), 'Mobile number should not start with 0'),
+  city: z.string().min(1, 'Please select a city'),
+  course: z.string().min(1, 'Please select a course'),
+  agreedToTerms: z.boolean().refine((val) => val === true, 'Please accept terms and conditions')
+})
+
 export function AdmissionModal() {
   const { isOpen, selectedCourse, closeModal } = useAdmissionModal()
   const [formData, setFormData] = useState({
@@ -64,8 +79,32 @@ export function AdmissionModal() {
     title: '',
     message: ''
   })
+  const [showCongratulations, setShowCongratulations] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [currentFormData, setCurrentFormData] = useState<any>(null)
 
   if (!isOpen) return null
+
+  const validateForm = () => {
+    try {
+      formSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {}
+        error.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            const fieldName = String(issue.path[0])
+            newErrors[fieldName] = issue.message
+          }
+        })
+        setErrors(newErrors)
+        console.log('Validation errors:', newErrors)
+      }
+      return false
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,6 +116,10 @@ export function AdmissionModal() {
         title: 'Terms Required',
         message: 'Please accept the terms and conditions to continue with your application.'
       })
+      return
+    }
+
+    if (!validateForm()) {
       return
     }
 
@@ -100,23 +143,26 @@ export function AdmissionModal() {
       const data = await response.json()
 
       if (response.ok) {
-        setModalState({
-          isOpen: true,
-          type: 'success',
-          title: 'Application Submitted Successfully! 🎉',
-          message: 'Thank you for your enquiry! We have received your application and will contact you soon with next steps.'
-        })
-        closeModal()
-        // Reset form
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          city: '',
-          course: selectedCourse || '',
-          courseType: 'regular',
-          agreedToTerms: false,
-        })
+        // Store current form data for congratulations modal
+        setCurrentFormData({ ...formData })
+        
+        setShowCongratulations(true)
+        // Don't close modal yet - let congratulations show on top
+        
+        // Reset form after showing congratulations
+        setTimeout(() => {
+          setFormData({
+            fullName: '',
+            email: '',
+            phone: '',
+            city: '',
+            course: selectedCourse || '',
+            courseType: 'regular',
+            agreedToTerms: false,
+          })
+          setCurrentFormData(null)
+          closeModal() // Close admission modal after congratulations
+        }, 3000) // Close after 3 seconds or when user closes congratulations
       } else {
         setModalState({
           isOpen: true,
@@ -207,7 +253,11 @@ export function AdmissionModal() {
                 placeholder="Full Name *"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="w-full pl-12 pr-4 py-4 h-14 bg-white border-2 border-orange-100 rounded-xl text-base focus:border-orange-400 focus:ring-orange-400"
+                className={`w-full pl-12 pr-4 py-4 h-14 bg-white border-2 rounded-xl text-base focus:ring-2 transition-colors ${
+                  errors.fullName 
+                    ? 'border-red-400 focus:border-red-400 focus:ring-red-400' 
+                    : 'border-orange-100 focus:border-orange-400 focus:ring-orange-400'
+                }`}
                 required
               />
             </div>
@@ -222,7 +272,11 @@ export function AdmissionModal() {
                 placeholder="Email ID *"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-12 pr-4 py-4 h-14 bg-white border-2 border-orange-100 rounded-xl text-base focus:border-orange-400 focus:ring-orange-400"
+                className={`w-full pl-12 pr-4 py-4 h-14 bg-white border-2 rounded-xl text-base focus:ring-2 transition-colors ${
+                  errors.email 
+                    ? 'border-red-400 focus:border-red-400 focus:ring-red-400' 
+                    : 'border-orange-100 focus:border-orange-400 focus:ring-orange-400'
+                }`}
                 required
               />
             </div>
@@ -238,21 +292,27 @@ export function AdmissionModal() {
                   type="tel"
                   placeholder="Contact Number *"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full pl-20 pr-4 py-4 h-14 bg-white border-2 border-orange-100 rounded-xl text-base focus:border-orange-400 focus:ring-orange-400"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 10)
+                    setFormData({ ...formData, phone: value })
+                  }}
+                  className={`w-full pl-20 pr-4 py-4 h-14 bg-white border-2 rounded-xl text-base focus:ring-2 transition-colors ${
+                    errors.phone 
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400' 
+                      : 'border-orange-100 focus:border-orange-400 focus:ring-orange-400'
+                  }`}
                   maxLength={10}
                   required
                 />
               </div>
-              <Button
-                type="button"
-                onClick={handleGetOTP}
-                disabled={formData.phone.length < 10 || otpSent}
-                className="h-14 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium disabled:opacity-50"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Get OTP
-              </Button>
+              
+              {/* Phone Error Message */}
+              {errors.phone && (
+                <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <Phone className="w-4 h-4" />
+                  {errors.phone}
+                </div>
+              )}
             </div>
 
             {/* City Dropdown */}
@@ -275,6 +335,14 @@ export function AdmissionModal() {
                   ))}
                 </SelectContent>
               </Select>
+              
+              {/* City Error Message */}
+              {errors.city && (
+                <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  {errors.city}
+                </div>
+              )}
             </div>
 
             {/* Course Dropdown */}
@@ -297,39 +365,17 @@ export function AdmissionModal() {
                   ))}
                 </SelectContent>
               </Select>
+              
+              {/* Course Error Message */}
+              {errors.course && (
+                <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <BookOpen className="w-4 h-4" />
+                  {errors.course}
+                </div>
+              )}
             </div>
 
-            {/* Course Type */}
-            <div>
-              <p className="text-gray-700 font-medium mb-3">
-                Course Interested <span className="text-orange-500">*</span>
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, courseType: 'online' })}
-                  className={`flex-1 py-3 px-4 rounded-full font-medium transition-all ${
-                    formData.courseType === 'online'
-                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  Online
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, courseType: 'regular' })}
-                  className={`flex-1 py-3 px-4 rounded-full font-medium transition-all ${
-                    formData.courseType === 'regular'
-                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  Regular
-                </button>
-              </div>
-            </div>
-
+       
             {/* Terms Checkbox */}
             <div className="flex items-start gap-3 py-2">
               <Checkbox
@@ -365,7 +411,7 @@ export function AdmissionModal() {
                   Submitting...
                 </div>
               ) : (
-                'Verify Phone to Continue'
+                'Submit'
               )}
             </Button>
           </form>
@@ -379,6 +425,18 @@ export function AdmissionModal() {
         type={modalState.type}
         title={modalState.title}
         message={modalState.message}
+      />
+      
+      {/* Congratulations Modal */}
+      <CongratulationsModal
+        isOpen={showCongratulations}
+        onClose={() => {
+          setShowCongratulations(false)
+          closeModal()
+          setCurrentFormData(null)
+        }}
+        studentName={currentFormData?.fullName || formData.fullName}
+        course={currentFormData?.course || formData.course || selectedCourse || 'Selected Course'}
       />
     </div>
   )
