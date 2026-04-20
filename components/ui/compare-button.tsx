@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Check } from 'lucide-react'
 import { Button } from './button'
 
@@ -57,10 +57,10 @@ export default function CompareButton({ college, variant = 'default', size = 'de
   }
 
   // Check if college is already in compare list on mount
-  useState(() => {
+  useEffect(() => {
     const currentCompare = JSON.parse(localStorage.getItem('compareColleges') || '[]')
     setIsAdded(currentCompare.some((c: College) => c.id === college.id))
-  })
+  }, [college.id])
 
   return (
     <Button
