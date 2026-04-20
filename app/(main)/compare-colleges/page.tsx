@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Plus, ArrowRight } from 'lucide-react'
+import { X, Plus, ArrowRight, MapPin, Star, GraduationCap, FileText, IndianRupee, CheckCircle, Calendar, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -9,45 +9,126 @@ interface College {
   id: string
   name: string
   slug: string
-  logo: string
-  city: string
-  state: string
-  fees: string
-  rating: number
-  placement: string
-  courses: string[]
-  category: string
+  description?: string
+  logoURL?: string
+  establishment_year?: number
+  Countryranking?: number
+  Internationalranking?: number
+  features: string[]
+  keyHighlights?: {
+    title: string
+    features: string[]
+    description: string
+  }
+  whyChooseUs?: {
+    title: string
+    features: {
+      title: string
+      description: string
+    }[]
+    description: string
+  }
+  documentsRequired?: {
+    title: string
+    documents: string[]
+    description: string
+  }
+  feesStructure?: {
+    title: string
+    courses: {
+      course_name: string
+      duration: string
+      annual_tuition_fee: string
+    }[]
+    description: string
+  }
+  admissionProcess?: {
+    title: string
+    steps: string[]
+    description: string
+  }
+  campusHighlights?: {
+    title: string
+    highlights: string[]
+    description: string
+  }
+  city?: {
+    name: string
+    state?: {
+      name: string
+    }
+  }
+  country?: {
+    name: string
+  }
+  categories?: Array<{
+    name: string
+  }>
+  courses?: Array<{
+    name: string
+  }>
 }
 
 export default function CompareCollegesPage() {
   const [selectedColleges, setSelectedColleges] = useState<College[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load selected colleges from localStorage
-    const stored = localStorage.getItem('compareColleges')
-    if (stored) {
-      setSelectedColleges(JSON.parse(stored))
+    const fetchFullCollegeData = async () => {
+      setLoading(true)
+      try {
+        const stored = localStorage.getItem('compareColleges')
+        if (!stored) {
+          setSelectedColleges([])
+          setLoading(false)
+          return
+        }
+
+        const storedItems = JSON.parse(stored) as College[]
+        if (storedItems.length === 0) {
+          setSelectedColleges([])
+          setLoading(false)
+          return
+        }
+
+        // Fetch full data for each ID to ensure we have all nested objects (fees, process, etc.)
+        const fullDataPromises = storedItems.map(item => 
+          fetch(`/api/colleges/${item.id}`).then(res => res.json())
+        )
+        
+        const results = await Promise.all(fullDataPromises)
+        // Filter out any failed fetches and update state
+        setSelectedColleges(results.filter(c => c && c.id))
+      } catch (error) {
+        console.error("Failed to fetch comparison data:", error)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    fetchFullCollegeData()
   }, [])
 
-  useEffect(() => {
-    // Save to localStorage whenever selection changes
-    localStorage.setItem('compareColleges', JSON.stringify(selectedColleges))
-  }, [selectedColleges])
-
   const removeCollege = (collegeId: string) => {
-    setSelectedColleges(prev => prev.filter(college => college.id !== collegeId))
-  }
-
-  const addMoreColleges = () => {
-    // Navigate to colleges page or show modal to add more
-    window.location.href = '/colleges'
+    const updated = selectedColleges.filter(college => college.id !== collegeId)
+    setSelectedColleges(updated)
+    localStorage.setItem('compareColleges', JSON.stringify(updated))
   }
 
   const clearAll = () => {
     setSelectedColleges([])
     localStorage.removeItem('compareColleges')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-orange-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">Fetching Comparison Data...</p>
+        </div>
+      </div>
+    )
   }
 
   if (selectedColleges.length === 0) {
@@ -80,26 +161,26 @@ export default function CompareCollegesPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Compare Colleges</h1>
               <p className="text-gray-600 mt-1">
                 Comparing {selectedColleges.length} college{selectedColleges.length > 1 ? 's' : ''}
               </p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               {selectedColleges.length < 4 && (
-                <button
-                  onClick={addMoreColleges}
+                <Link
+                  href="/colleges"
                   className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add College</span>
-                </button>
+                </Link>
               )}
               <button
                 onClick={clearAll}
-                className="text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+                className="text-gray-500 hover:text-red-600 px-4 py-2 rounded-lg font-medium transition-colors border border-gray-200"
               >
                 Clear All
               </button>
@@ -108,147 +189,167 @@ export default function CompareCollegesPage() {
         </div>
 
         {/* Comparison Table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed border-collapse">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left p-4 font-semibold text-gray-900 bg-gray-50 w-48">Feature</th>
+                  <th className="text-left p-6 font-bold text-gray-900 bg-gray-50/50 w-64">Criteria</th>
                   {selectedColleges.map((college) => (
-                    <th key={college.id} className="text-left p-4 font-semibold text-gray-900 bg-gray-50 min-w-[250px]">
+                    <th key={college.id} className="text-left p-6 font-bold text-gray-900 bg-gray-50/50 min-w-[300px] border-l border-gray-100">
                       <div className="flex items-center justify-between">
-                        <span className="truncate">{college.name}</span>
+                        <span className="truncate pr-2">{college.name}</span>
                         <button
                           onClick={() => removeCollege(college.id)}
-                          className="ml-2 text-gray-400 hover:text-red-500 transition-colors"
+                          className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
+                          title="Remove from comparison"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-5 h-5" />
                         </button>
                       </div>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
-                {/* College Logo */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Logo</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <Image
-                          src={college.logo}
-                          alt={college.name}
-                          width={60}
-                          height={60}
-                          className="w-12 h-12 object-contain rounded-lg"
-                        />
-                        <Link
-                          href={`/colleges/${college.slug}`}
-                          className="text-orange-500 hover:text-orange-600 text-sm font-medium"
-                        >
-                          View Details
-                        </Link>
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Location */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Location</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4 text-gray-900">
-                      {college.city}, {college.state}
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Category */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Category</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4 text-gray-900">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                        {college.category}
-                      </span>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Rating */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Rating</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-2xl font-bold text-gray-900">{college.rating}</span>
-                        <span className="text-yellow-500">★</span>
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Fees */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Annual Fees</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <span className="text-lg font-semibold text-gray-900">{college.fees}</span>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Placement */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Highest Package</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <span className="text-green-600 font-semibold">{college.placement}</span>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Courses */}
-                <tr className="border-b border-gray-100">
-                  <td className="p-4 font-medium text-gray-700">Popular Courses</td>
-                  {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <div className="space-y-2">
-                        {college.courses.slice(0, 3).map((course, index) => (
-                          <div key={index} className="text-sm text-gray-600">
-                            • {course}
-                          </div>
-                        ))}
-                        {college.courses.length > 3 && (
-                          <div className="text-sm text-orange-500 font-medium">
-                            +{college.courses.length - 3} more
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Actions */}
+              <tbody className="divide-y divide-gray-100">
+                {/* Visual Header Row */}
                 <tr>
-                  <td className="p-4 font-medium text-gray-700">Actions</td>
+                  <td className="p-6 font-semibold text-gray-700 bg-gray-50/30">Preview</td>
                   {selectedColleges.map((college) => (
-                    <td key={college.id} className="p-4">
-                      <div className="flex space-x-2">
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      <div className="flex flex-col items-center text-center space-y-3">
+                        <div className="relative w-20 h-20 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-center p-2">
+                          {college.logoURL ? (
+                            <Image
+                              src={college.logoURL}
+                              alt={college.name}
+                              fill
+                              className="object-contain p-2"
+                            />
+                          ) : (
+                            <GraduationCap className="w-10 h-10 text-gray-300" />
+                          )}
+                        </div>
                         <Link
                           href={`/colleges/${college.slug}`}
-                          className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                          className="text-orange-500 hover:underline text-sm font-bold"
                         >
-                          View Details
+                          View Official Profile
                         </Link>
-                        <button
-                          onClick={() => removeCollege(college.id)}
-                          className="px-3 py-2 border border-gray-300 hover:border-red-300 hover:text-red-600 rounded-lg text-sm font-medium transition-colors"
-                        >
-                          Remove
-                        </button>
                       </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Key Stats Row */}
+                <tr>
+                  <td className="p-6 font-semibold text-gray-700 bg-gray-50/30">Overview</td>
+                  {selectedColleges.map((college) => (
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 text-orange-500" />
+                          {college.city?.name}, {college.city?.state?.name || college.country?.name}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
+                          Established {college.establishment_year || 'N/A'}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 font-bold">
+                          <Star className="w-4 h-4 mr-2 text-yellow-500 fill-yellow-500" />
+                          Rank: #{college.Countryranking || 'NR'} (India)
+                        </div>
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Fees - Re-calculated for accuracy */}
+                <tr>
+                  <td className="p-6 font-semibold text-gray-700 bg-gray-50/30">Fee Structure</td>
+                  {selectedColleges.map((college) => (
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      {college.feesStructure?.courses?.length ? (
+                        <div className="space-y-3">
+                          <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+                            <span className="text-xs uppercase tracking-wider text-orange-600 font-bold">Average Annual Fee</span>
+                            <div className="text-xl font-black text-gray-900">
+                              {(() => {
+                                const fees = college.feesStructure?.courses?.map(c => {
+                                  const match = c.annual_tuition_fee.match(/[\d,]+/)
+                                  return match ? parseInt(match[0].replace(/,/g, '')) : 0
+                                }).filter(f => f > 0) || []
+                                const avg = fees.length > 0 ? Math.round(fees.reduce((a, b) => a + b, 0) / fees.length) : 0
+                                return avg > 0 ? `₹${avg.toLocaleString('en-IN')}` : 'Contact for Fees'
+                              })()}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            {college.feesStructure.courses.slice(0, 2).map((c, i) => (
+                              <div key={i} className="text-xs flex justify-between border-b border-gray-50 pb-1">
+                                <span className="text-gray-500 truncate max-w-[150px]">{c.course_name}</span>
+                                <span className="font-semibold text-gray-700">{c.annual_tuition_fee}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 italic">Not Disclosed</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Facilities / Highlights */}
+                <tr>
+                  <td className="p-6 font-semibold text-gray-700 bg-gray-50/30">Top Facilities</td>
+                  {selectedColleges.map((college) => (
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      <div className="flex flex-wrap gap-2">
+                        {(college.features || college.campusHighlights?.highlights || []).slice(0, 5).map((f, i) => (
+                          <span key={i} className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded uppercase">
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Admission Process */}
+                <tr>
+                  <td className="p-6 font-semibold text-gray-700 bg-gray-50/30">Admission Info</td>
+                  {selectedColleges.map((college) => (
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      {college.admissionProcess?.steps?.length ? (
+                        <ul className="space-y-2">
+                          {college.admissionProcess.steps.slice(0, 3).map((step, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                              <div className="w-4 h-4 bg-green-100 text-green-700 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
+                                {i + 1}
+                              </div>
+                              {step}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-gray-400 text-xs italic">Step-by-step guide available on profile</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Final CTA */}
+                <tr>
+                  <td className="p-6 bg-gray-50/30"></td>
+                  {selectedColleges.map((college) => (
+                    <td key={college.id} className="p-6 border-l border-gray-100">
+                      <Link
+                        href={`/colleges/${college.slug}`}
+                        className="block w-full py-3 bg-orange-500 hover:bg-orange-600 text-white text-center rounded-xl font-bold transition-all shadow-md shadow-orange-200"
+                      >
+                        Apply Now
+                      </Link>
                     </td>
                   ))}
                 </tr>
@@ -256,22 +357,6 @@ export default function CompareCollegesPage() {
             </table>
           </div>
         </div>
-
-        {/* Add More CTA */}
-        {selectedColleges.length < 4 && (
-          <div className="mt-6 text-center">
-            <button
-              onClick={addMoreColleges}
-              className="inline-flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Add More Colleges</span>
-            </button>
-            <p className="text-gray-500 text-sm mt-2">
-              You can compare up to 4 colleges at a time
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )
