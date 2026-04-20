@@ -21,6 +21,8 @@ import { useAdminCourses } from '@/hooks/useAdminCourses'
 import { useAdminExams } from '@/hooks/useAdminExams'
 import { useBlogContext } from '@/contexts/blog-context'
 import { useAdminNews } from '@/hooks/useAdminNews'
+import { useEnquiryStats } from '@/hooks/useEnquiries'
+import { useRouter } from 'next/navigation'
 
 interface StatCard {
   title: string
@@ -28,9 +30,11 @@ interface StatCard {
   description: string
   icon: any
   color: string
+  href: string
 }
 
 export function StatsCards() {
+  const router = useRouter()
   const { colleges, isLoading: collegesLoading } = useColleges()
   const { countries, isLoading: countriesLoading } = useCountryContext()
   const { cities, isLoading: citiesLoading } = useCityContext()
@@ -39,6 +43,7 @@ export function StatsCards() {
   const { exams, isLoading: examsLoading } = useAdminExams()
   const { blogs, loading: blogsLoading } = useBlogContext()
   const { news, isLoading: newsLoading } = useAdminNews()
+  const { stats, isLoading: enquiriesLoading } = useEnquiryStats()
 
   const statsData: StatCard[] = [
     {
@@ -46,69 +51,102 @@ export function StatsCards() {
       value: countries.length,
       description: 'Active destinations',
       icon: Globe,
-      color: 'text-blue-400'
+      color: 'text-blue-400',
+      href: '/admin/countries'
     },
     {
       title: 'Total Colleges',
       value: colleges.length,
       description: 'Educational institutions',
       icon: GraduationCap,
-      color: 'text-green-400'
+      color: 'text-green-400',
+      href: '/admin/colleges'
     },
     {
       title: 'Total Exams',
       value: exams.length,
       description: 'Standardized tests',
       icon: FileText,
-      color: 'text-purple-400'
+      color: 'text-purple-400',
+      href: '/admin/exams'
     },
     {
       title: 'Blog Posts',
       value: blogs.length,
       description: 'Published content',
       icon: BookOpen,
-      color: 'text-yellow-400'
+      color: 'text-yellow-400',
+      href: '/admin/blogs'
     },
     {
       title: 'Total Cities',
       value: cities.length,
       description: 'Study locations',
       icon: Building,
-      color: 'text-orange-400'
+      color: 'text-orange-400',
+      href: '/admin/cities'
     },
     {
       title: 'Categories',
       value: categoryCount,
       description: 'Content categories',
       icon: Folder,
-      color: 'text-pink-400'
+      color: 'text-pink-400',
+      href: '/admin/categories'
     },
     {
       title: 'Courses',
       value: courses.length,
       description: 'Available courses',
       icon: Library,
-      color: 'text-cyan-400'
+      color: 'text-cyan-400',
+      href: '/admin/courses'
     },
     {
       title: 'News',
       value: news.length,
       description: 'Latest updates',
       icon: Newspaper,
-      color: 'text-lime-400'
+      color: 'text-lime-400',
+      href: '/admin/news'
+    },
+    {
+      title: 'Total Enquiries',
+      value: stats.total,
+      description: 'Student inquiries',
+      icon: MessageSquare,
+      color: 'text-blue-400',
+      href: '/admin/enquiries'
     },
     {
       title: 'Pending Enquiries',
-      value: 7, // This would come from an enquiries API when available
+      value: stats.pending,
       description: 'Awaiting response',
       icon: MessageSquare,
-      color: 'text-red-400'
+      color: 'text-red-400',
+      href: '/admin/enquiries?status=PENDING'
+    },
+    {
+      title: 'Resolved Enquiries',
+      value: stats.resolved,
+      description: 'Completed',
+      icon: MessageSquare,
+      color: 'text-green-400',
+      href: '/admin/enquiries?status=RESOLVED'
+    },
+    {
+      title: 'Follow Up Required',
+      value: stats.followUp,
+      description: 'Need attention',
+      icon: MessageSquare,
+      color: 'text-yellow-400',
+      href: '/admin/enquiries?status=FOLLOW_UP'
     }
   ]
 
   const isLoading = collegesLoading || countriesLoading || citiesLoading || 
                    categoriesLoading || coursesLoading || examsLoading || 
-                   blogsLoading || newsLoading
+                   blogsLoading || newsLoading || enquiriesLoading
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-8">
@@ -123,7 +161,11 @@ export function StatsCards() {
         statsData.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index} className="bg-slate-800 border-slate-700 text-white">
+            <Card 
+              key={index} 
+              className="bg-slate-800 border-slate-700 text-white cursor-pointer hover:bg-slate-700 hover:border-slate-600 transition-all duration-200 hover:scale-105"
+              onClick={() => router.push(stat.href)}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-slate-300 text-sm font-medium">
