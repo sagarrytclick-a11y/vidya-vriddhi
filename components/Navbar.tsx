@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut } from 'lucide-react'
+import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import Link from 'next/link'
@@ -20,7 +20,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       // Show search bar after scrolling past hero section (approx 500px)
-      setShowSearchBar(window.scrollY >30)
+      setShowSearchBar(window.scrollY > 30)
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -134,11 +134,12 @@ const Navbar = () => {
               </Link>
             </div>
 
+
             {/* Desktop Search Bar - appears on scroll */}
-            <div className={`hidden lg:flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
+            <div className={`hidden cursor-pointer lg:flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-4 py-2.5 rounded-lg transition-all mr-3 w-96 xl:w-[500px]"
+                className="flex items-center cursor-pointer space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-4 py-2.5 rounded-lg transition-all mr-3 w-96 xl:w-125"
               >
                 <Search className="w-5 h-5 text-gray-400" />
                 <span className="text-sm">Search colleges, exams...</span>
@@ -146,7 +147,7 @@ const Navbar = () => {
             </div>
 
             {/* Right Side Actions */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex cursor-pointer items-center space-x-2 sm:space-x-3">
               {/* Mobile Search Button */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -155,10 +156,20 @@ const Navbar = () => {
                 <Search className="w-5 h-5" />
               </button>
 
+              <div className="hidden lg:flex items-center space-x-4 ml-8">
+                <Link href="/compare-colleges" className="text-white hover:text-orange-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                  <PencilLine className="w-4 h-4" />
+                  <div>
+                    <p>Compare Colleges</p>
+                    <p className='bg-orange-500 text-[10px] flex items-center justify-center p-1 rounded'>Upto 4 Colleges</p>
+                  </div>
+                </Link>
+              </div>
+
               {/* User Auth Section */}
               {isSignedIn ? (
                 <div className="flex items-center space-x-3">
-                   <button
+                  <button
                     onClick={() => openModal()}
                     className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
                   >
@@ -291,14 +302,25 @@ const Navbar = () => {
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}>
         {/* Backdrop */}
-        <div 
+        <div
           className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setIsMobileMenuOpen(false)}
         />
-        
+
         {/* Mobile Menu Panel */}
         <div className={`absolute top-15 sm:top-16 left-0 right-0 bg-white shadow-xl transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
           <div className="max-h-[calc(100vh-80px)] overflow-y-auto">
+            {/* Compare Colleges Link */}
+            <div className="border-b border-gray-100">
+              <Link
+                href="/compare-colleges"
+                className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
+              >
+                <span className="font-semibold text-gray-800">Compare Colleges</span>
+                <ArrowRight size={16} className="text-gray-500" />
+              </Link>
+            </div>
+
             {mainNavItems.map((item) => (
               <div key={item.name} className="border-b border-gray-100">
                 <button
@@ -310,7 +332,7 @@ const Navbar = () => {
                     <ChevronDown size={20} className={`text-gray-500 transition-transform duration-200 ${mobileOpenDropdown === item.name ? 'rotate-180' : ''}`} />
                   )}
                 </button>
-                
+
                 {/* Mobile Dropdown Content */}
                 {item.hasDropdown && mobileOpenDropdown === item.name && (
                   <div className="bg-gray-50 px-4 py-4 space-y-4">
