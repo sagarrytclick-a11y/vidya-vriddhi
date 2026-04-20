@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone, Mail, Globe } from 'lucide-react'
+import { SITE_IDENTITY, getFullAddress } from '../site-identity'
 
 const AboutPage = () => {
   return (
@@ -21,8 +22,8 @@ const AboutPage = () => {
               <GraduationCap className="w-6 h-6 text-orange-500" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">About Vidya Vriddhi</h1>
-              <p className="text-gray-600">Your trusted partner in educational excellence</p>
+              <h1 className="text-2xl font-bold text-gray-900">About {SITE_IDENTITY.name}</h1>
+              <p className="text-gray-600">{SITE_IDENTITY.description}</p>
             </div>
           </div>
         </div>
@@ -37,7 +38,7 @@ const AboutPage = () => {
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Do</h2>
               <p className="text-lg md:text-xl text-orange-100 max-w-4xl mx-auto leading-relaxed">
-                At Vidya Vriddhi, we provide comprehensive career counseling and admission guidance 
+                At {SITE_IDENTITY.name}, we provide comprehensive career counseling and admission guidance 
                 to help students secure placements at their dream universities across India and abroad. 
                 Our expert counselors work closely with each student to understand their aspirations, 
                 analyze their strengths, and craft personalized pathways to academic success.
@@ -101,7 +102,7 @@ const AboutPage = () => {
                   throughout their educational journey.
                 </p>
                 <div className="text-sm text-gray-500">
-                  <p><strong>Address:</strong> 123 Education Hub, Koramangala, Bangalore - 560034</p>
+                  <p><strong>Address:</strong> {getFullAddress()}</p>
                 </div>
               </div>
             </div>
@@ -117,18 +118,18 @@ const AboutPage = () => {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-1">Abhishek Tiwari</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">{SITE_IDENTITY.meta.author}</h3>
                 <p className="text-orange-500 font-medium mb-3">Founder & Chief Executive Officer</p>
                 <p className="text-gray-600 mb-4">
-                  With over 8 years of experience in education and career counseling, Dr. Sharma 
-                  founded Vidya Vriddhi with a vision to democratize access to quality higher education. 
-                  His passion for mentoring young minds has helped thousands of students find their 
+                  With extensive experience in education and career counseling, our founder 
+                  established {SITE_IDENTITY.name} with a vision to democratize access to quality higher education. 
+                  Their passion for mentoring young minds has helped thousands of students find their 
                   path to success at premier institutions across the nation.
                 </p>
                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <span className="flex items-center space-x-1">
                     <Mail className="w-4 h-4" />
-                    <span>info@vidyavriddhi.com</span>
+                    <span>{SITE_IDENTITY.contact.email.general}</span>
                   </span>
                 </div>
               </div>
@@ -142,9 +143,9 @@ const AboutPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Journey</h2>
             <div className="prose prose-lg max-w-none text-gray-700">
               <p className="mb-4">
-                Vidya Vriddhi was born from a powerful realization: every student deserves access 
+                {SITE_IDENTITY.name} was born from a powerful realization: every student deserves access 
                 to expert guidance that can transform their educational aspirations into reality. 
-                Founded in 2018 by Abhishek Tiwari, our organization emerged from the urgent need 
+                Founded in {SITE_IDENTITY.business.established} by our visionary founder, our organization emerged from the urgent need 
                 to bridge the gap between talented students and their dream institutions.
               </p>
               <p className="mb-4">
@@ -253,9 +254,11 @@ const AboutPage = () => {
                   <span>Contact Information</span>
                 </h3>
                 <div className="space-y-2 text-gray-600">
-                  <p><strong>Email:</strong> info@vidyavriddhi.com</p>
-                  <p><strong>Phone:</strong> +91 80 1234 5678</p>
-                  <p><strong>Mobile:</strong> +91 98765 43210</p>
+                  <p><strong>Email:</strong> {SITE_IDENTITY.contact.email.support}</p>
+                  <p><strong>Phone:</strong> {SITE_IDENTITY.contact.phone.display}</p>
+                  {SITE_IDENTITY.contact.phone.additional && (
+                    <p><strong>Additional:</strong> {SITE_IDENTITY.contact.phone.additional.join(', ')}</p>
+                  )}
                 </div>
               </div>
               <div>

@@ -9,14 +9,64 @@ interface College {
   id: string
   name: string
   slug: string
-  logo: string
-  city: string
-  state: string
-  fees: string
-  rating: number
-  placement: string
-  courses: string[]
-  category: string
+  description?: string
+  logoURL?: string
+  establishment_year?: number
+  Countryranking?: number
+  Internationalranking?: number
+  features: string[]
+  keyHighlights?: {
+    title: string
+    features: string[]
+    description: string
+  }
+  whyChooseUs?: {
+    title: string
+    features: {
+      title: string
+      description: string
+    }[]
+    description: string
+  }
+  documentsRequired?: {
+    title: string
+    documents: string[]
+    description: string
+  }
+  feesStructure?: {
+    title: string
+    courses: {
+      course_name: string
+      duration: string
+      annual_tuition_fee: string
+    }[]
+    description: string
+  }
+  admissionProcess?: {
+    title: string
+    steps: string[]
+    description: string
+  }
+  campusHighlights?: {
+    title: string
+    highlights: string[]
+    description: string
+  }
+  city?: {
+    name: string
+    state?: {
+      name: string
+    }
+  }
+  country?: {
+    name: string
+  }
+  categories?: Array<{
+    name: string
+  }>
+  courses?: Array<{
+    name: string
+  }>
 }
 
 interface CollegeActionButtonsProps {
@@ -50,19 +100,27 @@ export function CollegeActionButtons({ collegeSlug, college }: CollegeActionButt
         return
       }
       
-      // Add to compare list
+      // Add to compare list with full college data
       const updated = [...currentCompare, {
         id: college.id,
         name: college.name,
         slug: college.slug,
-        logo: college.logoURL || '',
-        city: college.city?.name || '',
-        state: college.city?.state?.name || '',
-        fees: 'N/A',
-        rating: college.Countryranking || 0,
-        placement: 'N/A',
-        courses: college.courses?.map((c: any) => c.name) || [],
-        category: college.categories?.[0]?.name || 'Unknown'
+        description: college.description,
+        logoURL: college.logoURL,
+        establishment_year: college.establishment_year,
+        Countryranking: college.Countryranking,
+        Internationalranking: college.Internationalranking,
+        features: college.features || [],
+        keyHighlights: college.keyHighlights,
+        whyChooseUs: college.whyChooseUs,
+        documentsRequired: college.documentsRequired,
+        feesStructure: college.feesStructure,
+        admissionProcess: college.admissionProcess,
+        campusHighlights: college.campusHighlights,
+        city: college.city,
+        country: college.country,
+        categories: college.categories,
+        courses: college.courses
       }]
       localStorage.setItem('compareColleges', JSON.stringify(updated))
       setIsAdded(true)

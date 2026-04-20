@@ -8,14 +8,64 @@ interface College {
   id: string
   name: string
   slug: string
-  logo: string
-  city: string
-  state: string
-  fees: string
-  rating: number
-  placement: string
-  courses: string[]
-  category: string
+  description?: string
+  logoURL?: string
+  establishment_year?: number
+  Countryranking?: number
+  Internationalranking?: number
+  features: string[]
+  keyHighlights?: {
+    title: string
+    features: string[]
+    description: string
+  }
+  whyChooseUs?: {
+    title: string
+    features: {
+      title: string
+      description: string
+    }[]
+    description: string
+  }
+  documentsRequired?: {
+    title: string
+    documents: string[]
+    description: string
+  }
+  feesStructure?: {
+    title: string
+    courses: {
+      course_name: string
+      duration: string
+      annual_tuition_fee: string
+    }[]
+    description: string
+  }
+  admissionProcess?: {
+    title: string
+    steps: string[]
+    description: string
+  }
+  campusHighlights?: {
+    title: string
+    highlights: string[]
+    description: string
+  }
+  city?: {
+    name: string
+    state?: {
+      name: string
+    }
+  }
+  country?: {
+    name: string
+  }
+  categories?: Array<{
+    name: string
+  }>
+  courses?: Array<{
+    name: string
+  }>
 }
 
 interface CompareButtonProps {

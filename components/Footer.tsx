@@ -65,7 +65,7 @@ const Footer = () => {
                 <div className="flex items-center space-x-3">
                   <MapPin className="w-5 h-5 text-orange-400" />
                   <span className="text-gray-300">
-                    {SITE_IDENTITY.contact.address.city}, {SITE_IDENTITY.contact.address.country}
+                    {SITE_IDENTITY.contact.address.office}
                   </span>
                 </div>
               </div>
@@ -134,8 +134,6 @@ const Footer = () => {
             <div className="flex flex-wrap justify-center gap-6 mb-8">
               <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</Link>
               <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link>
-              <Link href="/advertising" className="text-gray-300 hover:text-white transition-colors">Advertising</Link>
-              <Link href="/careers" className="text-gray-300 hover:text-white transition-colors">Career</Link>
               <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</Link>
               <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link>
             </div>
