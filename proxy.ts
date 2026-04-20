@@ -11,9 +11,7 @@ const isUserProtectedRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  const { pathname } = req.nextUrl
-
-  // Check if the path is an admin route
+  const { pathname } = req.nextUrl  // Check if the path is an admin route
   if (pathname.startsWith('/admin')) {
     // Skip middleware for login page itself
     if (pathname === '/admin-login') {
@@ -50,6 +48,9 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
+    // Include all admin routes
+    '/admin/:path*',
+    '/admin-login',
     // Skip Next.js internals and all static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|svelte|svg))*)',
     // Always run for API routes

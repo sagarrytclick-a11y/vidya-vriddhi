@@ -99,6 +99,7 @@ model Enquiry {
   name      String
   email     String
   phone     String?
+  city      String?
   category  String?
   status    EnquiryStatus @default(PENDING)
   createdAt DateTime      @default(now())

@@ -6,6 +6,7 @@ import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { SuccessModal } from '@/components/ui/success-modal'
 import {
   Select,
   SelectContent,
@@ -51,14 +52,90 @@ export function AdmissionModal() {
     agreedToTerms: false,
   })
   const [otpSent, setOtpSent] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean
+    type: 'success' | 'error' | 'info' | 'warning'
+    title: string
+    message: string
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  })
 
   if (!isOpen) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log('Form submitted:', formData)
-    closeModal()
+    
+    if (!formData.agreedToTerms) {
+      setModalState({
+        isOpen: true,
+        type: 'warning',
+        title: 'Terms Required',
+        message: 'Please accept the terms and conditions to continue with your application.'
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          category: formData.course,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setModalState({
+          isOpen: true,
+          type: 'success',
+          title: 'Application Submitted Successfully! 🎉',
+          message: 'Thank you for your enquiry! We have received your application and will contact you soon with next steps.'
+        })
+        closeModal()
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          city: '',
+          course: selectedCourse || '',
+          courseType: 'regular',
+          agreedToTerms: false,
+        })
+      } else {
+        setModalState({
+          isOpen: true,
+          type: 'error',
+          title: 'Submission Failed',
+          message: data.error || 'Failed to submit enquiry. Please try again.'
+        })
+      }
+    } catch (error) {
+      console.error('Error submitting enquiry:', error)
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'Something went wrong',
+        message: 'Failed to submit enquiry. Please check your connection and try again.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleGetOTP = () => {
@@ -66,7 +143,12 @@ export function AdmissionModal() {
       setOtpSent(true)
       // Simulate OTP API call
       setTimeout(() => {
-        alert('OTP sent to ' + formData.phone)
+        setModalState({
+          isOpen: true,
+          type: 'info',
+          title: 'OTP Sent',
+          message: `OTP has been sent to ${formData.phone}`
+        })
       }, 500)
     }
   }
@@ -274,14 +356,30 @@ export function AdmissionModal() {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={!formData.agreedToTerms}
+              disabled={!formData.agreedToTerms || isSubmitting}
               className="w-full h-14 bg-gray-300 hover:bg-orange-500 text-gray-600 hover:text-white rounded-xl font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Verify Phone to Continue
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+                  Submitting...
+                </div>
+              ) : (
+                'Verify Phone to Continue'
+              )}
             </Button>
           </form>
         </div>
       </div>
+      
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        type={modalState.type}
+        title={modalState.title}
+        message={modalState.message}
+      />
     </div>
   )
 }

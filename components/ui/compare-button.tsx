@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Check } from 'lucide-react'
 import { Button } from './button'
+import { CompareLimitModal } from './success-modal'
 
 interface College {
   id: string
@@ -76,6 +77,7 @@ interface CompareButtonProps {
 
 export default function CompareButton({ college, variant = 'default', size = 'default' }: CompareButtonProps) {
   const [isAdded, setIsAdded] = useState(false)
+  const [showLimitModal, setShowLimitModal] = useState(false)
 
   const handleCompare = () => {
     // Get current compare list from localStorage
@@ -92,7 +94,7 @@ export default function CompareButton({ college, variant = 'default', size = 'de
     } else {
       // Check max limit (4 colleges)
       if (currentCompare.length >= 4) {
-        alert('You can compare up to 4 colleges at a time. Please remove one to add this college.')
+        setShowLimitModal(true)
         return
       }
       
@@ -113,23 +115,31 @@ export default function CompareButton({ college, variant = 'default', size = 'de
   }, [college.id])
 
   return (
-    <Button
-      variant={isAdded ? 'secondary' : variant}
-      size={size}
-      onClick={handleCompare}
-      className={isAdded ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' : ''}
-    >
-      {isAdded ? (
-        <>
-          <Check className="w-4 h-4 mr-2" />
-          Added to Compare
-        </>
-      ) : (
-        <>
-          <Plus className="w-4 h-4 mr-2" />
-          Compare
-        </>
-      )}
-    </Button>
+    <>
+      <Button
+        variant={isAdded ? 'secondary' : variant}
+        size={size}
+        onClick={handleCompare}
+        className={isAdded ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' : ''}
+      >
+        {isAdded ? (
+          <>
+            <Check className="w-4 h-4 mr-2" />
+            Added to Compare
+          </>
+        ) : (
+          <>
+            <Plus className="w-4 h-4 mr-2" />
+            Compare
+          </>
+        )}
+      </Button>
+      
+      {/* Compare Limit Modal */}
+      <CompareLimitModal 
+        isOpen={showLimitModal} 
+        onClose={() => setShowLimitModal(false)} 
+      />
+    </>
   )
 }
