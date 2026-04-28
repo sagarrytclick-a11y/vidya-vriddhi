@@ -11,8 +11,15 @@ interface News {
   updatedAt: string
 }
 
-const fetchNews = async (limit: number = 10): Promise<News[]> => {
-  const response = await fetch(`/api/news?limit=${limit}`)
+interface NewsResponse {
+  news: News[]
+  total: number
+  limit: number
+  skip: number
+}
+
+const fetchNews = async (limit: number = 10, skip: number = 0): Promise<NewsResponse> => {
+  const response = await fetch(`/api/news?limit=${limit}&skip=${skip}`)
   
   if (!response.ok) {
     throw new Error('Failed to fetch news')
@@ -21,10 +28,10 @@ const fetchNews = async (limit: number = 10): Promise<News[]> => {
   return response.json()
 }
 
-export const useNews = (limit: number = 10) => {
+export const useNews = (limit: number = 10, skip: number = 0) => {
   return useQuery({
-    queryKey: ['news', limit],
-    queryFn: () => fetchNews(limit),
+    queryKey: ['news', limit, skip],
+    queryFn: () => fetchNews(limit, skip),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

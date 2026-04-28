@@ -14,15 +14,20 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '10')
+    const skip = parseInt(searchParams.get('skip') || '0')
 
-    const news = await db.news.findMany({
-      take: limit,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+    const [news, total] = await Promise.all([
+      db.news.findMany({
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      db.news.count()
+    ])
 
-    return NextResponse.json(news)
+    return NextResponse.json({ news, total, limit, skip })
   } catch (error) {
     console.error('Error fetching news:', error)
     return NextResponse.json(

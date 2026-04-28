@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, Calendar, Clock, User, ArrowRight, BookOpen } from 'lucide-react'
+import { Search, Calendar, Clock, User, ArrowRight, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useBlogs } from '@/hooks/useBlogs'
 
 export default function BlogsPage() {
-  const { blogs, isLoading, error } = useBlogs()
+  const [currentPage, setCurrentPage] = useState(0)
+  const itemsPerPage = 5
+  const { blogs, total, isLoading, error } = useBlogs(itemsPerPage, currentPage * itemsPerPage)
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredBlogs = blogs?.filter(blog => {
@@ -19,6 +21,12 @@ export default function BlogsPage() {
 
     return matchesSearch
   }) || []
+
+  const totalPages = Math.ceil(total / itemsPerPage)
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
 
   if (error) {
     return (
@@ -150,6 +158,62 @@ export default function BlogsPage() {
                 <p className="text-slate-600">
                   Try adjusting your search or category filters to find what you're looking for.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!isLoading && totalPages > 1 && (
+            <div className="flex items-center justify-center mt-12 pt-8 border-t border-slate-200">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i
+                  } else if (currentPage < 3) {
+                    pageNum = i
+                  } else if (currentPage > totalPages - 3) {
+                    pageNum = totalPages - 5 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className={currentPage === pageNum 
+                        ? "bg-orange-500 hover:bg-orange-600 text-white" 
+                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                      }
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  )
+                })}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages - 1}
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               </div>
             </div>
           )}

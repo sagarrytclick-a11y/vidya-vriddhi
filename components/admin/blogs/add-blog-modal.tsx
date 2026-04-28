@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useBlogContext, BlogFormData } from '@/contexts/blog-context'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
@@ -24,6 +24,7 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
     title: '',
     slug: '',
     content: '',
+    category: '',
     imageUrl: '',
     active: false,
   })
@@ -31,6 +32,18 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Hardcoded educational blog categories
+  const categories = [
+    'Career Guidance',
+    'Study Tips',
+    'Exam Preparation',
+    'College Selection',
+    'Scholarship Information',
+    'Study Abroad',
+    'Skill Development',
+    'Industry Insights'
+  ]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +63,11 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
       return
     }
 
+    if (!formData.category.trim()) {
+      alert('Please enter a blog category')
+      return
+    }
+
     try {
       await createBlog(formData)
       onClose()
@@ -57,6 +75,7 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
         title: '',
         slug: '',
         content: '',
+        category: '',
         imageUrl: '',
         active: false,
       })
@@ -178,6 +197,24 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                 placeholder="Enter blog content"
                 required
               />
+            </div>
+
+            <div className="col-span-2">
+              <Label htmlFor="category">Category</Label>
+              <select
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full bg-slate-700 border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="col-span-2">

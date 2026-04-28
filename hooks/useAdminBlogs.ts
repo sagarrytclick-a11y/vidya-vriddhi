@@ -7,8 +7,8 @@ interface Blog {
   slug: string
   content: string
   active: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   imageUrl: string | null
 }
 
@@ -39,19 +39,11 @@ export const blogKeys = {
 
 // API functions
 const fetchBlogs = async (limit: number = 10, skip: number = 0): Promise<BlogsResponse> => {
-  try {
-    const response = await fetch(`/api/blogs?limit=${limit}&skip=${skip}`)
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch blogs')
-    }
-    
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error fetching blogs:', error)
-    return { blogs: [], total: 0, limit, skip }
+  const response = await fetch(`/api/blogs?limit=${limit}&skip=${skip}`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch blogs')
   }
+  return response.json()
 }
 
 const fetchBlog = async (id: string): Promise<Blog> => {
@@ -107,14 +99,14 @@ const deleteBlog = async (id: string): Promise<void> => {
   }
 }
 
-// Main hook
-export function useBlogs(limit: number = 10, skip: number = 0) {
+// Main hook for admin with pagination
+export function useAdminBlogs(limit: number = 10, skip: number = 0) {
   const queryClient = useQueryClient()
 
-  // Fetch all blogs
+  // Fetch blogs with pagination
   const {
     data: blogData = { blogs: [], total: 0, limit, skip },
-    isLoading,
+    isLoading: loading,
     error,
     refetch,
   } = useQuery({
@@ -178,7 +170,7 @@ export function useBlogs(limit: number = 10, skip: number = 0) {
     total: blogData.total,
     limit: blogData.limit,
     skip: blogData.skip,
-    isLoading,
+    loading,
     error: error?.message || null,
     createBlog: createBlogHandler,
     updateBlog: updateBlogHandler,
@@ -191,7 +183,7 @@ export function useBlogs(limit: number = 10, skip: number = 0) {
 }
 
 // Hook for single blog
-export function useBlog(id: string) {
+export function useAdminBlog(id: string) {
   return useQuery({
     queryKey: blogKeys.detail(id),
     queryFn: () => fetchBlog(id),

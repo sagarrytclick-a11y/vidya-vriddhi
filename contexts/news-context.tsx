@@ -6,6 +6,9 @@ import { useAdminNews, News, NewsFormData } from '@/hooks/useAdminNews'
 interface NewsContextType {
   // Data
   news: News[]
+  total: number
+  limit: number
+  skip: number
   isLoading: boolean
   error: string | null
 
@@ -49,11 +52,16 @@ const NewsContext = createContext<NewsContextType | undefined>(undefined)
 
 interface NewsProviderProps {
   children: ReactNode
+  limit?: number
+  skip?: number
 }
 
-export function NewsProvider({ children }: NewsProviderProps) {
+export function NewsProvider({ children, limit = 10, skip = 0 }: NewsProviderProps) {
   const {
     news,
+    total,
+    limit: returnedLimit,
+    skip: returnedSkip,
     isLoading,
     error,
     createNews,
@@ -63,7 +71,7 @@ export function NewsProvider({ children }: NewsProviderProps) {
     isUpdating,
     isDeleting,
     refetchNews,
-  } = useAdminNews()
+  } = useAdminNews(limit, skip)
 
   // Modal state
   const [selectedNews, setSelectedNews] = useState<News | null>(null)
@@ -114,6 +122,9 @@ export function NewsProvider({ children }: NewsProviderProps) {
   const value: NewsContextType = {
     // Data
     news,
+    total,
+    limit,
+    skip,
     isLoading,
     error,
 

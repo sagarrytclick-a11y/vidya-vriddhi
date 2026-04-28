@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '1000')
     
     const exams = await db.exam.findMany({
       where: {
