@@ -41,8 +41,8 @@ export function StatsCards() {
   const { count: categoryCount, isLoading: categoriesLoading } = useCategoryCount()
   const { courses, isLoading: coursesLoading } = useAdminCourses()
   const { exams, isLoading: examsLoading } = useAdminExams()
-  const { blogs, loading: blogsLoading } = useBlogContext()
-  const { news, isLoading: newsLoading } = useAdminNews()
+  const { blogs, total: blogTotal, loading: blogsLoading } = useBlogContext()
+  const { news, total: newsTotal, isLoading: newsLoading } = useAdminNews()
   const { stats, isLoading: enquiriesLoading } = useEnquiryStats()
 
   const statsData: StatCard[] = [
@@ -72,7 +72,7 @@ export function StatsCards() {
     },
     {
       title: 'Blog Posts',
-      value: blogs.length,
+      value: blogTotal,
       description: 'Published content',
       icon: BookOpen,
       color: 'text-yellow-400',
@@ -104,7 +104,7 @@ export function StatsCards() {
     },
     {
       title: 'News',
-      value: news.length,
+      value: newsTotal,
       description: 'Latest updates',
       icon: Newspaper,
       color: 'text-lime-400',

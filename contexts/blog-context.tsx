@@ -27,6 +27,9 @@ export const blogKeys = {
 interface BlogContextType {
   // Data
   blogs: Blog[]
+  total: number
+  limit: number
+  skip: number
   loading: boolean
   error: string | null
 
@@ -69,8 +72,8 @@ interface BlogContextType {
 const BlogContext = createContext<BlogContextType | undefined>(undefined)
 
 // API functions
-const fetchBlogs = async (): Promise<Blog[]> => {
-  const response = await fetch('/api/blogs')
+const fetchBlogs = async (limit: number = 10, skip: number = 0): Promise<{ blogs: Blog[], total: number, limit: number, skip: number }> => {
+  const response = await fetch(`/api/blogs?limit=${limit}&skip=${skip}`)
   if (!response.ok) {
     throw new Error('Failed to fetch blogs')
   }
@@ -124,7 +127,7 @@ const deleteBlog = async (id: string): Promise<void> => {
 }
 
 // Provider component
-export function BlogProvider({ children }: { children: ReactNode }) {
+export function BlogProvider({ children, limit = 10, skip = 0 }: { children: ReactNode, limit?: number, skip?: number }) {
   const queryClient = useQueryClient()
 
   // Modal state
@@ -136,13 +139,13 @@ export function BlogProvider({ children }: { children: ReactNode }) {
 
   // Fetch all blogs
   const {
-    data: blogs = [],
+    data: blogData = { blogs: [], total: 0, limit, skip },
     isLoading: loading,
     error,
     refetch,
   } = useQuery({
-    queryKey: blogKeys.lists(),
-    queryFn: fetchBlogs,
+    queryKey: blogKeys.list({ limit, skip }),
+    queryFn: () => fetchBlogs(limit, skip),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
@@ -237,7 +240,10 @@ export function BlogProvider({ children }: { children: ReactNode }) {
 
   const value: BlogContextType = {
     // Data
-    blogs,
+    blogs: blogData.blogs,
+    total: blogData.total,
+    limit: blogData.limit,
+    skip: blogData.skip,
     loading,
     error: error?.message || null,
 
@@ -294,6 +300,7 @@ export interface BlogFormData {
   title: string
   slug: string
   content: string
+  category: string
   imageUrl?: string
   active?: boolean
 }

@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation'
 
 const FloatingActions: React.FC = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
-  const { data: newsItems } = useNews(3)
+  const { data: newsData } = useNews(3)
+  const newsItems = newsData?.news || []
   const router = useRouter()
 
   const handleWhatsAppClick = () => {

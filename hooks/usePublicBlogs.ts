@@ -14,7 +14,14 @@ interface Blog {
   }
 }
 
-const fetchBlogs = async (limit: number = 10): Promise<Blog[]> => {
+interface BlogsResponse {
+  blogs: Blog[]
+  total: number
+  limit: number
+  skip: number
+}
+
+const fetchBlogs = async (limit: number = 10): Promise<BlogsResponse> => {
   const response = await fetch(`/api/blogs?limit=${limit}`)
   
   if (!response.ok) {

@@ -11,15 +11,24 @@ const createBlogSchema = z.object({
   active: z.boolean().default(false),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const blogs = await db.blog.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const skip = parseInt(searchParams.get('skip') || '0')
 
-    return NextResponse.json(blogs)
+    const [blogs, total] = await Promise.all([
+      db.blog.findMany({
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      db.blog.count()
+    ])
+
+    return NextResponse.json({ blogs, total, limit, skip })
   } catch (error) {
     console.error('Error fetching blogs:', error)
     return NextResponse.json(

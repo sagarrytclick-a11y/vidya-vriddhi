@@ -20,6 +20,13 @@ export interface NewsFormData {
   active?: boolean
 }
 
+interface NewsResponse {
+  news: News[]
+  total: number
+  limit: number
+  skip: number
+}
+
 // Query keys for consistent cache management
 export const newsKeys = {
   all: ['news'] as const,
@@ -30,8 +37,8 @@ export const newsKeys = {
 }
 
 // API functions
-const fetchNews = async (): Promise<News[]> => {
-  const response = await fetch('/api/news')
+const fetchNews = async (limit: number = 10, skip: number = 0): Promise<NewsResponse> => {
+  const response = await fetch(`/api/news?limit=${limit}&skip=${skip}`)
   if (!response.ok) {
     throw new Error('Failed to fetch news')
   }
@@ -92,18 +99,18 @@ const deleteNews = async (id: string): Promise<void> => {
 }
 
 // Main hook
-export function useAdminNews() {
+export function useAdminNews(limit: number = 10, skip: number = 0) {
   const queryClient = useQueryClient()
 
   // Fetch all news
   const {
-    data: news = [],
+    data: newsData = { news: [], total: 0, limit, skip },
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: newsKeys.lists(),
-    queryFn: fetchNews,
+    queryKey: newsKeys.list({ limit, skip }),
+    queryFn: () => fetchNews(limit, skip),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
@@ -158,7 +165,10 @@ export function useAdminNews() {
   }
 
   return {
-    news,
+    news: newsData.news,
+    total: newsData.total,
+    limit: newsData.limit,
+    skip: newsData.skip,
     isLoading,
     error: error?.message || null,
     createNews: createNewsHandler,
