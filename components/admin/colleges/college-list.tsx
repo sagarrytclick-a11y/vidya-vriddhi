@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, Eye, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { Plus, Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,14 +14,14 @@ import { useCityContext } from '@/contexts/city-context'
 import { College, CollegeFormData } from '@/types/college'
 
 export function CollegeList() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const { 
-    colleges, 
-    isLoading, 
-    error, 
-    createCollege, 
-    updateCollege, 
+  const {
+    colleges,
+    isLoading,
+    error,
+    createCollege,
+    updateCollege,
     deleteCollege,
     openAddModal,
     closeAddModal,
@@ -38,7 +38,10 @@ export function CollegeList() {
     selectedCollege,
     isCreating,
     isUpdating,
-    isDeleting
+    isDeleting,
+    pagination,
+    page,
+    setPage,
   } = useCollegeContext()
   
   const { countries } = useCountryContext()
@@ -116,10 +119,10 @@ export function CollegeList() {
 
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
-          <CardTitle className="text-white">All Colleges ({filteredColleges.length})</CardTitle>
+          <CardTitle className="text-white">All Colleges ({pagination?.total || colleges.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredColleges.length === 0 ? (
+          {colleges.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-400">
                 {searchTerm ? 'No colleges found matching your search.' : 'No colleges found. Create your first college!'}
@@ -139,7 +142,7 @@ export function CollegeList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredColleges.map((college) => (
+                  {colleges.map((college) => (
                     <tr key={college.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                       <td className="py-3 px-4">
                         <div>
@@ -156,15 +159,15 @@ export function CollegeList() {
                         {college.city?.name}, {college.country?.name}
                       </td>
                       <td className="py-3 px-4 text-gray-400 text-sm">
-                        {college.features && college.features.length > 0 
-                          ? college.features.slice(0, 2).join(', ') + (college.features.length > 2 ? '...' : '') 
+                        {college.features && college.features.length > 0
+                          ? college.features.slice(0, 2).join(', ') + (college.features.length > 2 ? '...' : '')
                           : 'No features'
                         }
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 text-xs rounded-full ${
-                          college.active 
-                            ? 'bg-green-900 text-green-300' 
+                          college.active
+                            ? 'bg-green-900 text-green-300'
                             : 'bg-gray-700 text-gray-300'
                         }`}>
                           {college.active ? 'Active' : 'Inactive'}
@@ -190,6 +193,54 @@ export function CollegeList() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-700">
+                  <div className="text-sm text-gray-400">
+                    Showing {((page - 1) * pagination.limit) + 1} - {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} colleges
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(page - 1)}
+                      disabled={!pagination.hasPrev}
+                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Previous
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(pageNum)}
+                          className={`w-8 h-8 p-0 ${
+                            pageNum === page
+                              ? 'bg-blue-600 border-blue-600 text-white'
+                              : 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600'
+                          }`}
+                        >
+                          {pageNum}
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(page + 1)}
+                      disabled={!pagination.hasNext}
+                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

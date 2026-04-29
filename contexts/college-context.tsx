@@ -3,6 +3,7 @@
 import { createContext, useContext, ReactNode, useState } from 'react'
 import { useColleges } from '@/hooks/useColleges'
 import { College, CollegeFormData } from '@/types/college'
+import { Pagination } from '@/types/api'
 
 interface CollegeContextType {
   // Data
@@ -44,6 +45,13 @@ interface CollegeContextType {
 
   // Refetch
   refetchColleges: () => Promise<any>
+
+  // Pagination
+  pagination: Pagination | null
+  page: number
+  setPage: (page: number) => void
+  limit: number
+  setLimit: (limit: number) => void
 }
 
 const CollegeContext = createContext<CollegeContextType | undefined>(undefined)
@@ -64,6 +72,11 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
     isUpdating,
     isDeleting,
     refetchColleges,
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   } = useColleges()
 
   // Modal state
@@ -169,6 +182,13 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
 
     // Refetch
     refetchColleges,
+
+    // Pagination
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   }
 
   return (
