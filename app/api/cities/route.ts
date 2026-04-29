@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 const createCitySchema = z.object({
   name: z.string().min(1, 'City name is required'),
@@ -15,15 +16,36 @@ const createCitySchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = createPaginationParams(searchParams)
+    const search = searchParams.get('search') || ''
 
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { slug: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Fetch cities with pagination
     const [cities, total] = await Promise.all([
       db.city.findMany({
-        take: limit,
+        where,
         skip,
-        include: {
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          cityImageURL: true,
+          features: true,
+          active: true,
+          countryId: true,
+          createdAt: true,
+          updatedAt: true,
           country: {
             select: {
               id: true,
@@ -42,18 +64,10 @@ export async function GET(request: NextRequest) {
           createdAt: 'desc',
         },
       }),
-      db.city.count()
+      db.city.count({ where })
     ])
 
-    return NextResponse.json({
-      cities,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit)
-      }
-    })
+    return NextResponse.json(createPaginationResponse(cities, total, page, limit))
   } catch (error) {
     console.error('Error fetching cities:', error)
     return NextResponse.json(

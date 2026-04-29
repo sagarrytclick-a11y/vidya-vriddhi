@@ -11,7 +11,7 @@ import { useCities } from '@/hooks/useCities'
 export default function CitiesPage() {
   const { data: response, isLoading, error } = useCities(100)
   const [searchTerm, setSearchTerm] = useState('')
-  const cities = response?.cities || []
+  const cities = response?.data || []
 
   const filteredCities = cities.filter(city => {
     const matchesSearch = searchTerm === '' || 

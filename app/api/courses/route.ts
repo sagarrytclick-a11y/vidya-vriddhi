@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 const createCourseSchema = z.object({
   name: z.string().min(1, 'Course name is required'),
@@ -12,18 +13,36 @@ const createCourseSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const skip = (page - 1) * limit
-    
+    const { page, limit, skip } = createPaginationParams(searchParams)
+    const search = searchParams.get('search') || ''
+
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { slug: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Fetch courses with pagination
     const [courses, total] = await Promise.all([
       db.course.findMany({
+        where,
         orderBy: {
           createdAt: 'desc',
         },
-        take: limit,
         skip,
-        include: {
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          createdAt: true,
+          updatedAt: true,
           colleges: {
             select: {
               id: true,
@@ -37,18 +56,10 @@ export async function GET(request: NextRequest) {
           }
         }
       }),
-      db.course.count()
+      db.course.count({ where })
     ])
 
-    return NextResponse.json({
-      courses,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit)
-      }
-    })
+    return NextResponse.json(createPaginationResponse(courses, total, page, limit))
   } catch (error) {
     console.error('Error fetching courses:', error)
     return NextResponse.json(

@@ -33,7 +33,7 @@ export interface PaginationInfo {
 }
 
 export interface CategoriesResponse {
-  categories: Category[]
+  data: Category[]
   pagination: PaginationInfo
 }
 
@@ -77,7 +77,7 @@ export function useAdminCategories(page: number = 1, limit: number = 10, search:
     retry: 3,
   })
 
-  const categories = data?.categories || []
+  const categories = data?.data || []
   const pagination = data?.pagination || {
     page: 1,
     limit: 10,

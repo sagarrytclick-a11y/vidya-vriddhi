@@ -11,12 +11,15 @@ import { EditCourseModal } from '@/components/admin/courses/edit-course-modal'
 import { DeleteCourseModal } from '@/components/admin/courses/delete-course-modal'
 import { LoadingPage } from '@/components/ui/loading'
 import { useCourseContext } from '@/contexts/course-context'
+import { CourseUIProvider, useCourseUIContext } from '@/contexts/course-ui-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
 import { Search, Plus, Trash2, Eye, Edit, Building, ChevronLeft, ChevronRight } from 'lucide-react'
 
-export default function CoursesPage() {
+// Inner component that uses the UI context
+function CoursesPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
-  
+
+  // Data from CourseContext
   const {
     courses,
     pagination,
@@ -25,6 +28,13 @@ export default function CoursesPage() {
     createCourse,
     updateCourse,
     deleteCourse,
+    isCreating,
+    isUpdating,
+    setPage
+  } = useCourseContext()
+
+  // UI state from CourseUIContext
+  const {
     openAddModal,
     closeAddModal,
     openViewModal,
@@ -37,11 +47,8 @@ export default function CoursesPage() {
     isViewModalOpen,
     isEditModalOpen,
     isDeleteModalOpen,
-    selectedCourse,
-    isCreating,
-    isUpdating,
-    setPage
-  } = useCourseContext()
+    selectedCourse
+  } = useCourseUIContext()
 
   const handleCreateCourse = async (data: CourseFormData) => {
     await createCourse(data)
@@ -283,5 +290,14 @@ export default function CoursesPage() {
         />
       </div>
     </AdminLayout>
+  )
+}
+
+// Main export wrapped with CourseUIProvider
+export default function CoursesPage() {
+  return (
+    <CourseUIProvider>
+      <CoursesPageContent />
+    </CourseUIProvider>
   )
 }

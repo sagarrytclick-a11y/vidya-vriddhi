@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState } from 'react'
 import { useAdminCities } from '@/hooks/useAdminCities'
-import { City, CreateCityData, UpdateCityData } from '@/hooks/useAdminCities'
+import { CityWithCountry as City, CreateCityData, UpdateCityData } from '@/types/domain'
 
 interface CityContextType {
   // Data

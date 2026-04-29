@@ -3,23 +3,11 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building, ExternalLink } from 'lucide-react'
 import { useCities } from '@/hooks/useCities'
+import { CityWithStats } from '@/types/domain'
 import Link from 'next/link'
 
-interface City {
-  id: string
-  name: string
-  slug: string
-  cityImageURL: string | null
-  country: {
-    flagEmoji: string | null
-  }
-  _count: {
-    colleges: number
-  }
-}
-
 interface CityCardProps {
-  city: City
+  city: CityWithStats
 }
 
 const CityCard: React.FC<CityCardProps> = ({ city }) => {
@@ -62,7 +50,7 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
 const TopStudyPlaces: React.FC = () => {
   // Fetch cities using custom hook
   const { data: response, isLoading, error } = useCities(10)
-  const cities = response?.cities || []
+  const cities = response?.data || []
 
   const scrollLeft = () => {
     const element = document.getElementById('cities-scroll-container')

@@ -1,26 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CourseWithColleges, CourseFormData } from '@/types/domain'
 
-export interface Course {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  active: boolean
-  createdAt: string
-  updatedAt: string
-  colleges: Array<{
-    id: string
-    name: string
-  }>
-}
-
-export interface CourseFormData {
-  name: string
-  slug: string
-  description?: string
-  active?: boolean
-}
+// Re-export types for backward compatibility
+export type { CourseWithColleges as Course, CourseFormData }
 
 // Query keys for consistent cache management
 export const courseKeys = {
@@ -32,7 +15,7 @@ export const courseKeys = {
 }
 
 // API functions
-const fetchCourses = async ({ queryKey }: any): Promise<{ courses: Course[], pagination: any }> => {
+const fetchCourses = async ({ queryKey }: any): Promise<{ data: CourseWithColleges[], pagination: any }> => {
   const [, , page = 1, limit = 10] = queryKey
   const response = await fetch(`/api/courses?page=${page}&limit=${limit}`)
   if (!response.ok) {
@@ -41,7 +24,7 @@ const fetchCourses = async ({ queryKey }: any): Promise<{ courses: Course[], pag
   return response.json()
 }
 
-const fetchCourse = async (id: string): Promise<Course> => {
+const fetchCourse = async (id: string): Promise<CourseWithColleges> => {
   const response = await fetch(`/api/courses/${id}`)
   if (!response.ok) {
     throw new Error('Failed to fetch course')
@@ -49,7 +32,7 @@ const fetchCourse = async (id: string): Promise<Course> => {
   return response.json()
 }
 
-const createCourse = async (data: CourseFormData): Promise<Course> => {
+const createCourse = async (data: CourseFormData): Promise<CourseWithColleges> => {
   const response = await fetch('/api/courses', {
     method: 'POST',
     headers: {
@@ -66,7 +49,7 @@ const createCourse = async (data: CourseFormData): Promise<Course> => {
   return response.json()
 }
 
-const updateCourse = async ({ id, data }: { id: string; data: Partial<CourseFormData> }): Promise<Course> => {
+const updateCourse = async ({ id, data }: { id: string; data: Partial<CourseFormData> }): Promise<CourseWithColleges> => {
   const response = await fetch(`/api/courses/${id}`, {
     method: 'PUT',
     headers: {
@@ -100,7 +83,7 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
 
   // Fetch all courses
   const {
-    data: response = { courses: [], pagination: { page, limit, total: 0, totalPages: 0 } },
+    data: response = { data: [], pagination: { page, limit, total: 0, totalPages: 0 } },
     isLoading,
     error,
     refetch,
@@ -161,7 +144,7 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
   }
 
   return {
-    courses: response.courses,
+    courses: response.data,
     pagination: response.pagination,
     isLoading,
     error: error?.message || null,

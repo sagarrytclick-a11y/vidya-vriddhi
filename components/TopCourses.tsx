@@ -3,18 +3,11 @@
 import React, { useState } from 'react'
 import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink, MapPin } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
+import { CourseWithColleges } from '@/types/domain'
 import Link from 'next/link'
 
-interface Course {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  colleges?: any
-}
-
 interface CourseCardProps {
-  course: Course
+  course: CourseWithColleges
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
@@ -50,7 +43,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 const TopCourses: React.FC = () => {
   // Fetch courses using custom hook
   const { data: response, isLoading, error } = useCourses()
-  const courses = response?.courses || []
+  const courses = response?.data || []
 
   const scrollLeft = () => {
     const element = document.getElementById('courses-scroll-container')

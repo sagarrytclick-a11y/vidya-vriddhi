@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 // Schema for exam validation
 const examSchema = z.object({
@@ -50,41 +51,51 @@ const examSchema = z.object({
   })
 })
 
-// GET all exams
+// GET all exams with pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
-    const limit = parseInt(searchParams.get('limit') || '1000')
-    
-    const exams = await db.exam.findMany({
-      where: {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { shortName: { contains: search, mode: 'insensitive' } }
-        ]
-      },
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        shortName: true,
-        description: true,
-        conductingBody: true,
-        examMode: true,
-        examType: true,
-        frequency: true,
-        active: true,
-        examImageurl: true,
-        examDates: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    })
 
-    return NextResponse.json(exams)
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { shortName: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Fetch exams with pagination
+    const [exams, total] = await Promise.all([
+      db.exam.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortName: true,
+          description: true,
+          conductingBody: true,
+          examMode: true,
+          examType: true,
+          frequency: true,
+          active: true,
+          examImageurl: true,
+          examDates: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      }),
+      db.exam.count({ where })
+    ])
+
+    return NextResponse.json(createPaginationResponse(exams, total, page, limit))
   } catch (error) {
     console.error('Error fetching exams:', error)
     return NextResponse.json(

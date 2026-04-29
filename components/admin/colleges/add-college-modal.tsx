@@ -177,7 +177,9 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         const examsResponse = await fetch('/api/exams')
         if (examsResponse.ok) {
           const examsData = await examsResponse.json()
-          setExams(Array.isArray(examsData) ? examsData : [])
+          // API returns { data: [...], pagination: {...} }
+          const examsArray = examsData.data || []
+          setExams(Array.isArray(examsArray) ? examsArray : [])
         }
 
         // Fetch categories
@@ -186,8 +188,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
           console.log('Categories data:', categoriesData)
-          // API returns { categories: [...], pagination: {...} }
-          const categoriesArray = categoriesData.categories || categoriesData
+          // API returns { data: [...], pagination: {...} }
+          const categoriesArray = categoriesData.data || []
           console.log('Extracted categories array:', categoriesArray, 'Is array:', Array.isArray(categoriesArray))
           setCategories(Array.isArray(categoriesArray) ? categoriesArray : [])
         } else {
@@ -198,7 +200,9 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         const coursesResponse = await fetch('/api/courses')
         if (coursesResponse.ok) {
           const coursesData = await coursesResponse.json()
-          setCourses(Array.isArray(coursesData) ? coursesData : [])
+          // API returns { data: [...], pagination: {...} }
+          const coursesArray = coursesData.data || []
+          setCourses(Array.isArray(coursesArray) ? coursesArray : [])
         }
       } catch (error) {
         console.error('Error fetching data:', error)

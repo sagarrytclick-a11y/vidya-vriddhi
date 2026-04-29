@@ -59,7 +59,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
 const LatestNewsStories: React.FC = () => {
   // Fetch news using custom hook
   const { data: newsData, isLoading, error } = useNews(10)
-  const newsItems = newsData?.news || []
+  const newsItems = newsData?.data || []
 
   const scrollRight = () => {
     const element = document.getElementById('news-scroll-container')

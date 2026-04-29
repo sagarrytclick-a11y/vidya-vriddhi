@@ -72,8 +72,9 @@ interface BlogContextType {
 const BlogContext = createContext<BlogContextType | undefined>(undefined)
 
 // API functions
-const fetchBlogs = async (limit: number = 10, skip: number = 0): Promise<{ blogs: Blog[], total: number, limit: number, skip: number }> => {
-  const response = await fetch(`/api/blogs?limit=${limit}&skip=${skip}`)
+const fetchBlogs = async (limit: number = 10, skip: number = 0): Promise<{ data: Blog[], pagination: { page: number, limit: number, total: number, totalPages: number, hasNext: boolean, hasPrev: boolean } }> => {
+  const page = Math.floor(skip / limit) + 1
+  const response = await fetch(`/api/blogs?page=${page}&limit=${limit}`)
   if (!response.ok) {
     throw new Error('Failed to fetch blogs')
   }
@@ -139,7 +140,7 @@ export function BlogProvider({ children, limit = 10, skip = 0 }: { children: Rea
 
   // Fetch all blogs
   const {
-    data: blogData = { blogs: [], total: 0, limit, skip },
+    data: blogData = { data: [], pagination: { page: 1, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false } },
     isLoading: loading,
     error,
     refetch,
@@ -240,10 +241,10 @@ export function BlogProvider({ children, limit = 10, skip = 0 }: { children: Rea
 
   const value: BlogContextType = {
     // Data
-    blogs: blogData.blogs,
-    total: blogData.total,
-    limit: blogData.limit,
-    skip: blogData.skip,
+    blogs: blogData.data,
+    total: blogData.pagination.total,
+    limit: blogData.pagination.limit,
+    skip: (blogData.pagination.page - 1) * blogData.pagination.limit,
     loading,
     error: error?.message || null,
 
