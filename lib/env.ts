@@ -5,25 +5,31 @@ import { z } from 'zod'
  * Add all required environment variables here
  */
 const envSchema = z.object({
-  // Database
+  // Database (Required)
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-  
-  // NextAuth / Authentication (if used)
-  NEXTAUTH_SECRET: z.string().optional(),
-  NEXTAUTH_URL: z.string().url().optional(),
-  
-  // API Configuration
+
+  // ImageKit (Required for image uploads)
+  IMAGEKIT_PUBLIC_KEY: z.string().min(1, 'IMAGEKIT_PUBLIC_KEY is required'),
+  IMAGEKIT_PRIVATE_KEY: z.string().min(1, 'IMAGEKIT_PRIVATE_KEY is required'),
+  IMAGEKIT_URL_ENDPOINT: z.string().url().min(1, 'IMAGEKIT_URL_ENDPOINT is required'),
+
+  // Admin Auth (Required)
+  ADMIN_USERNAME: z.string().min(1, 'ADMIN_USERNAME is required'),
+  ADMIN_PASSWORD: z.string().min(1, 'ADMIN_PASSWORD is required'),
+
+  // Clerk Authentication (Required)
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1, 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required'),
+  CLERK_SECRET_KEY: z.string().min(1, 'CLERK_SECRET_KEY is required'),
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_IN_URL is required'),
+  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_UP_URL is required'),
+
+  // Resend Email (Required)
+  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
+  RESEND_FROM_EMAIL: z.string().email().min(1, 'RESEND_FROM_EMAIL is required'),
+  ADMIN_EMAIL: z.string().email().min(1, 'ADMIN_EMAIL is required'),
+
+  // Optional
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
-  
-  // File Upload / Storage (if used)
-  UPLOADTHING_SECRET: z.string().optional(),
-  UPLOADTHING_APP_ID: z.string().optional(),
-  
-  // Email Service (if used)
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().optional(),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASSWORD: z.string().optional(),
 })
 
 /**
