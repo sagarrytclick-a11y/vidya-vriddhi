@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
+import { categoryCreateSchema, categoryUpdateSchema } from '@/lib/validations/schema'
+import { z } from 'zod'
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,14 +57,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, slug, description, categoryImageUrl, active } = body
 
-    if (!name || !slug) {
+    // Validate input using Zod schema
+    const validatedData = categoryCreateSchema.safeParse(body)
+    if (!validatedData.success) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        { error: 'Validation failed', details: validatedData.error.issues },
         { status: 400 }
       )
     }
+
+    const { name, slug, description, categoryImageUrl, active } = validatedData.data
 
     // Check if category with same name or slug already exists
     const existingCategory = await db.category.findFirst({

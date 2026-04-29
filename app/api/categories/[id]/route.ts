@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { categoryUpdateSchema } from '@/lib/validations/schema'
 
 export async function GET(
   request: NextRequest,
@@ -37,14 +38,17 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { name, slug, description, categoryImageUrl, active } = body
 
-    if (!name || !slug) {
+    // Validate input using Zod schema
+    const validatedData = categoryUpdateSchema.safeParse({ ...body, id })
+    if (!validatedData.success) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        { error: 'Validation failed', details: validatedData.error.issues },
         { status: 400 }
       )
     }
+
+    const { name, slug, description, categoryImageUrl, active } = validatedData.data
 
     // Check if category with same name or slug already exists (excluding current category)
     const existingCategory = await db.category.findFirst({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -58,60 +59,71 @@ const collegeSchema = z.object({
   courses: z.array(z.string()).optional()
 })
 
-// GET all colleges
+// GET all colleges with pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
-    
-    // For list view, fetch only essential data
-    const colleges = await db.college.findMany({
-      where: {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { slug: { contains: search, mode: 'insensitive' } }
-        ]
-      },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        active: true,
-        establishment_year: true,
-        Countryranking: true,
-        Internationalranking: true,
-        logoURL: true,
-        imageURL: true,
-        createdAt: true,
-        updatedAt: true,
-        city: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          }
-        },
-        country: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            flagEmoji: true
-          }
-        },
-        _count: {
-          select: {
-            categories: true,
-            courses: true,
-            exams: true
+
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { slug: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Fetch colleges with pagination - only essential fields for list view
+    const [colleges, total] = await Promise.all([
+      db.college.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          active: true,
+          establishment_year: true,
+          Countryranking: true,
+          Internationalranking: true,
+          logoURL: true,
+          imageURL: true,
+          createdAt: true,
+          // Fetch related data in single query to avoid N+1
+          city: {
+            select: {
+              id: true,
+              name: true,
+              slug: true
+            }
+          },
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true
+            }
+          },
+          // Use _count for relation counts instead of fetching all relations
+          _count: {
+            select: {
+              categories: true,
+              courses: true,
+              exams: true
+            }
           }
         }
-      }
-    })
+      }),
+      db.college.count({ where })
+    ])
 
-    return NextResponse.json(colleges)
+    return NextResponse.json(createPaginationResponse(colleges, total, page, limit))
   } catch (error) {
     console.error('Error fetching colleges:', error)
     return NextResponse.json(

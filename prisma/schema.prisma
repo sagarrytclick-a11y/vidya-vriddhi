@@ -47,6 +47,9 @@ model Country {
   updatedAt   DateTime  @updatedAt
   cities      City[]
   colleges    College[]
+
+  @@index([active])
+  @@index([createdAt])
 }
 
 model Category {
@@ -59,6 +62,9 @@ model Category {
   updatedAt        DateTime  @updatedAt
   categoryImageUrl String?
   colleges         College[] @relation("CategoryToCollege")
+
+  @@index([active])
+  @@index([createdAt])
 }
 
 model Course {
@@ -70,6 +76,9 @@ model Course {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   colleges    College[] @relation("CollegeToCourse")
+
+  @@index([active])
+  @@index([createdAt])
 }
 
 model News {
@@ -81,6 +90,9 @@ model News {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   imageUrl  String?
+
+  @@index([active])
+  @@index([createdAt])
 }
 
 model Blog {
@@ -92,6 +104,9 @@ model Blog {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   imageUrl  String?
+
+  @@index([active])
+  @@index([createdAt])
 }
 
 model Enquiry {
@@ -104,6 +119,10 @@ model Enquiry {
   status    EnquiryStatus @default(PENDING)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
 }
 
 model City {
@@ -119,6 +138,10 @@ model City {
   updatedAt    DateTime  @updatedAt
   country      Country   @relation(fields: [countryId], references: [id])
   colleges     College[]
+
+  @@index([countryId])
+  @@index([active])
+  @@index([createdAt])
 }
 
 model Exam {
@@ -141,6 +164,11 @@ model Exam {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   colleges         College[] @relation("CollegeToExam")
+
+  @@index([examType])
+  @@index([examMode])
+  @@index([active])
+  @@index([createdAt])
 }
 
 model College {
@@ -170,4 +198,10 @@ model College {
   categories           Category[] @relation("CategoryToCollege")
   courses              Course[]   @relation("CollegeToCourse")
   exams                Exam[]     @relation("CollegeToExam")
+
+  @@index([countryId])
+  @@index([cityId])
+  @@index([active])
+  @@index([Countryranking])
+  @@index([createdAt])
 }
