@@ -12,29 +12,43 @@ const createCourseSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '1000')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const skip = (page - 1) * limit
     
-    const courses = await db.course.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-      include: {
-        colleges: {
-          select: {
-            id: true,
-            name: true,
-          }
+    const [courses, total] = await Promise.all([
+      db.course.findMany({
+        orderBy: {
+          createdAt: 'desc',
         },
-        _count: {
-          select: {
-            colleges: true
+        take: limit,
+        skip,
+        include: {
+          colleges: {
+            select: {
+              id: true,
+              name: true,
+            }
+          },
+          _count: {
+            select: {
+              colleges: true
+            }
           }
         }
+      }),
+      db.course.count()
+    ])
+
+    return NextResponse.json({
+      courses,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
       }
     })
-
-    return NextResponse.json(courses)
   } catch (error) {
     console.error('Error fetching courses:', error)
     return NextResponse.json(

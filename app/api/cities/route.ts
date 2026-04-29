@@ -15,31 +15,45 @@ const createCitySchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
-    
-    const cities = await db.city.findMany({
-      take: limit,
-      include: {
-        country: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            flagEmoji: true,
-          },
-        },
-        _count: {
-          select: {
-            colleges: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+    const skip = (page - 1) * limit
 
-    return NextResponse.json(cities)
+    const [cities, total] = await Promise.all([
+      db.city.findMany({
+        take: limit,
+        skip,
+        include: {
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true,
+            },
+          },
+          _count: {
+            select: {
+              colleges: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      db.city.count()
+    ])
+
+    return NextResponse.json({
+      cities,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    })
   } catch (error) {
     console.error('Error fetching cities:', error)
     return NextResponse.json(

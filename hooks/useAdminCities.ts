@@ -46,8 +46,9 @@ export const cityKeys = {
   detail: (id: string) => [...cityKeys.details(), id] as const,
 }
 
-async function fetchCities(): Promise<City[]> {
-  const response = await fetch(`${API_BASE}/cities`)
+async function fetchCities({ queryKey }: any): Promise<{ cities: City[], pagination: any }> {
+  const [, , page = 1, limit = 10] = queryKey
+  const response = await fetch(`${API_BASE}/cities?page=${page}&limit=${limit}`)
   if (!response.ok) {
     throw new Error('Failed to fetch cities')
   }
@@ -99,16 +100,16 @@ async function deleteCity(id: string): Promise<void> {
   }
 }
 
-export function useAdminCities() {
+export function useAdminCities(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
 
   const {
-    data: cities = [],
+    data: response = { cities: [], pagination: { page, limit, total: 0, totalPages: 0 } },
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: cityKeys.lists(),
+    queryKey: [...cityKeys.lists(), page, limit],
     queryFn: fetchCities,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
@@ -159,7 +160,8 @@ export function useAdminCities() {
   })
 
   return {
-    cities,
+    cities: response.cities,
+    pagination: response.pagination,
     isLoading,
     error: error?.message || null,
     refetch,

@@ -8,6 +8,15 @@ interface CourseContextType {
   courses: Course[]
   isLoading: boolean
   error: string | null
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+
+  // Pagination actions
+  setPage: (page: number) => void
 
   // Mutations
   createCourse: (data: CourseFormData) => Promise<void>
@@ -52,8 +61,12 @@ interface CourseProviderProps {
 }
 
 export function CourseProvider({ children }: CourseProviderProps) {
+  const [page, setPage] = useState(1)
+  const limit = 10
+
   const {
     courses,
+    pagination,
     isLoading,
     error,
     createCourse,
@@ -63,7 +76,7 @@ export function CourseProvider({ children }: CourseProviderProps) {
     isUpdating,
     isDeleting,
     refetchCourses,
-  } = useAdminCourses()
+  } = useAdminCourses(page, limit)
 
   // Modal state
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
@@ -116,6 +129,10 @@ export function CourseProvider({ children }: CourseProviderProps) {
     courses,
     isLoading,
     error,
+    pagination,
+
+    // Pagination actions
+    setPage,
 
     // Mutations
     createCourse,

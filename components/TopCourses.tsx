@@ -49,7 +49,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
 const TopCourses: React.FC = () => {
   // Fetch courses using custom hook
-  const { data: courses, isLoading, error } = useCourses()
+  const { data: response, isLoading, error } = useCourses()
+  const courses = response?.courses || []
 
   const scrollLeft = () => {
     const element = document.getElementById('courses-scroll-container')

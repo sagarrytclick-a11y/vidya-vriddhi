@@ -21,7 +21,7 @@ interface City {
   }
 }
 
-const fetchCities = async (limit: number = 10): Promise<City[]> => {
+const fetchCities = async (limit: number = 10): Promise<{ cities: City[], pagination: any }> => {
   try {
     const response = await fetch(`/api/cities?limit=${limit}`)
     
@@ -29,11 +29,11 @@ const fetchCities = async (limit: number = 10): Promise<City[]> => {
       throw new Error('Failed to fetch cities')
     }
     
-    const cities = await response.json()
-    return cities
+    const data = await response.json()
+    return data
   } catch (error) {
     console.error('Error fetching cities:', error)
-    return []
+    return { cities: [], pagination: { limit, total: 0, totalPages: 0, page: 1 } }
   }
 }
 
@@ -48,7 +48,7 @@ export const useCities = (limit: number = 10) => {
 export const useCitiesData = (limit: number = 10) => {
   const query = useCities(limit)
   return {
-    cities: query.data || [],
+    cities: query.data?.cities || [],
     isLoading: query.isLoading,
     error: query.error,
   }

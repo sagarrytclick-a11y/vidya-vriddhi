@@ -12,13 +12,14 @@ import { DeleteCourseModal } from '@/components/admin/courses/delete-course-moda
 import { LoadingPage } from '@/components/ui/loading'
 import { useCourseContext } from '@/contexts/course-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
-import { Search, Plus, Trash2, Eye, Edit, Building } from 'lucide-react'
+import { Search, Plus, Trash2, Eye, Edit, Building, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   
   const {
     courses,
+    pagination,
     isLoading,
     error,
     createCourse,
@@ -38,7 +39,8 @@ export default function CoursesPage() {
     isDeleteModalOpen,
     selectedCourse,
     isCreating,
-    isUpdating
+    isUpdating,
+    setPage
   } = useCourseContext()
 
   const handleCreateCourse = async (data: CourseFormData) => {
@@ -60,6 +62,10 @@ export default function CoursesPage() {
     course.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (course.description && course.description.toLowerCase().includes(searchTerm.toLowerCase()))
   )
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
 
   if (isLoading) {
     return (
@@ -201,6 +207,54 @@ export default function CoursesPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <div className="text-sm text-gray-400">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} courses
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === pagination.page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNum)}
+                    className={
+                      pageNum === pagination.page
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : "border-slate-600 text-white hover:bg-slate-700"
+                    }
+                  >
+                    {pageNum}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page === pagination.totalPages}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
 
         <AddCourseModal
           isOpen={isAddModalOpen}

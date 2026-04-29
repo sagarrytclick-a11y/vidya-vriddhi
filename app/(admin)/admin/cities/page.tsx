@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoadingPage } from '@/components/ui/loading'
-import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCityContext } from '@/contexts/city-context'
 import { AddCityModal } from '@/components/admin/cities/add-city-modal'
 import { ViewCityModal } from '@/components/admin/cities/view-city-modal'
@@ -15,6 +15,7 @@ import { DeleteCityModal } from '@/components/admin/cities/delete-city-modal'
 export default function CitiesPage() {
   const {
     cities,
+    pagination,
     isLoading,
     error,
     selectedCity,
@@ -30,7 +31,12 @@ export default function CitiesPage() {
     closeDeleteModal,
     openAddModal,
     closeAddModal,
+    setPage,
   } = useCityContext()
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
 
   if (isLoading) {
     return (
@@ -94,7 +100,7 @@ export default function CitiesPage() {
 
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">All Cities ({cities.length})</CardTitle>
+            <CardTitle className="text-white">All Cities ({pagination?.total || cities.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -150,6 +156,54 @@ export default function CitiesPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <div className="text-sm text-gray-400">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} cities
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === pagination.page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNum)}
+                    className={
+                      pageNum === pagination.page
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : "border-slate-600 text-white hover:bg-slate-700"
+                    }
+                  >
+                    {pageNum}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page === pagination.totalPages}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   )

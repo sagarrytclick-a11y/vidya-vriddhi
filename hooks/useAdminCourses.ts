@@ -32,8 +32,9 @@ export const courseKeys = {
 }
 
 // API functions
-const fetchCourses = async (): Promise<Course[]> => {
-  const response = await fetch('/api/courses')
+const fetchCourses = async ({ queryKey }: any): Promise<{ courses: Course[], pagination: any }> => {
+  const [, , page = 1, limit = 10] = queryKey
+  const response = await fetch(`/api/courses?page=${page}&limit=${limit}`)
   if (!response.ok) {
     throw new Error('Failed to fetch courses')
   }
@@ -94,17 +95,17 @@ const deleteCourse = async (id: string): Promise<void> => {
 }
 
 // Main hook
-export function useAdminCourses() {
+export function useAdminCourses(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
 
   // Fetch all courses
   const {
-    data: courses = [],
+    data: response = { courses: [], pagination: { page, limit, total: 0, totalPages: 0 } },
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: courseKeys.lists(),
+    queryKey: [...courseKeys.lists(), page, limit],
     queryFn: fetchCourses,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
@@ -160,7 +161,8 @@ export function useAdminCourses() {
   }
 
   return {
-    courses,
+    courses: response.courses,
+    pagination: response.pagination,
     isLoading,
     error: error?.message || null,
     createCourse: createCourseHandler,
