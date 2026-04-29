@@ -1,8 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { College, CollegeFormData } from '@/types/college'
+import { Pagination } from '@/types/api'
 
 // Query keys for consistent cache management
 export const collegeKeys = {
@@ -14,18 +16,43 @@ export const collegeKeys = {
 }
 
   // API functions
-const fetchColleges = async (search?: string): Promise<College[]> => {
-  const url = search ? `/api/colleges?search=${encodeURIComponent(search)}` : '/api/colleges'
+interface PaginatedCollegesResponse {
+  data: College[]
+  pagination: Pagination
+}
+
+const fetchCollegesWithPagination = async (
+  search?: string,
+  page?: number,
+  limit?: number
+): Promise<PaginatedCollegesResponse> => {
+  const params = new URLSearchParams()
+  if (search) params.append('search', search)
+  if (page) params.append('page', page.toString())
+  if (limit) params.append('limit', limit.toString())
+
+  const url = `/api/colleges?${params.toString()}`
   const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error('Failed to fetch colleges')
   }
 
-  const data = await response.json()
+  const result = await response.json()
+
+  // API returns paginated response: { data: [...], pagination: {...} }
+  const colleges = result.data || []
+  const pagination = result.pagination || {
+    page: 1,
+    limit: 10,
+    total: colleges.length,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false
+  }
 
   // Transform data to match expected format - optimized for list view
-  return data.map((college: any) => ({
+  const transformedColleges = colleges.map((college: any) => ({
     id: college.id,
     name: college.name,
     slug: college.slug,
@@ -53,6 +80,8 @@ const fetchColleges = async (search?: string): Promise<College[]> => {
     courses: [],
     exams: []
   }))
+
+  return { data: transformedColleges, pagination }
 }
 
 const fetchCollege = async (id: string): Promise<College> => {
@@ -110,19 +139,40 @@ const deleteCollege = async (id: string): Promise<void> => {
   }
 }
 
-// Main hook
-export function useColleges(search?: string) {
-  const queryClient = useQueryClient()
+interface UseCollegesReturn {
+  colleges: College[]
+  isLoading: boolean
+  error: string | null
+  createCollege: (data: CollegeFormData) => Promise<void>
+  updateCollege: (id: string, data: CollegeFormData) => Promise<void>
+  deleteCollege: (id: string) => Promise<void>
+  isCreating: boolean
+  isUpdating: boolean
+  isDeleting: boolean
+  refetchColleges: () => Promise<any>
+  // Pagination
+  pagination: Pagination | null
+  page: number
+  setPage: (page: number) => void
+  limit: number
+  setLimit: (limit: number) => void
+}
 
-  // Fetch all colleges
+// Main hook
+export function useColleges(search?: string): UseCollegesReturn {
+  const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+
+  // Fetch all colleges with pagination
   const {
-    data: colleges = [],
+    data: response,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: collegeKeys.list(search ? { search } : {}),
-    queryFn: () => fetchColleges(search),
+    queryKey: collegeKeys.list({ search: search || '', page, limit }),
+    queryFn: () => fetchCollegesWithPagination(search, page, limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
@@ -174,6 +224,14 @@ export function useColleges(search?: string) {
     await deleteCollegeMutation.mutateAsync(id)
   }
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1)
+  }, [search])
+
+  const colleges = response?.data || []
+  const pagination = response?.pagination || null
+
   return {
     colleges,
     isLoading,
@@ -185,6 +243,11 @@ export function useColleges(search?: string) {
     isUpdating: updateCollegeMutation.isPending,
     isDeleting: deleteCollegeMutation.isPending,
     refetchColleges: refetch,
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   }
 }
 
