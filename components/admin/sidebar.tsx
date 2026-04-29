@@ -34,7 +34,6 @@ export function Sidebar() {
 
   const pathname = usePathname()
 
-  console.log(pathname);
 
   return (
     <div className="w-64 bg-slate-900 text-white min-h-screen p-6">

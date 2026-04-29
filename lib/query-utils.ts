@@ -181,6 +181,5 @@ export const queryPerformanceLogger = {
   
   logCacheHitRate: (hits: number, total: number) => {
     const hitRate = (hits / total) * 100
-    console.log(`Query cache hit rate: ${hitRate.toFixed(2)}% (${hits}/${total})`)
   },
 }

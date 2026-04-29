@@ -108,7 +108,6 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
   } = useCategories(currentPage, limit, searchTerm)
 
   // Debug logging
-  console.log('CategoryContext Hook Data:', { categories, categoriesLength: categories?.length, loading, error, pagination })
 
   // Modal actions
   const openViewModal = (category: Category) => {

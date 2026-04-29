@@ -44,7 +44,6 @@ export const env = envSchema.parse(process.env)
 export function validateEnv(): void {
   try {
     envSchema.parse(process.env)
-    console.log('✅ Environment variables validated successfully')
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map((e: z.ZodIssue) => e.path.join('.')).join(', ')

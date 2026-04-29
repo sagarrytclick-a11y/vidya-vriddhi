@@ -122,29 +122,15 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Debug form state changes (remove for production)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Form data changed:', formData)
-    }
-  }, [formData])
 
   // Update form data when initialData changes (for edit mode)
   useEffect(() => {
-    console.log('=== DESCRIPTION DEBUG START ===')
-    console.log('1. initialData received:', initialData)
-    console.log('2. initialData.description:', initialData?.description)
-    console.log('3. isEdit:', isEdit)
-    console.log('4. typeof initialData.description:', typeof initialData?.description)
-    console.log('5. initialData.description length:', initialData?.description?.length)
-    
     if (initialData && isEdit) {
-      // Force immediate update with proper data structure
-      const updatedFormData = {
+      setFormData({
         name: initialData.name || '',
         slug: initialData.slug || '',
         shortName: initialData.shortName || '',
-        description: initialData.description || '', // This should work
+        description: initialData.description || '',
         conductingBody: initialData.conductingBody || '',
         examType: initialData.examType || 'NATIONAL',
         examMode: initialData.examMode || 'ONLINE',
@@ -183,35 +169,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
           passingCriteria: '',
           totalMarks: 0
         }
-      }
-      
-      console.log('6. updatedFormData.description:', updatedFormData.description)
-      console.log('7. typeof updatedFormData.description:', typeof updatedFormData.description)
-      console.log('8. updatedFormData.description length:', updatedFormData.description?.length)
-      
-      setFormData(updatedFormData)
-      
-      // Force set description separately if it's still empty
-      if (initialData.description && !updatedFormData.description) {
-        console.log('9. Force setting description (empty case):', initialData.description)
-        setTimeout(() => {
-          setFormData(prev => ({ ...prev, description: initialData.description }))
-        }, 100)
-      }
-      
-      // Always force description update after 200ms as backup
-      if (initialData.description) {
-        setTimeout(() => {
-          console.log('10. Backup force setting description:', initialData.description)
-          setFormData(prev => ({ ...prev, description: initialData.description }))
-        }, 200)
-      }
+      })
       
       if (initialData.examImageurl) {
         setUploadedImage(initialData.examImageurl)
       }
     }
-    console.log('=== DESCRIPTION DEBUG END ===')
   }, [initialData, isEdit])
 
   // Reset form when modal opens for add mode
@@ -221,17 +184,6 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
     }
   }, [isOpen, isEdit])
 
-  // Force description update when modal opens for edit
-  useEffect(() => {
-    if (isOpen && isEdit && initialData?.description) {
-      console.log('Modal opened for edit - forcing description:', initialData.description)
-      // Force update description immediately
-      setTimeout(() => {
-        setFormData(prev => ({ ...prev, description: initialData.description }))
-        console.log('Description forced updated to:', initialData.description)
-      }, 50)
-    }
-  }, [isOpen, isEdit, initialData?.description])
 
   const handleImageUpload = async (file: File) => {
     if (!file) return
@@ -649,19 +601,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => {
-                  console.log('Description field changed:', e.target.value)
-                  setFormData(prev => ({ ...prev, description: e.target.value }))
-                }}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="bg-slate-700 border-slate-600"
                 placeholder="Enter exam description"
                 rows={3}
                 required
               />
-              {/* Debug: Show description value */}
-              <div className="text-xs text-slate-400 mt-1">
-                Current description: {formData.description || 'EMPTY'}
-              </div>
             </div>
           </div>
 

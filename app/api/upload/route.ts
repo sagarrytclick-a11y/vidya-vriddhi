@@ -10,12 +10,10 @@ const imagekit = new ImageKit({
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Upload API called')
     
     const formData = await request.formData()
     const file = formData.get('file') as File
 
-    console.log('File received:', file?.name, file?.type, file?.size)
 
     if (!file) {
       console.error('No file provided')
@@ -50,7 +48,6 @@ export async function POST(request: NextRequest) {
     const uniqueFilename = `city-${randomUUID()}.${fileExtension}`
 
     // Upload to ImageKit
-    console.log('Starting ImageKit upload...')
     const uploadResponse = await imagekit.upload({
       file: buffer,
       fileName: uniqueFilename,
@@ -59,7 +56,6 @@ export async function POST(request: NextRequest) {
       tags: ['city', 'vidya-vridhi'],
     })
 
-    console.log('ImageKit upload successful:', uploadResponse.url)
 
     // Return the ImageKit URL
     return NextResponse.json({ 

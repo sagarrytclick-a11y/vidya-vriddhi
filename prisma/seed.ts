@@ -3,7 +3,6 @@ import 'dotenv/config'
 import { db } from '@/lib/db'
 
 async function main() {
-  console.log('Seeding categories...')
 
   const categories = [
     {
@@ -64,9 +63,7 @@ async function main() {
     })
   }
 
-  console.log('Categories seeded successfully!')
 
-  console.log('Seeding countries...')
 
   const countries = [
     {
@@ -100,9 +97,7 @@ async function main() {
     })
   }
 
-  console.log('Countries seeded successfully!')
 
-  console.log('Seeding cities...')
 
   const usCountry = await db.country.findUnique({ where: { slug: 'united-states' } })
   const ukCountry = await db.country.findUnique({ where: { slug: 'united-kingdom' } })
@@ -172,8 +167,6 @@ async function main() {
       create: city,
     })
   }
-
-  console.log('Cities seeded successfully!')
 }
 
 main()
