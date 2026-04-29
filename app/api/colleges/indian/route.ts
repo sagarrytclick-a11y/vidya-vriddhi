@@ -59,9 +59,7 @@ export async function GET(request: NextRequest) {
     if (category) {
       whereClause.categories = {
         some: {
-          category: {
-            slug: category
-          }
+          slug: category
         }
       }
     }
@@ -70,9 +68,7 @@ export async function GET(request: NextRequest) {
     if (course) {
       whereClause.courses = {
         some: {
-          course: {
-            slug: course
-          }
+          slug: course
         }
       }
     }
@@ -88,9 +84,7 @@ export async function GET(request: NextRequest) {
     if (exam) {
       whereClause.exams = {
         some: {
-          exam: {
-            slug: exam
-          }
+          slug: exam
         }
       }
     }
