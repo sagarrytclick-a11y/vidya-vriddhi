@@ -14,12 +14,12 @@ const fetchFiltersData = async (): Promise<FilterData> => {
     fetch('/api/cities?limit=100').then(res => res.json()),
     fetch('/api/exams?limit=100').then(res => res.json())
   ])
-  
+
   return {
     categories: categories.categories || categories,
-    courses: courses,
-    cities: cities,
-    exams: exams
+    courses: courses.courses || courses,
+    cities: cities.cities || cities,
+    exams: exams.exams || exams
   }
 }
 
