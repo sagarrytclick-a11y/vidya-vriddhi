@@ -9,10 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { useCities } from '@/hooks/useCities'
 
 export default function CitiesPage() {
-  const { data: cities, isLoading, error } = useCities(100)
+  const { data: response, isLoading, error } = useCities(100)
   const [searchTerm, setSearchTerm] = useState('')
+  const cities = response?.cities || []
 
-  const filteredCities = (cities || []).filter(city => {
+  const filteredCities = cities.filter(city => {
     const matchesSearch = searchTerm === '' || 
       city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       city.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -61,7 +61,8 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
 
 const TopStudyPlaces: React.FC = () => {
   // Fetch cities using custom hook
-  const { data: cities, isLoading, error } = useCities(10)
+  const { data: response, isLoading, error } = useCities(10)
+  const cities = response?.cities || []
 
   const scrollLeft = () => {
     const element = document.getElementById('cities-scroll-container')

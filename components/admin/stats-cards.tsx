@@ -37,9 +37,9 @@ export function StatsCards() {
   const router = useRouter()
   const { colleges, isLoading: collegesLoading } = useColleges()
   const { countries, isLoading: countriesLoading } = useCountryContext()
-  const { cities, isLoading: citiesLoading } = useCityContext()
+  const { cities, pagination: cityPagination, isLoading: citiesLoading } = useCityContext()
   const { count: categoryCount, isLoading: categoriesLoading } = useCategoryCount()
-  const { courses, isLoading: coursesLoading } = useAdminCourses()
+  const { courses, pagination, isLoading: coursesLoading } = useAdminCourses()
   const { exams, isLoading: examsLoading } = useAdminExams()
   const { blogs, total: blogTotal, loading: blogsLoading } = useBlogContext()
   const { news, total: newsTotal, isLoading: newsLoading } = useAdminNews()
@@ -80,7 +80,7 @@ export function StatsCards() {
     },
     {
       title: 'Total Cities',
-      value: cities.length,
+      value: cityPagination?.total || cities.length,
       description: 'Study locations',
       icon: Building,
       color: 'text-orange-400',
@@ -96,7 +96,7 @@ export function StatsCards() {
     },
     {
       title: 'Courses',
-      value: courses.length,
+      value: pagination?.total || courses.length,
       description: 'Available courses',
       icon: Library,
       color: 'text-cyan-400',

@@ -9,6 +9,15 @@ interface CityContextType {
   cities: City[]
   isLoading: boolean
   error: string | null
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+
+  // Pagination actions
+  setPage: (page: number) => void
 
   // Mutations
   createCity: (data: CreateCityData) => Promise<City>
@@ -50,8 +59,12 @@ interface CityProviderProps {
 }
 
 export function CityProvider({ children }: CityProviderProps) {
+  const [page, setPage] = useState(1)
+  const limit = 10
+
   const {
     cities,
+    pagination,
     isLoading,
     error,
     createCity,
@@ -60,7 +73,7 @@ export function CityProvider({ children }: CityProviderProps) {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useAdminCities()
+  } = useAdminCities(page, limit)
 
   // Modal state
   const [selectedCity, setSelectedCity] = useState<City | null>(null)
@@ -113,6 +126,10 @@ export function CityProvider({ children }: CityProviderProps) {
     cities,
     isLoading,
     error,
+    pagination,
+
+    // Pagination actions
+    setPage,
 
     // Mutations
     createCity,
