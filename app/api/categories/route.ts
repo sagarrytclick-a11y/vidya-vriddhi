@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
-
-    const skip = (page - 1) * limit
 
     // Build where clause for search
     const where = search
@@ -22,29 +20,29 @@ export async function GET(request: NextRequest) {
       : {}
 
     // Get total count and categories in parallel
-    const [total, categories] = await Promise.all([
-      db.category.count({ where }),
+    const [categories, total] = await Promise.all([
       db.category.findMany({
         where,
         orderBy: {
           name: 'asc'
         },
         skip,
-        take: limit
-      })
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          categoryImageUrl: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      }),
+      db.category.count({ where })
     ])
-    
-    return NextResponse.json({
-      categories,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
-    })
+
+    return NextResponse.json(createPaginationResponse(categories, total, page, limit))
   } catch (error) {
     console.error('Error fetching categories:', error)
     return NextResponse.json(

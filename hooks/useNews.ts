@@ -12,19 +12,25 @@ interface News {
 }
 
 interface NewsResponse {
-  news: News[]
-  total: number
-  limit: number
-  skip: number
+  data: News[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 const fetchNews = async (limit: number = 10, skip: number = 0): Promise<NewsResponse> => {
-  const response = await fetch(`/api/news?limit=${limit}&skip=${skip}`)
-  
+  const page = Math.floor(skip / limit) + 1
+  const response = await fetch(`/api/news?page=${page}&limit=${limit}`)
+
   if (!response.ok) {
     throw new Error('Failed to fetch news')
   }
-  
+
   return response.json()
 }
 

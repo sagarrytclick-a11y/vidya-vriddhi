@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 
 const createBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required'),
@@ -14,21 +15,44 @@ const createBlogSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const skip = parseInt(searchParams.get('skip') || '0')
+    const { page, limit, skip } = createPaginationParams(searchParams)
+    const search = searchParams.get('search') || ''
 
+    // Build where clause for search
+    const where = search
+      ? {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' as const } },
+            { slug: { contains: search, mode: 'insensitive' as const } },
+            { content: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {}
+
+    // Fetch blogs with pagination
     const [blogs, total] = await Promise.all([
       db.blog.findMany({
+        where,
+        skip,
         take: limit,
-        skip: skip,
         orderBy: {
           createdAt: 'desc',
         },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          content: true,
+          imageUrl: true,
+          active: true,
+          createdAt: true,
+          updatedAt: true
+        }
       }),
-      db.blog.count()
+      db.blog.count({ where })
     ])
 
-    return NextResponse.json({ blogs, total, limit, skip })
+    return NextResponse.json(createPaginationResponse(blogs, total, page, limit))
   } catch (error) {
     console.error('Error fetching blogs:', error)
     return NextResponse.json(

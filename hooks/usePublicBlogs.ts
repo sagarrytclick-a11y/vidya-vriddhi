@@ -15,19 +15,24 @@ interface Blog {
 }
 
 interface BlogsResponse {
-  blogs: Blog[]
-  total: number
-  limit: number
-  skip: number
+  data: Blog[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 const fetchBlogs = async (limit: number = 10): Promise<BlogsResponse> => {
   const response = await fetch(`/api/blogs?limit=${limit}`)
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch blogs')
   }
-  
+
   return response.json()
 }
 

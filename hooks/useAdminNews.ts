@@ -21,10 +21,15 @@ export interface NewsFormData {
 }
 
 interface NewsResponse {
-  news: News[]
-  total: number
-  limit: number
-  skip: number
+  data: News[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 // Query keys for consistent cache management
@@ -38,7 +43,8 @@ export const newsKeys = {
 
 // API functions
 const fetchNews = async (limit: number = 10, skip: number = 0): Promise<NewsResponse> => {
-  const response = await fetch(`/api/news?limit=${limit}&skip=${skip}`)
+  const page = Math.floor(skip / limit) + 1
+  const response = await fetch(`/api/news?page=${page}&limit=${limit}`)
   if (!response.ok) {
     throw new Error('Failed to fetch news')
   }
@@ -104,7 +110,7 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
 
   // Fetch all news
   const {
-    data: newsData = { news: [], total: 0, limit, skip },
+    data: newsData = { data: [], pagination: { page: 1, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false } },
     isLoading,
     error,
     refetch,
@@ -165,10 +171,10 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
   }
 
   return {
-    news: newsData.news,
-    total: newsData.total,
-    limit: newsData.limit,
-    skip: newsData.skip,
+    news: newsData.data,
+    total: newsData.pagination.total,
+    limit: newsData.pagination.limit,
+    skip: (newsData.pagination.page - 1) * newsData.pagination.limit,
     isLoading,
     error: error?.message || null,
     createNews: createNewsHandler,

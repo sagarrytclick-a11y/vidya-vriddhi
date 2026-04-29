@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { AdmissionButton } from '@/components/ui/AdmissionButton'
+import { QueryStateWrapper } from '@/components/ui/query-state-wrapper'
+import { CardSkeleton } from '@/components/ui/skeletons'
 import { useCoursesByCategory } from '@/hooks/useCourses'
 
 export default function CoursesPage() {
@@ -31,55 +33,8 @@ export default function CoursesPage() {
     return matchesSearch
   })
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-white flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-red-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Error Loading Courses</h2>
-          <p className="text-slate-600 mb-4">Failed to load courses. Please try again.</p>
-          <Button onClick={() => window.location.reload()} className="bg-orange-500 hover:bg-orange-600">
-            Retry
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-12">
-            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-              <BookOpen className="w-10 h-10 text-orange-500" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
-              Loading <span className="text-orange-500">Courses</span>
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Fetching available courses for you...
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 animate-pulse">
-                <div className="flex items-start space-x-4">
-                  <div className="w-14 h-14 bg-slate-100 rounded-xl" />
-                  <div className="flex-1 space-y-3">
-                    <div className="h-5 bg-slate-100 rounded w-3/4"></div>
-                    <div className="h-3 bg-slate-100 rounded w-full"></div>
-                    <div className="h-3 bg-slate-100 rounded w-2/3"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+  const handleRetry = () => {
+    window.location.reload()
   }
 
   return (
@@ -162,7 +117,7 @@ export default function CoursesPage() {
               <h2 className="text-3xl font-bold text-slate-900 mb-2">Available Courses</h2>
               <p className="text-slate-600">Explore our wide range of professional courses</p>
             </div>
-            {filteredCourses.length > 0 && (
+            {!isLoading && filteredCourses.length > 0 && (
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-100 px-4 py-2 text-sm">
                 <TrendingUp className="w-4 h-4 mr-1" />
                 {filteredCourses.length} Courses
@@ -170,18 +125,27 @@ export default function CoursesPage() {
             )}
           </div>
 
-          {filteredCourses.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BookOpen className="w-12 h-12 text-slate-400" />
+          <QueryStateWrapper
+            isLoading={isLoading}
+            error={error}
+            isEmpty={filteredCourses.length === 0}
+            onRetry={handleRetry}
+            loadingComponent={<CardSkeleton count={6} />}
+            emptyComponent={
+              <div className="text-center py-20">
+                <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <BookOpen className="w-12 h-12 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">No courses found</h3>
+                <p className="text-slate-600 mb-4">{searchTerm ? 'Try adjusting your search terms' : 'No courses available at the moment'}</p>
+                {searchTerm && (
+                  <Button onClick={() => setSearchTerm('')} variant="outline">
+                    Clear Search
+                  </Button>
+                )}
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No courses found</h3>
-              <p className="text-slate-600 mb-4">Try adjusting your search terms</p>
-              <Button onClick={() => setSearchTerm('')} variant="outline">
-                Clear Search
-              </Button>
-            </div>
-          ) : (
+            }
+          >
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredCourses.map((course, index) => (
                 <Card key={course.id} className="group relative bg-white border-0 shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl overflow-hidden">
@@ -237,7 +201,7 @@ export default function CoursesPage() {
                 </Card>
               ))}
             </div>
-          )}
+          </QueryStateWrapper>
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (

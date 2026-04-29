@@ -25,8 +25,8 @@ const NewsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const newsItems = newsData?.news || []
-  const totalPages = newsData ? Math.ceil(newsData.total / itemsPerPage) : 0
+  const newsItems = newsData?.data || []
+  const totalPages = newsData ? Math.ceil(newsData.pagination.total / itemsPerPage) : 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +45,7 @@ const NewsPage: React.FC = () => {
             </div>
             {totalPages > 0 && (
               <div className="text-sm text-gray-500">
-                Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, newsData?.total || 0)} of {newsData?.total || 0}
+                Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, newsData?.pagination?.total || 0)} of {newsData?.pagination?.total || 0}
               </div>
             )}
           </div>

@@ -1,33 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import { CourseWithColleges } from '@/types/domain'
+import { apiClient, ApiClientError } from '@/lib/api-client'
 
-interface Course {
-  id: string
-  name: string
-  slug: string
-  description: string
-  active: boolean
-  createdAt: Date
-  updatedAt: Date
-  colleges: any[]
-}
-
-// Real API function - fetch courses from API endpoint
-const fetchCourses = async ({ queryKey }: any): Promise<{ courses: Course[], pagination: any }> => {
+// Real API function - fetch courses from API endpoint using apiClient
+const fetchCourses = async ({ queryKey }: any): Promise<{ data: CourseWithColleges[], pagination: any }> => {
   const [, category, page = 1, limit = 9] = queryKey
   try {
-    const url = `/api/courses?page=${page}&limit=${limit}${category ? `&category=${category}` : ''}`
-    const response = await fetch(url)
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch courses')
-    }
-    
-    const data = await response.json()
-    return data
+    const params = new URLSearchParams()
+    params.append('page', page.toString())
+    params.append('limit', limit.toString())
+    if (category) params.append('category', category)
+
+    const url = `/api/courses?${params.toString()}`
+    return await apiClient.get<{ data: CourseWithColleges[], pagination: any }>(url)
   } catch (error) {
     console.error('Error fetching courses:', error)
-    return { courses: [], pagination: { page, limit, total: 0, totalPages: 0 } }
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
+    return { data: [], pagination: { page, limit, total: 0, totalPages: 0 } }
   }
 }
 
@@ -41,17 +33,17 @@ export function useCourses(category?: string, page: number = 1, limit: number = 
 }
 
 export function useCoursesByCategory(category?: string, page: number = 1, limit: number = 9) {
-  const { data: response = { courses: [], pagination: { page, limit, total: 0, totalPages: 0 } }, isLoading } = useCourses(category, page, limit)
-  
+  const { data: response = { data: [], pagination: { page, limit, total: 0, totalPages: 0 } }, isLoading } = useCourses(category, page, limit)
+
   const filteredCourses = useMemo(() => {
     if (!category || category === 'All') {
-      return response.courses
+      return response.data
     }
-    
-    return response.courses.filter((course: any) => 
+
+    return response.data.filter((course) =>
       course.name.toLowerCase().includes(category.toLowerCase())
     )
-  }, [response.courses, category])
+  }, [response.data, category])
 
   return {
     courses: filteredCourses || [],

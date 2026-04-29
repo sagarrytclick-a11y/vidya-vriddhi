@@ -22,10 +22,15 @@ interface BlogFormData {
 }
 
 interface BlogsResponse {
-  blogs: Blog[]
-  total: number
-  limit: number
-  skip: number
+  data: Blog[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 // Query keys for consistent cache management
@@ -40,17 +45,18 @@ export const blogKeys = {
 // API functions
 const fetchBlogs = async (limit: number = 10, skip: number = 0): Promise<BlogsResponse> => {
   try {
-    const response = await fetch(`/api/blogs?limit=${limit}&skip=${skip}`)
-    
+    const page = Math.floor(skip / limit) + 1
+    const response = await fetch(`/api/blogs?page=${page}&limit=${limit}`)
+
     if (!response.ok) {
       throw new Error('Failed to fetch blogs')
     }
-    
+
     const data = await response.json()
     return data
   } catch (error) {
     console.error('Error fetching blogs:', error)
-    return { blogs: [], total: 0, limit, skip }
+    return { data: [], pagination: { page: 1, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false } }
   }
 }
 
@@ -113,7 +119,7 @@ export function useBlogs(limit: number = 10, skip: number = 0) {
 
   // Fetch all blogs
   const {
-    data: blogData = { blogs: [], total: 0, limit, skip },
+    data: blogData = { data: [], pagination: { page: 1, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false } },
     isLoading,
     error,
     refetch,
@@ -174,10 +180,10 @@ export function useBlogs(limit: number = 10, skip: number = 0) {
   }
 
   return {
-    blogs: blogData.blogs,
-    total: blogData.total,
-    limit: blogData.limit,
-    skip: blogData.skip,
+    blogs: blogData.data,
+    total: blogData.pagination.total,
+    limit: blogData.pagination.limit,
+    skip: (blogData.pagination.page - 1) * blogData.pagination.limit,
     isLoading,
     error: error?.message || null,
     createBlog: createBlogHandler,

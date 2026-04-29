@@ -1,41 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { CityWithCountry, CreateCityData, UpdateCityData } from '@/types/domain'
+import { apiClient, ApiClientError } from '@/lib/api-client'
 
-export interface City {
-  id: string
-  description: string | null
-  name: string | null
-  cityImageURL: string | null
-  features: string[]
-  active: boolean
-  countryId: string
-  country?: {
-    id: string
-    name: string
-    slug: string
-    flagEmoji: string | null
-  }
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateCityData {
-  description?: string
-  cityImageURL?: string
-  features?: string[]
-  active?: boolean
-  countryId: string
-}
-
-export interface UpdateCityData {
-  description?: string
-  cityImageURL?: string
-  features?: string[]
-  active?: boolean
-  countryId?: string
-}
-
-const API_BASE = '/api'
+// Re-export types for backward compatibility
+export type { CityWithCountry as City, CreateCityData, UpdateCityData }
 
 // Query keys for consistent cache management
 export const cityKeys = {
@@ -46,56 +15,63 @@ export const cityKeys = {
   detail: (id: string) => [...cityKeys.details(), id] as const,
 }
 
-async function fetchCities({ queryKey }: any): Promise<{ cities: City[], pagination: any }> {
+async function fetchCities({ queryKey }: any): Promise<{ data: CityWithCountry[], pagination: any }> {
   const [, , page = 1, limit = 10] = queryKey
-  const response = await fetch(`${API_BASE}/cities?page=${page}&limit=${limit}`)
-  if (!response.ok) {
+  try {
+    return await apiClient.get<{ data: CityWithCountry[], pagination: any }>(`/api/cities?page=${page}&limit=${limit}`)
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to fetch cities')
   }
-  return response.json()
 }
 
-async function fetchCity(id: string): Promise<City> {
-  const response = await fetch(`${API_BASE}/cities/${id}`)
-  if (!response.ok) {
+async function fetchCity(id: string): Promise<CityWithCountry> {
+  try {
+    return await apiClient.get<CityWithCountry>(`/api/cities/${id}`)
+  } catch (error) {
+    console.error('Error fetching city:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to fetch city')
   }
-  return response.json()
 }
 
-async function createCity(data: CreateCityData): Promise<City> {
-  const response = await fetch(`${API_BASE}/cities`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
+async function createCity(data: CreateCityData): Promise<CityWithCountry> {
+  try {
+    return await apiClient.post<CityWithCountry>('/api/cities', data)
+  } catch (error) {
+    console.error('Error creating city:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to create city')
   }
-  return response.json()
 }
 
-async function updateCity({ id, data }: { id: string; data: UpdateCityData }): Promise<City> {
-  const response = await fetch(`${API_BASE}/cities/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
+async function updateCity({ id, data }: { id: string; data: UpdateCityData }): Promise<CityWithCountry> {
+  try {
+    return await apiClient.put<CityWithCountry>(`/api/cities/${id}`, data)
+  } catch (error) {
+    console.error('Error updating city:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to update city')
   }
-  return response.json()
 }
 
 async function deleteCity(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/cities/${id}`, {
-    method: 'DELETE',
-  })
-  if (!response.ok) {
+  try {
+    await apiClient.delete<void>(`/api/cities/${id}`)
+  } catch (error) {
+    console.error('Error deleting city:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to delete city')
   }
 }
@@ -104,7 +80,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
 
   const {
-    data: response = { cities: [], pagination: { page, limit, total: 0, totalPages: 0 } },
+    data: response = { data: [], pagination: { page, limit, total: 0, totalPages: 0 } },
     isLoading,
     error,
     refetch,
@@ -119,7 +95,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     mutationFn: createCity,
     onSuccess: (newCity) => {
       toast.success('City created successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: City[] = []) => [
+      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) => [
         newCity,
         ...oldCities,
       ])
@@ -134,7 +110,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     mutationFn: updateCity,
     onSuccess: (updatedCity) => {
       toast.success('City updated successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: City[] = []) =>
+      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) =>
         oldCities.map((city) =>
           city.id === updatedCity.id ? updatedCity : city
         )
@@ -150,7 +126,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     mutationFn: deleteCity,
     onSuccess: (_, deletedId) => {
       toast.success('City deleted successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: City[] = []) =>
+      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) =>
         oldCities.filter((city) => city.id !== deletedId)
       )
     },
@@ -160,7 +136,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
   })
 
   return {
-    cities: response.cities,
+    cities: response.data,
     pagination: response.pagination,
     isLoading,
     error: error?.message || null,

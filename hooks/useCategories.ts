@@ -24,7 +24,7 @@ export interface PaginationInfo {
 }
 
 export interface CategoriesResponse {
-  categories: Category[]
+  data: Category[]
   pagination: PaginationInfo
 }
 
@@ -156,7 +156,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
 
   console.log('useCategories Hook:', { categoriesData, loading, error, page, limit, search })
 
-  const categories = categoriesData?.categories || []
+  const categories = categoriesData?.data || []
   const pagination = categoriesData?.pagination || {
     page: 1,
     limit: 10,
@@ -173,7 +173,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
         if (!oldData) return oldData
         return {
           ...oldData,
-          categories: [newCategory, ...oldData.categories],
+          data: [newCategory, ...oldData.data],
           pagination: {
             ...oldData.pagination,
             total: oldData.pagination.total + 1
@@ -194,7 +194,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
         if (!oldData) return oldData
         return {
           ...oldData,
-          categories: oldData.categories.map((category) =>
+          data: oldData.data.map((category) =>
             category.id === updatedCategory.id ? updatedCategory : category
           )
         }
@@ -213,7 +213,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
         if (!oldData) return oldData
         return {
           ...oldData,
-          categories: oldData.categories.filter((category) => category.id !== deletedId),
+          data: oldData.data.filter((category) => category.id !== deletedId),
           pagination: {
             ...oldData.pagination,
             total: oldData.pagination.total - 1

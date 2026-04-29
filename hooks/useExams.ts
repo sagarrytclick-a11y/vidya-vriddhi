@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { apiClient, ApiClientError } from '@/lib/api-client'
 
-interface Exam {
+export interface Exam {
   id: string
   name: string
   slug: string
@@ -21,14 +22,29 @@ interface Exam {
   updatedAt: string
 }
 
+interface ExamsResponse {
+  data: Exam[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
+
 const fetchExams = async (limit: number = 10): Promise<Exam[]> => {
-  const response = await fetch(`/api/exams?limit=${limit}`)
-  
-  if (!response.ok) {
+  try {
+    const response = await apiClient.get<ExamsResponse>(`/api/exams?limit=${limit}`)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching exams:', error)
+    if (error instanceof ApiClientError) {
+      throw new Error(error.message)
+    }
     throw new Error('Failed to fetch exams')
   }
-  
-  return response.json()
 }
 
 export const useExams = (limit: number = 10) => {

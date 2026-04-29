@@ -16,10 +16,10 @@ const fetchFiltersData = async (): Promise<FilterData> => {
   ])
 
   return {
-    categories: categories.categories || categories,
-    courses: courses.courses || courses,
-    cities: cities.cities || cities,
-    exams: exams.exams || exams
+    categories: categories.data || [],
+    courses: courses.data || [],
+    cities: cities.data || [],
+    exams: exams.data || []
   }
 }
 
