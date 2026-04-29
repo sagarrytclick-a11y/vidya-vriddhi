@@ -47,17 +47,13 @@ const fetchCategories = async ({ queryKey }: { queryKey: readonly unknown[] }): 
     search
   })
   const url = `/api/categories?${params}`
-  console.log('🔍 [Simple Hook] Fetching from:', url)
-
   const response = await fetch(url)
-  console.log('📡 [Simple Hook] Response status:', response.status)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch: ${response.status}`)
   }
 
   const data: CategoriesResponse = await response.json()
-  console.log('✅ [Simple Hook] Data received:', data)
   return data
 }
 
@@ -87,7 +83,6 @@ export function useAdminCategories(page: number = 1, limit: number = 10, search:
     hasPrev: false
   }
 
-  console.log('📊 [Admin Hook] Hook state:', { categories, categoriesLength: categories.length, pagination, isLoading, error, page, limit, search })
 
   return {
     categories,

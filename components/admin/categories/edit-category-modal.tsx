@@ -37,8 +37,6 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
 
   useEffect(() => {
     if (category) {
-      console.log('🖼️ EditModal - Category data:', category)
-      console.log('🖼️ EditModal - categoryImageUrl:', category.categoryImageUrl)
       setFormData({
         name: category.name || '',
         slug: category.slug || '',
@@ -218,8 +216,6 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
                 
                 {(uploadedImage || formData.categoryImageUrl) && (
                   <div className="relative group">
-                    {/* eslint-disable-next-line no-console */}
-                    {(() => { console.log('🖼️ Rendering image preview:', uploadedImage || formData.categoryImageUrl); return null; })()}
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                       <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
                         <img
@@ -227,11 +223,9 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
                           alt="Category preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.log('🖼️ Image failed to load:', uploadedImage || formData.categoryImageUrl)
                             e.currentTarget.style.display = 'none'
                             e.currentTarget.nextElementSibling?.classList.remove('hidden')
                           }}
-                          onLoad={() => console.log('🖼️ Image loaded successfully')}
                         />
                         <div className="hidden w-full h-full items-center justify-center">
                           <ImageIcon className="h-6 w-6 text-slate-400" />

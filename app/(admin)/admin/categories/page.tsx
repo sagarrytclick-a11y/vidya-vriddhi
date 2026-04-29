@@ -370,7 +370,6 @@ export default function CategoriesPage() {
 
   const { categories, pagination, isLoading, refetch } = useAdminCategories(page, limit, search)
 
-  console.log('📋 [Page] Categories data:', { categories, categoriesLength: categories.length, pagination, isLoading, page, limit, search })
 
   const handleDelete = async () => {
     if (!selectedCategory) return

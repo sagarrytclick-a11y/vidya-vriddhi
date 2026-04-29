@@ -184,13 +184,10 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
         // Fetch categories
         const categoriesResponse = await fetch('/api/categories?limit=100')
-        console.log('Categories response status:', categoriesResponse.status)
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
-          console.log('Categories data:', categoriesData)
           // API returns { data: [...], pagination: {...} }
           const categoriesArray = categoriesData.data || []
-          console.log('Extracted categories array:', categoriesArray, 'Is array:', Array.isArray(categoriesArray))
           setCategories(Array.isArray(categoriesArray) ? categoriesArray : [])
         } else {
           console.error('Categories fetch failed:', categoriesResponse.status)

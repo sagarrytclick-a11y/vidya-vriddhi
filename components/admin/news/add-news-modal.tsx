@@ -98,14 +98,12 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
       const formData = new FormData()
       formData.append('file', file)
       
-      console.log('Uploading file:', file.name, file.type, file.size)
       
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       })
       
-      console.log('Upload response status:', response.status)
       
       if (!response.ok) {
         const errorData = await response.json()
@@ -114,7 +112,6 @@ export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {
       }
       
       const data = await response.json()
-      console.log('Upload success:', data)
       
       setUploadedImage(data.url)
       setFormData(prev => ({ ...prev, imageUrl: data.url }))

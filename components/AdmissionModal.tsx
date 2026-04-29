@@ -100,7 +100,6 @@ export function AdmissionModal() {
           }
         })
         setErrors(newErrors)
-        console.log('Validation errors:', newErrors)
       }
       return false
     }
