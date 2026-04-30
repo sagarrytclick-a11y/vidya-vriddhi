@@ -142,6 +142,9 @@ model City {
   @@index([countryId])
   @@index([active])
   @@index([createdAt])
+  @@index([active, createdAt])
+  @@index([slug])
+  @@index([name])
 }
 
 model Exam {
@@ -169,6 +172,9 @@ model Exam {
   @@index([examMode])
   @@index([active])
   @@index([createdAt])
+  @@index([active, createdAt])
+  @@index([slug])
+  @@index([name])
 }
 
 model College {
@@ -204,4 +210,7 @@ model College {
   @@index([active])
   @@index([Countryranking])
   @@index([createdAt])
+  @@index([active, createdAt])
+  @@index([slug])
+  @@index([name])
 }

@@ -4,45 +4,143 @@ import { db } from '@/lib/db'
 // GET all tables with their data
 export async function GET(request: NextRequest) {
   try {
-    // Get all tables data
-    const countries = await db.country.findMany({
-      include: {
-        cities: true
-      }
-    })
-    
-    const cities = await db.city.findMany({
-      include: {
-        country: true
-      }
-    })
-    
-    const colleges = await db.college.findMany({
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        exams: true
-      }
-    })
-    
-    const categories = await db.category.findMany({
-      include: {
-        colleges: true
-      }
-    })
-    
-    const exams = await db.exam.findMany({
-      include: {
-        colleges: true
-      }
-    })
-    
-    const courses = await db.course.findMany({
-      include: {
-        colleges: true
-      }
-    })
+    // Get all tables data in parallel with selective fields
+    const [countries, cities, colleges, categories, exams, courses] = await Promise.all([
+      db.country.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          flagEmoji: true,
+          description: true,
+          active: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: { cities: true }
+          }
+        }
+      }),
+
+      db.city.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          cityImageURL: true,
+          features: true,
+          active: true,
+          countryId: true,
+          createdAt: true,
+          updatedAt: true,
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true
+            }
+          },
+          _count: {
+            select: { colleges: true }
+          }
+        }
+      }),
+
+      db.college.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          establishment_year: true,
+          Countryranking: true,
+          Internationalranking: true,
+          logoURL: true,
+          imageURL: true,
+          countryId: true,
+          cityId: true,
+          createdAt: true,
+          updatedAt: true,
+          city: {
+            select: {
+              id: true,
+              name: true,
+              slug: true
+            }
+          },
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true
+            }
+          },
+          _count: {
+            select: {
+              categories: true,
+              courses: true,
+              exams: true
+            }
+          }
+        }
+      }),
+
+      db.category.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          categoryImageUrl: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: { colleges: true }
+          }
+        }
+      }),
+
+      db.exam.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortName: true,
+          description: true,
+          active: true,
+          conductingBody: true,
+          frequency: true,
+          examMode: true,
+          examType: true,
+          examImageurl: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: { colleges: true }
+          }
+        }
+      }),
+
+      db.course.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          active: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: { colleges: true }
+          }
+        }
+      })
+    ])
 
     return NextResponse.json({
       countries: countries,

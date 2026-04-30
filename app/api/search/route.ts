@@ -11,57 +11,60 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [] })
     }
 
-    // Search colleges
-    const colleges = await db.college.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' as const } },
-          { slug: { contains: query, mode: 'insensitive' as const } }
-        ]
-      },
-      take: limit,
-      include: {
-        country: {
-          select: {
-            name: true,
-            flagEmoji: true
+    // Search all entities in parallel
+    const [colleges, exams, news, courses] = await Promise.all([
+      // Search colleges
+      db.college.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' as const } },
+            { slug: { contains: query, mode: 'insensitive' as const } }
+          ]
+        },
+        take: limit,
+        include: {
+          country: {
+            select: {
+              name: true,
+              flagEmoji: true
+            }
           }
         }
-      }
-    })
+      }),
 
-    // Search exams
-    const exams = await db.exam.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' as const } },
-          { slug: { contains: query, mode: 'insensitive' as const } }
-        ]
-      },
-      take: limit
-    })
+      // Search exams
+      db.exam.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' as const } },
+            { slug: { contains: query, mode: 'insensitive' as const } }
+          ]
+        },
+        take: limit
+      }),
 
-    // Search news/articles
-    const news = await db.news.findMany({
-      where: {
-        OR: [
-          { title: { contains: query, mode: 'insensitive' as const } },
-          { content: { contains: query, mode: 'insensitive' as const } }
-        ]
-      },
-      take: limit
-    })
+      // Search news/articles
+      db.news.findMany({
+        where: {
+          OR: [
+            { title: { contains: query, mode: 'insensitive' as const } },
+            { content: { contains: query, mode: 'insensitive' as const } }
+          ]
+        },
+        take: limit
+      }),
 
-    // Search courses
-    const courses = await db.course.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' as const } },
-          { slug: { contains: query, mode: 'insensitive' as const } }
-        ]
-      },
-      take: limit
-    })
+      // Search courses
+      db.course.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' as const } },
+            { slug: { contains: query, mode: 'insensitive' as const } }
+          ]
+        },
+        take: limit
+      })
+    ])
 
     // Format results with type
     const results = [
