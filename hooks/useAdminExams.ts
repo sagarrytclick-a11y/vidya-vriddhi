@@ -1,7 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { Pagination } from '@/types/api'
 
 interface Exam {
   id: string
@@ -56,6 +58,69 @@ export const examKeys = {
 }
 
 // API functions
+interface PaginatedExamsResponse {
+  data: Exam[]
+  pagination: Pagination
+}
+
+const fetchExamsWithPagination = async (
+  search?: string,
+  page?: number,
+  limit?: number
+): Promise<PaginatedExamsResponse> => {
+  const params = new URLSearchParams()
+  if (search) params.append('search', search)
+  if (page) params.append('page', page.toString())
+  if (limit) params.append('limit', limit.toString())
+
+  const url = `/api/exams?${params.toString()}`
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch exams')
+  }
+
+  const result = await response.json()
+
+  // API returns paginated response: { data: [...], pagination: {...} }
+  const exams = result.data || []
+  const pagination = result.pagination || {
+    page: 1,
+    limit: 10,
+    total: exams.length,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false
+  }
+
+  // Transform data to match expected format
+  const transformedExams = exams.map((exam: any) => ({
+    id: exam.id,
+    name: exam.name,
+    shortName: exam.shortName,
+    slug: exam.slug,
+    description: exam.description,
+    type: exam.examType.charAt(0) + exam.examType.slice(1).toLowerCase(),
+    mode: exam.examMode.charAt(0) + exam.examMode.slice(1).toLowerCase(),
+    frequency: exam.frequency,
+    status: exam.active ? 'Active' : 'Inactive',
+    conductingBody: exam.conductingBody,
+    createdAt: new Date(exam.createdAt).toLocaleDateString(),
+    updatedAt: new Date(exam.updatedAt).toLocaleDateString(),
+    active: exam.active,
+    examImageurl: exam.examImageurl,
+    heroSection: exam.heroSection,
+    overview: exam.overview,
+    registration: exam.registration,
+    examPattern: exam.examPattern,
+    examDates: exam.examDates,
+    resultStatistics: exam.resultStatistics,
+    colleges: exam.colleges || []
+  }))
+
+  return { data: transformedExams, pagination }
+}
+
 const fetchExams = async (search?: string): Promise<Exam[]> => {
   const url = search ? `/api/exams?search=${encodeURIComponent(search)}` : '/api/exams'
   const response = await fetch(url)
@@ -64,10 +129,13 @@ const fetchExams = async (search?: string): Promise<Exam[]> => {
     throw new Error('Failed to fetch exams')
   }
 
-  const data = await response.json()
+  const result = await response.json()
+
+  // API returns paginated response: { data: [...], pagination: {...} }
+  const exams = result.data || result
 
   // Transform data to match expected format
-  return data.map((exam: any) => ({
+  return exams.map((exam: any) => ({
     id: exam.id,
     name: exam.name,
     shortName: exam.shortName,
@@ -147,19 +215,40 @@ const deleteExam = async (id: string): Promise<void> => {
   }
 }
 
-// Main hook
-export function useAdminExams(search?: string) {
-  const queryClient = useQueryClient()
+interface UseAdminExamsReturn {
+  exams: Exam[]
+  isLoading: boolean
+  error: string | null
+  createExam: (data: ExamFormData) => Promise<void>
+  updateExam: (id: string, data: Partial<ExamFormData>) => Promise<void>
+  deleteExam: (id: string) => Promise<void>
+  isCreating: boolean
+  isUpdating: boolean
+  isDeleting: boolean
+  refetchExams: () => Promise<any>
+  // Pagination
+  pagination: Pagination | null
+  page: number
+  setPage: (page: number) => void
+  limit: number
+  setLimit: (limit: number) => void
+}
 
-  // Fetch all exams
+// Main hook
+export function useAdminExams(search?: string): UseAdminExamsReturn {
+  const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+
+  // Fetch all exams with pagination
   const {
-    data: exams = [],
+    data: response,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: examKeys.list(search ? { search } : {}),
-    queryFn: () => fetchExams(search),
+    queryKey: examKeys.list({ search: search || '', page, limit }),
+    queryFn: () => fetchExamsWithPagination(search, page, limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
@@ -211,6 +300,14 @@ export function useAdminExams(search?: string) {
     await deleteExamMutation.mutateAsync(id)
   }
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1)
+  }, [search])
+
+  const exams = response?.data || []
+  const pagination = response?.pagination || null
+
   return {
     exams,
     isLoading,
@@ -222,6 +319,11 @@ export function useAdminExams(search?: string) {
     isUpdating: updateExamMutation.isPending,
     isDeleting: deleteExamMutation.isPending,
     refetchExams: refetch,
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   }
 }
 
