@@ -13,8 +13,9 @@ const createPrismaClient = () => {
   }
 
   const pool = new Pool({ connectionString });
-  
-  // Cast 'pool' to any to bypass the version mismatch error
+
+  // Type cast required due to @prisma/adapter-pg having different @types/pg version than project's pg package
+  // This is a known issue with Prisma adapter type compatibility
   const adapter = new PrismaPg(pool as any);
 
   return new PrismaClient({
@@ -23,7 +24,7 @@ const createPrismaClient = () => {
   });
 };
 
-// 4. Prevent multiple instances of Prisma Client in development (Hot Reloading)
+// Prevent multiple instances of Prisma Client in development (Hot Reloading)
 export const db = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
