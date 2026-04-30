@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
-import { unstable_cache } from 'next/cache'
 import { ChevronRight, MapPin, GraduationCap, Award, BookOpen, Phone, Mail, Globe, Download, FileText, CheckCircle2, Building2, Calendar, Users, Star, Sparkles, Clock, Wallet, ListOrdered, Briefcase, TrendingUp, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,33 +19,31 @@ interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-export const revalidate = 3600
+// Remove ISR to avoid oversized page errors
+// export const revalidate = 3600
 
-export async function generateStaticParams() {
-  const colleges = await db.college.findMany({
-    where: { active: true },
-    select: { slug: true },
-    take: 100
+// Remove static generation to avoid 22.8MB page size
+// export async function generateStaticParams() {
+//   const colleges = await db.college.findMany({
+//     where: { active: true },
+//     select: { slug: true },
+//     take: 100
+//   })
+//   return colleges.map((c) => ({ slug: c.slug }))
+// }
+
+const getCollegeBySlug = async (slug: string) => {
+  return db.college.findUnique({
+    where: { slug },
+    include: {
+      city: true,
+      country: true,
+      categories: true,
+      courses: true,
+      exams: true,
+    },
   })
-  return colleges.map((c) => ({ slug: c.slug }))
 }
-
-const getCollegeBySlug = unstable_cache(
-  async (slug: string) => {
-    return db.college.findUnique({
-      where: { slug },
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        courses: true,
-        exams: true,
-      },
-    })
-  },
-  ['college-detail'],
-  { revalidate: 3600 }
-)
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
@@ -81,33 +78,25 @@ export default async function CollegeDetailPage({ params }: PageProps) {
   const campusHighlights = college.campusHighlights as any || {}
   const features = college.features || []
 
-  // Get related colleges with caching
-  const getRelatedColleges = unstable_cache(
-    async (countryId: string, collegeId: string) => {
-      return db.college.findMany({
-        where: {
-          countryId,
-          id: { not: collegeId },
-          active: true,
-        },
-        take: 5,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          logoURL: true,
-          description: true,
-          city: { select: { name: true } },
-          categories: { select: { name: true, slug: true } },
-          _count: { select: { courses: true } },
-        },
-      })
+  // Get related colleges
+  const relatedColleges = await db.college.findMany({
+    where: {
+      countryId: college.countryId,
+      id: { not: college.id },
+      active: true,
     },
-    ['related-colleges'],
-    { revalidate: 3600 }
-  )
-
-  const relatedColleges = await getRelatedColleges(college.countryId, college.id)
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      logoURL: true,
+      description: true,
+      city: { select: { name: true } },
+      categories: { select: { name: true, slug: true } },
+      _count: { select: { courses: true } },
+    },
+  })
 
   // TOC sections
   const tocSections = [
