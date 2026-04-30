@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState } from 'react'
 import { useAdminExams, ExamFormData } from '@/hooks/useAdminExams'
+import { Pagination } from '@/types/api'
 
 interface Exam {
   id: string
@@ -67,6 +68,13 @@ interface ExamContextType {
 
   // Refetch
   refetchExams: () => Promise<any>
+
+  // Pagination
+  pagination: Pagination | null
+  page: number
+  setPage: (page: number) => void
+  limit: number
+  setLimit: (limit: number) => void
 }
 
 const ExamContext = createContext<ExamContextType | undefined>(undefined)
@@ -87,6 +95,11 @@ export function ExamProvider({ children }: ExamProviderProps) {
     isUpdating,
     isDeleting,
     refetchExams,
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   } = useAdminExams()
 
   // Modal state
@@ -175,6 +188,13 @@ export function ExamProvider({ children }: ExamProviderProps) {
 
     // Refetch
     refetchExams,
+
+    // Pagination
+    pagination,
+    page,
+    setPage,
+    limit,
+    setLimit,
   }
 
   return (
