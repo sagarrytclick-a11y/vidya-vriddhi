@@ -87,9 +87,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params
-    
+
     const body = await request.json()
-    const validatedData = examSchema.parse(body)
 
     // First check if exam exists
     const existingExam = await db.exam.findUnique({
@@ -103,6 +102,9 @@ export async function PUT(
       )
     }
 
+    // Validate only the fields that are provided
+    const validatedData = examSchema.parse(body)
+
     const exam = await db.exam.update({
       where: { id },
       data: validatedData
@@ -111,7 +113,7 @@ export async function PUT(
     return NextResponse.json(exam)
   } catch (error) {
     console.error('Error updating exam:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', issues: error.issues },

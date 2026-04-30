@@ -31,11 +31,6 @@ export interface ExamFormData {
   frequency: 'ONCE_A_YEAR' | 'TWICE_A_YEAR' | 'QUARTERLY' | 'MONTHLY'
   active: boolean
   examImageurl: string
-  heroSection: {
-    title: string
-    subtitle?: string
-    image?: string
-  }
   overview: {
     title: string
     content: string
@@ -83,11 +78,6 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
     examMode: 'ONLINE',
     frequency: 'ONCE_A_YEAR',
     active: false,
-    heroSection: {
-      title: '',
-      subtitle: '',
-      image: ''
-    },
     examImageurl: '',
     overview: {
       title: 'Overview',
@@ -136,11 +126,6 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
         examMode: initialData.examMode || 'ONLINE',
         frequency: initialData.frequency || 'ONCE_A_YEAR',
         active: initialData.active !== undefined ? initialData.active : false,
-        heroSection: initialData.heroSection || {
-          title: '',
-          subtitle: '',
-          image: ''
-        },
         examImageurl: initialData.examImageurl || '',
         overview: initialData.overview || {
           title: 'Overview',
@@ -284,11 +269,6 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
       examMode: 'ONLINE',
       frequency: 'ONCE_A_YEAR',
       active: false,
-      heroSection: {
-        title: '',
-        subtitle: '',
-        image: ''
-      },
       examImageurl: '',
       overview: {
         title: 'Overview',
