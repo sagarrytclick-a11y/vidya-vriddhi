@@ -216,6 +216,24 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validation
+    if (!formData.name.trim()) {
+      toast.error('College name is required')
+      return
+    }
+    if (!formData.slug.trim()) {
+      toast.error('Slug is required')
+      return
+    }
+    if (!formData.countryId) {
+      toast.error('Please select a country')
+      return
+    }
+    if (!formData.cityId) {
+      toast.error('Please select a city')
+      return
+    }
+    
     try {
       await onSubmit(formData)
       const action = isEdit ? 'updated' : 'created'
