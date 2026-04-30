@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
+import { unstable_cache } from 'next/cache'
 import { ChevronRight, MapPin, GraduationCap, Award, BookOpen, Phone, Mail, Globe, Download, FileText, CheckCircle2, Building2, Calendar, Users, Star, Sparkles, Clock, Wallet, ListOrdered, Briefcase, TrendingUp, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -32,22 +33,38 @@ interface PageProps {
 //   return colleges.map((c) => ({ slug: c.slug }))
 // }
 
-const getCollegeBySlug = async (slug: string) => {
+// Add caching without ISR to improve performance
+const getCollegeBySlug = unstable_cache(
+  async (slug: string) => {
+    return db.college.findUnique({
+      where: { slug },
+      include: {
+        city: true,
+        country: true,
+        categories: true,
+        courses: true,
+        exams: true,
+      },
+    })
+  },
+  ['college-detail'],
+  { revalidate: 3600 }
+)
+
+// Optimized query for metadata (avoid cache limit)
+const getCollegeForMetadata = async (slug: string) => {
   return db.college.findUnique({
     where: { slug },
-    include: {
-      city: true,
-      country: true,
-      categories: true,
-      courses: true,
-      exams: true,
+    select: {
+      name: true,
+      description: true,
     },
   })
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const college = await getCollegeBySlug(slug)
+  const college = await getCollegeForMetadata(slug)
 
   if (!college) {
     return {
@@ -78,25 +95,33 @@ export default async function CollegeDetailPage({ params }: PageProps) {
   const campusHighlights = college.campusHighlights as any || {}
   const features = college.features || []
 
-  // Get related colleges
-  const relatedColleges = await db.college.findMany({
-    where: {
-      countryId: college.countryId,
-      id: { not: college.id },
-      active: true,
+  // Get related colleges with caching
+  const getRelatedColleges = unstable_cache(
+    async (countryId: string, collegeId: string) => {
+      return db.college.findMany({
+        where: {
+          countryId,
+          id: { not: collegeId },
+          active: true,
+        },
+        take: 5,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          logoURL: true,
+          description: true,
+          city: { select: { name: true } },
+          categories: { select: { name: true, slug: true } },
+          _count: { select: { courses: true } },
+        },
+      })
     },
-    take: 5,
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      logoURL: true,
-      description: true,
-      city: { select: { name: true } },
-      categories: { select: { name: true, slug: true } },
-      _count: { select: { courses: true } },
-    },
-  })
+    ['related-colleges'],
+    { revalidate: 3600 }
+  )
+
+  const relatedColleges = await getRelatedColleges(college.countryId, college.id)
 
   // TOC sections
   const tocSections = [
