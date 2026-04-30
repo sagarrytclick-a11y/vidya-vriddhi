@@ -93,7 +93,7 @@ const fetchExamsWithPagination = async (
     hasPrev: false
   }
 
-  // Transform data to match expected format
+  // Transform data to match expected format - preserve original field names for edit modal
   const transformedExams = exams.map((exam: any) => ({
     id: exam.id,
     name: exam.name,
@@ -115,7 +115,10 @@ const fetchExamsWithPagination = async (
     examPattern: exam.examPattern,
     examDates: exam.examDates,
     resultStatistics: exam.resultStatistics,
-    colleges: exam.colleges || []
+    colleges: exam.colleges || [],
+    // Preserve original field names for edit modal
+    examType: exam.examType,
+    examMode: exam.examMode
   }))
 
   return { data: transformedExams, pagination }
@@ -134,7 +137,7 @@ const fetchExams = async (search?: string): Promise<Exam[]> => {
   // API returns paginated response: { data: [...], pagination: {...} }
   const exams = result.data || result
 
-  // Transform data to match expected format
+  // Transform data to match expected format - preserve original field names for edit modal
   return exams.map((exam: any) => ({
     id: exam.id,
     name: exam.name,
@@ -156,7 +159,10 @@ const fetchExams = async (search?: string): Promise<Exam[]> => {
     examPattern: exam.examPattern,
     examDates: exam.examDates,
     resultStatistics: exam.resultStatistics,
-    colleges: exam.colleges || []
+    colleges: exam.colleges || [],
+    // Preserve original field names for edit modal
+    examType: exam.examType,
+    examMode: exam.examMode
   }))
 }
 
