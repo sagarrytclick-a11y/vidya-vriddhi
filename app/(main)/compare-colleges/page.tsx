@@ -191,20 +191,20 @@ export default function CompareCollegesPage() {
         {/* Comparison Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
-            <table className="w-full table-fixed border-collapse">
+            <table className="w-full min-w-150 border-collapse">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left p-6 font-bold text-gray-900 bg-gray-50/50 w-64">Criteria</th>
+                  <th className="text-left p-4 md:p-6 font-bold text-gray-900 bg-gray-50/50 w-40 md:w-64">Criteria</th>
                   {selectedColleges.map((college) => (
-                    <th key={college.id} className="text-left p-6 font-bold text-gray-900 bg-gray-50/50 min-w-[300px] border-l border-gray-100">
-                      <div className="flex items-center justify-between">
-                        <span className="truncate pr-2">{college.name}</span>
+                    <th key={college.id} className="text-left p-4 md:p-6 font-bold text-gray-900 bg-gray-50/50 min-w-50 md:min-w-75 border-l border-gray-100">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate pr-2 text-sm md:text-base">{college.name}</span>
                         <button
                           onClick={() => removeCollege(college.id)}
-                          className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
+                          className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors shrink-0"
                           title="Remove from comparison"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                       </div>
                     </th>
