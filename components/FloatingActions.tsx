@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { MessageCircle, Bell, X, ChevronUp, ChevronDown, Newspaper } from 'lucide-react'
+import { MessageCircle, Bell, X, Newspaper } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 import { useRouter } from 'next/navigation'
 
