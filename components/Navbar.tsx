@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine } from 'lucide-react'
+import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine, Bot, Sparkles } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
+import { useVVSaarthi } from '@/contexts/vv-saarthi-context'
 import Link from 'next/link'
 import { UserButton, useUser } from '@clerk/nextjs'
 
@@ -16,6 +17,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { openModal } = useAdmissionModal()
+  const { toggle: toggleSaarthi } = useVVSaarthi()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -164,6 +166,14 @@ const Navbar = () => {
                     <p className='bg-orange-500 text-[10px] flex items-center justify-center p-1 rounded'>Upto 4 Colleges</p>
                   </div>
                 </Link>
+                <button
+                  onClick={toggleSaarthi}
+                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                >
+                  <Bot className="w-4 h-4" />
+                  <span>VV Saarthi</span>
+                  <Sparkles className="w-3 h-3 text-yellow-200" />
+                </button>
               </div>
 
               {/* User Auth Section */}
@@ -319,6 +329,24 @@ const Navbar = () => {
                 <span className="font-semibold text-gray-800">Compare Colleges</span>
                 <ArrowRight size={16} className="text-gray-500" />
               </Link>
+            </div>
+
+            {/* VV Saarthi - Mobile */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => {
+                  toggleSaarthi()
+                  setIsMobileMenuOpen(false)
+                }}
+                className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
+              >
+                <span className="font-semibold text-orange-600 flex items-center gap-2">
+                  <Bot className="w-4 h-4" />
+                  VV Saarthi
+                  <Sparkles className="w-3 h-3 text-orange-400" />
+                </span>
+                <ArrowRight size={16} className="text-orange-500" />
+              </button>
             </div>
 
             {mainNavItems.map((item) => (
