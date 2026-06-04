@@ -3,18 +3,12 @@
 import React from 'react'
 import { GraduationCap, MapPin, Award, Building2, ChevronRight, Globe } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const CollegeListing: React.FC = () => {
   const { data: collegesData, isLoading, error } = useIndianColleges(1, 6)
-  const router = useRouter()
   
   const colleges = collegesData?.colleges || []
-
-  const handleCollegeClick = (slug: string) => {
-    router.push(`/colleges/${slug}`)
-  }
 
   return (
     <section className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8 min-h-screen">
@@ -54,10 +48,10 @@ const CollegeListing: React.FC = () => {
         {!isLoading && !error && colleges.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {colleges.map((college) => (
-              <div
+              <Link
                 key={college.id}
-                onClick={() => handleCollegeClick(college.slug)}
-                className="group cursor-pointer bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-lg"
+                href={`/colleges/${college.slug}`}
+                className="group block bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-lg"
               >
                 {/* Campus Image */}
                 <div className="relative h-48 w-full overflow-hidden">
@@ -116,7 +110,7 @@ const CollegeListing: React.FC = () => {
                     <ChevronRight className="w-5 h-5 text-orange-500 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
