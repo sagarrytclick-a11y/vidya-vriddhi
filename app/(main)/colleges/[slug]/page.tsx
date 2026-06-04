@@ -20,8 +20,8 @@ interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-// Remove ISR to avoid oversized page errors
-// export const revalidate = 3600
+// Enable ISR with 1-hour revalidation
+export const revalidate = 3600
 
 // Remove static generation to avoid 22.8MB page size
 // export async function generateStaticParams() {

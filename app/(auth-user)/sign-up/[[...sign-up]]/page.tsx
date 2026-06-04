@@ -1,78 +1,39 @@
 import { SignUp } from '@clerk/nextjs'
-import Image from 'next/image'
-import { Home } from 'lucide-react'
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white">
-      
-      {/* Left Side - Visual Section */}
-      <div className="relative hidden lg:flex lg:w-[55%] xl:w-[60%] overflow-hidden">
-        {/* Background Image - Replace with your actual image path */}
-        <Image
-          src="/modern-architecture.jpg" // Aap apni image yahan lagayein
-          alt="Modern Architecture"
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        {/* Subtle Dark Overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-
-        {/* Brand Logo */}
-        <div className="absolute bg-white p-3 rounded top-10 left-10 flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="VidyaVriddhi Logo"
-              width={100}
-              height={100}
-              className="object-contain"
-            />
-         
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-orange-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <img src="/logo.png" alt="VidyaVriddhi" className="h-14 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+          <p className="text-gray-500 mt-1.5">Join thousands of students finding their perfect college</p>
         </div>
 
-       
-      </div>
-
-      {/* Right Side - Authentication Section */}
-      <div className="w-full lg:w-[45%] xl:w-[40%] flex flex-col bg-zinc-950">
-        {/* Mobile Logo Only */}
-        <div className="lg:hidden p-6 flex items-center gap-2">
-           <Home className="w-6 h-6 text-zinc-100" />
-           <span className="font-bold text-xl text-zinc-100">VidyaVriddhi</span>
-        </div>
-
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="w-full max-w-[440px]">
-            <SignUp
-              path="/sign-up"
-              routing="path"
-              signInUrl="/sign-in"
-              forceRedirectUrl="/"
-              appearance={{
-                layout: {
-                  socialButtonsPlacement: "bottom",
-                  shimmer: true,
-                },
-                elements: {
-                  rootBox: "w-full",
-                  card: "shadow-none border-none bg-transparent w-full",
-                  headerTitle: "text-3xl font-bold text-zinc-100",
-                  headerSubtitle: "text-zinc-400 text-base mb-6",
-                  formButtonPrimary: "bg-orange-500 hover:bg-orange-600 text-white text-sm normal-case py-3 rounded-xl",
-                  socialButtonsBlockButton: "border-zinc-700 hover:bg-zinc-800 rounded-xl py-3 transition-all bg-zinc-900",
-                  socialButtonsBlockButtonText: "font-medium text-zinc-300",
-                  formFieldInput: "border-zinc-700 bg-zinc-900 rounded-xl focus:ring-orange-500 py-3 text-zinc-100",
-                  formFieldLabel: "text-zinc-400 font-medium mb-1.5",
-                  footerActionLink: "text-orange-500 hover:text-orange-400 font-semibold",
-                  dividerLine: "bg-zinc-800",
-                  dividerText: "text-zinc-500 text-xs uppercase tracking-widest"
-                }
-              }}
-            />
-          </div>
-        </div>
+        <SignUp
+            path="/sign-up"
+            routing="path"
+            signInUrl="/sign-in"
+            forceRedirectUrl="/"
+            appearance={{
+              elements: {
+                rootBox: "w-full",
+                card: "bg-white shadow-sm border border-gray-200 rounded-2xl p-8 w-full",
+                headerTitle: "text-xl font-bold text-gray-900",
+                headerSubtitle: "text-gray-500 text-sm mb-6",
+                socialButtonsBlockButton: "border-gray-300 hover:bg-gray-50 rounded-xl py-3 text-sm font-medium text-gray-700",
+                socialButtonsBlockButtonText: "font-medium text-gray-700",
+                dividerLine: "bg-gray-200",
+                dividerText: "text-gray-400 text-xs",
+                formFieldInput: "border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 py-3 text-sm",
+                formFieldLabel: "text-gray-700 text-sm font-medium mb-1.5",
+                formButtonPrimary: "bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold normal-case py-3 rounded-xl w-full",
+                footerActionLink: "text-orange-600 hover:text-orange-700 font-semibold text-sm",
+                identityPreviewText: "text-sm text-gray-600",
+                identityPreviewEditButton: "text-orange-600 text-sm",
+              }
+            }}
+          />
       </div>
     </div>
   )
