@@ -8,19 +8,9 @@ interface FilterData {
 }
 
 const fetchFiltersData = async (): Promise<FilterData> => {
-  const [categories, courses, cities, exams] = await Promise.all([
-    fetch('/api/categories?limit=100').then(res => res.json()),
-    fetch('/api/courses?limit=100').then(res => res.json()),
-    fetch('/api/cities?limit=100').then(res => res.json()),
-    fetch('/api/exams?limit=100').then(res => res.json())
-  ])
-
-  return {
-    categories: categories.data || [],
-    courses: courses.data || [],
-    cities: cities.data || [],
-    exams: exams.data || []
-  }
+  const res = await fetch('/api/filters')
+  if (!res.ok) throw new Error('Failed to fetch filters')
+  return res.json()
 }
 
 export function useCollegesFilters() {
@@ -31,9 +21,9 @@ export function useCollegesFilters() {
   } = useQuery({
     queryKey: ['colleges-filters'],
     queryFn: fetchFiltersData,
-    staleTime: 30 * 60 * 1000, // 30 minutes - filters don't change often
+    staleTime: 30 * 60 * 1000,
   })
-  
+
   return {
     categories: data?.categories || [],
     courses: data?.courses || [],

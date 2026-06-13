@@ -30,7 +30,13 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc'
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        flagEmoji: true,
+        description: true,
+        active: true,
         _count: {
           select: {
             colleges: true
@@ -39,7 +45,9 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ success: true, countries })
+    return NextResponse.json({ success: true, countries }, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' },
+    })
   } catch (error) {
     console.error('Error fetching countries:', error)
     return NextResponse.json(

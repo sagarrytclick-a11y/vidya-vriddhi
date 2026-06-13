@@ -53,7 +53,5 @@ export const config = {
     '/admin-login',
     // Skip Next.js internals and all static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|svelte|svg))*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
   ],
 }

@@ -67,7 +67,9 @@ export async function GET(request: NextRequest) {
       db.city.count({ where })
     ])
 
-    return NextResponse.json(createPaginationResponse(cities, total, page, limit))
+    return NextResponse.json(createPaginationResponse(cities, total, page, limit), {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+    })
   } catch (error) {
     console.error('Error fetching cities:', error)
     return NextResponse.json(

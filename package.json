@@ -23,7 +23,6 @@
     "@prisma/client": "^7.5.0",
     "@radix-ui/react-tabs": "^1.1.13",
     "@tanstack/react-query": "^5.90.21",
-    "@tanstack/react-query-devtools": "^5.91.3",
     "better-auth": "^1.6.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -54,6 +53,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prisma": "^7.5.0",
+    "@tanstack/react-query-devtools": "^5.91.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

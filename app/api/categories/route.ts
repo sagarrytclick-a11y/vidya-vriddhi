@@ -44,7 +44,9 @@ export async function GET(request: NextRequest) {
       db.category.count({ where })
     ])
 
-    return NextResponse.json(createPaginationResponse(categories, total, page, limit))
+    return NextResponse.json(createPaginationResponse(categories, total, page, limit), {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+    })
   } catch (error) {
     console.error('Error fetching categories:', error)
     return NextResponse.json(
