@@ -1,75 +1,26 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { db } from '@/lib/db'
-import Link from 'next/link'
-import Image from 'next/image'
-import { unstable_cache } from 'next/cache'
-import { ChevronRight, MapPin, GraduationCap, Award, BookOpen, Phone, Mail, Globe, Download, FileText, CheckCircle2, Building2, Calendar, Users, Star, Sparkles, Clock, Wallet, ListOrdered, Briefcase, TrendingUp, Trophy } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { CollegeActions } from '@/components/college/CollegeActions'
-import { GallerySection } from '@/components/college/GallerySection'
-import { NewsSidebar } from '@/components/college/NewsSidebar'
-import { RecommendedColleges } from '@/components/college/RecommendedColleges'
-import { ContactSidebar } from '@/components/college/ContactSidebar'
+import { Suspense } from 'react'
+import { ChevronRight } from 'lucide-react'
+import { getCollegeBySlug, getRelatedColleges } from '@/lib/college-utils'
 import { CollegeTabs } from '@/components/college/CollegeTabs'
-import { AdmissionButton } from '@/components/ui/AdmissionButton'
+import { HeroSection } from '@/components/college/sections/HeroSection'
+import { ContentSections } from '@/components/college/sections/ContentSections'
+import { CollegeSidebar } from '@/components/college/sections/CollegeSidebar'
+import Link from 'next/link'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-// Enable ISR with 1-hour revalidation
 export const revalidate = 3600
-
-// Remove static generation to avoid 22.8MB page size
-// export async function generateStaticParams() {
-//   const colleges = await db.college.findMany({
-//     where: { active: true },
-//     select: { slug: true },
-//     take: 100
-//   })
-//   return colleges.map((c) => ({ slug: c.slug }))
-// }
-
-// Add caching without ISR to improve performance
-const getCollegeBySlug = unstable_cache(
-  async (slug: string) => {
-    return db.college.findUnique({
-      where: { slug },
-      include: {
-        city: true,
-        country: true,
-        categories: true,
-        courses: true,
-        exams: true,
-      },
-    })
-  },
-  ['college-detail'],
-  { revalidate: 3600 }
-)
-
-// Optimized query for metadata (avoid cache limit)
-const getCollegeForMetadata = async (slug: string) => {
-  return db.college.findUnique({
-    where: { slug },
-    select: {
-      name: true,
-      description: true,
-    },
-  })
-}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const college = await getCollegeForMetadata(slug)
+  const college = await getCollegeBySlug(slug)
 
   if (!college) {
-    return {
-      title: 'College Not Found | Vidya Vriddhi',
-    }
+    return { title: 'College Not Found | Vidya Vriddhi' }
   }
 
   return {
@@ -78,787 +29,104 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function CollegeDetailPage({ params }: PageProps) {
-  const { slug } = await params
+async function HeroSectionWrapper({ slug }: { slug: string }) {
   const college = await getCollegeBySlug(slug)
+  if (!college) notFound()
+  return <HeroSection college={college} />
+}
 
-  if (!college) {
-    notFound()
-  }
+async function ContentSectionWrapper({ slug }: { slug: string }) {
+  const college = await getCollegeBySlug(slug)
+  if (!college) return null
 
-  // Parse JSON fields
   const keyHighlights = college.keyHighlights as any || {}
   const whyChooseUs = college.whyChooseUs as any || {}
   const documentsRequired = college.documentsRequired as any || {}
   const feesStructure = college.feesStructure as any || {}
   const admissionProcess = college.admissionProcess as any || {}
   const campusHighlights = college.campusHighlights as any || {}
-  const features = college.features || []
 
-  // Get related colleges with caching
-  const getRelatedColleges = unstable_cache(
-    async (countryId: string, collegeId: string) => {
-      return db.college.findMany({
-        where: {
-          countryId,
-          id: { not: collegeId },
-          active: true,
-        },
-        take: 5,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          logoURL: true,
-          description: true,
-          city: { select: { name: true } },
-          categories: { select: { name: true, slug: true } },
-          _count: { select: { courses: true } },
-        },
-      })
-    },
-    ['related-colleges'],
-    { revalidate: 3600 }
+  return (
+    <ContentSections
+      college={college}
+      keyHighlights={keyHighlights}
+      whyChooseUs={whyChooseUs}
+      documentsRequired={documentsRequired}
+      feesStructure={feesStructure}
+      admissionProcess={admissionProcess}
+      campusHighlights={campusHighlights}
+    />
   )
+}
 
-  const relatedColleges = await getRelatedColleges(college.countryId, college.id)
+async function SidebarWrapper({ slug }: { slug: string }) {
+  const college = await getCollegeBySlug(slug)
+  if (!college) return null
 
-  // TOC sections
-  const tocSections = [
-    { id: 'about', title: `About ${college.name?.split(' ').slice(0, 2).join(' ')}` },
-    { id: 'highlights', title: 'Key Highlights' },
-    { id: 'courses', title: 'Courses & Fees' },
-    { id: 'admission', title: 'Admission Process' },
-    { id: 'why-choose', title: 'Why Choose Us' },
-    { id: 'placements', title: 'Placements' },
-    { id: 'cutoff', title: 'Cutoffs' },
-    { id: 'scholarship', title: 'Scholarships' },
-    { id: 'ranking', title: 'Rankings' },
-    { id: 'hostel', title: 'Hostel & Campus' },
-    { id: 'documents', title: 'Documents Required' },
-    { id: 'campus', title: 'Campus Highlights' },
-    { id: 'gallery', title: 'Gallery' },
-    { id: 'reviews', title: 'Reviews' },
-  ]
+  const [relatedColleges] = await Promise.all([
+    getRelatedColleges(college.countryId, college.id),
+  ])
+
+  return <CollegeSidebar collegeName={college.name} relatedColleges={relatedColleges} />
+}
+
+function SectionFallback() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      <div className="h-8 bg-gray-200 rounded w-1/3" />
+      <div className="h-48 bg-gray-100 rounded-xl" />
+    </div>
+  )
+}
+
+export default async function CollegeDetailPage({ params }: PageProps) {
+  const { slug } = await params
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto  px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            <Link href="/colleges" className="hover:text-blue-600 transition-colors">Colleges</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            {college.categories[0] && (
-              <>
-                <span className="text-blue-600 font-medium">{college.categories[0].name}</span>
-                <ChevronRight className="w-4 h-4 mx-2" />
-              </>
-            )}
-            <span className="text-gray-900 font-medium">{college.name}</span>
-          </nav>
-        </div>
-      </div>
+      <Suspense fallback={<BreadcrumbFallback />}>
+        <HeroSectionWrapper slug={slug} />
+      </Suspense>
 
-      {/* Hero Section */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left: College Info */}
-            <div className="flex-1">
-              <div className="flex items-start gap-6">
-                {/* Logo */}
-                <div className="w-24 h-24 bg-white rounded-lg border p-2 shrink-0">
-                  {college.logoURL ? (
-                    <Image
-                      src={college.logoURL}
-                      alt={college.name}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
-                      <Building2 className="w-10 h-10 text-gray-400" />
-                    </div>
-                  )}
-                </div>
+      <Suspense fallback={null}>
+        <CollegeTabs />
+      </Suspense>
 
-                <div className="flex-1">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                    {college.name}: Admission 2026, Fees, Cut Off, Placements
-                  </h1>
-
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-red-500" />
-                      {college.city?.name}, {college.country?.name}
-                    </span>
-                    {college.courses.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        <BookOpen className="w-4 h-4 text-blue-500" />
-                        {college.courses.length} Courses
-                      </span>
-                    )}
-                    {college.Countryranking && (
-                      <span className="flex items-center gap-1">
-                        <Award className="w-4 h-4 text-orange-500" />
-                        Rank #{college.Countryranking}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="text-sm px-3 py-1">
-                      {college.establishment_year ? `Est. ${college.establishment_year}` : 'Established'}
-                    </Badge>
-                    {college.categories.slice(0, 3).map((cat) => (
-                      <Badge key={cat.id} variant="outline" className="text-sm px-3 py-1">
-                        {cat.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Action Buttons */}
-            <CollegeActions collegeName={college.name} />
-          </div>
-        </div>
-      </div>
-
-      {/* Sticky Horizontal Tabs */}
-      <CollegeTabs />
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left: Main Content */}
           <div className="flex-1">
-            <div className="flex flex-col lg:flex-row gap-8">
-              {/* Table of Contents - Sticky */}
-
-
-              {/* Content Sections */}
-              <div className="flex-1 space-y-12">
-                {/* About Section */}
-                <section id="about" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-                      <Building2 className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      About {college.name?.split(' ').slice(0, 3).join(' ')}
-                    </h2>
-                  </div>
-
-                  <Card className="overflow-hidden border-0 shadow-lg shadow-gray-100">
-                    <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400" />
-                    <CardContent className="p-6">
-                      <p className="text-gray-700 leading-relaxed text-[15px]">
-                        {college.description}
-                      </p>
-
-                      {features.length > 0 && (
-                        <div className="mt-6 pt-6 border-t border-gray-100">
-                          <p className="text-sm font-semibold text-gray-900 mb-3">Key Features</p>
-                          <div className="flex flex-wrap gap-2">
-                            {features.map((feature, idx) => (
-                              <Badge
-                                key={idx}
-                                className="bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 px-3 py-1.5 font-medium"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                                {feature}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Quick Stats */}
-                      <div className="mt-6 grid grid-cols-3 gap-4">
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xl font-bold text-blue-600">{college.establishment_year || '2000'}</p>
-                          <p className="text-xs text-gray-600 mt-0.5">Established</p>
-                        </div>
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xl font-bold text-green-600">{college.courses.length || '15'}+</p>
-                          <p className="text-xs text-gray-600 mt-0.5">Courses</p>
-                        </div>
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xl font-bold text-orange-600">5000+</p>
-                          <p className="text-xs text-gray-600 mt-0.5">Students</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </section>
-
-                {/* Highlights Section */}
-                {keyHighlights?.features && (
-                  <section id="highlights" className="scroll-mt-24">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-200">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {keyHighlights.title || 'Key Highlights'}
-                      </h2>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {keyHighlights.features.map((feature: string, idx: number) => (
-                        <Card
-                          key={idx}
-                          className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md hover:-translate-y-1"
-                        >
-                          <CardContent className="p-4 flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-200">
-                              <CheckCircle2 className="w-6 h-6 text-white" />
-                            </div>
-                            <p className="text-gray-700 text-[15px] leading-relaxed pt-2">{feature}</p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-
-                    {keyHighlights.description && (
-                      <Card className="mt-4 border-0 bg-gradient-to-r from-amber-50 to-orange-50">
-                        <CardContent className="p-4">
-                          <p className="text-gray-700 text-[15px] flex items-start gap-2">
-                            <span className="text-2xl">💡</span>
-                            {keyHighlights.description}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </section>
-                )}
-
-                {/* Courses & Fees Section */}
-                <section id="courses" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-200">
-                      <GraduationCap className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Courses & Fees 2026</h2>
-                  </div>
-
-                  {feesStructure?.courses ? (
-                    <div className="grid gap-4">
-                      {feesStructure.courses.map((course: any, idx: number) => (
-                        <Card
-                          key={idx}
-                          className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                          {/* Header with gradient */}
-                          <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                                <BookOpen className="w-5 h-5 text-white" />
-                              </div>
-                              <h3 className="font-bold text-white text-lg">{course.course_name}</h3>
-                            </div>
-                            <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
-                              {course.duration}
-                            </Badge>
-                          </div>
-
-                          <CardContent className="p-6">
-                            <div className="grid md:grid-cols-3 gap-6">
-                              {/* Duration */}
-                              <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                                  <Clock className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</p>
-                                  <p className="font-semibold text-gray-900 mt-0.5">{course.duration}</p>
-                                </div>
-                              </div>
-
-                              {/* Total Fees */}
-                              <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-                                  <Wallet className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Fees</p>
-                                  <p className="font-bold text-green-600 mt-0.5 text-lg">{course.annual_tuition_fee}</p>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              <div className="flex flex-col gap-3">
-                                <AdmissionButton examName={college.name} variant="default" />
-                                <Button
-                                  variant="outline"
-                                  className="w-full h-12 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-colors group/btn"
-                                >
-                                  <Download className="w-4 h-4 mr-2 group-hover/btn:animate-bounce" />
-                                  Download Brochure
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-gray-50 to-gray-100">
-                      <CardContent className="p-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-                          <BookOpen className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <p className="text-gray-500 font-medium">Course details coming soon</p>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {feesStructure?.description && (
-                    <Card className="mt-4 border-0 bg-gradient-to-r from-blue-50 to-cyan-50">
-                      <CardContent className="p-4">
-                        <p className="text-gray-700 text-[15px] flex items-start gap-2">
-                          <span className="text-xl">ℹ️</span>
-                          {feesStructure.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-                </section>
-
-                {/* Admission Process */}
-                {admissionProcess?.steps && (
-                  <section id="admission" className="scroll-mt-24">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-200">
-                        <ListOrdered className="w-5 h-5 text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {admissionProcess.title || 'Admission Process'}
-                      </h2>
-                    </div>
-
-                    <Card className="border-0 shadow-lg overflow-hidden">
-                      <div className="h-1 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500" />
-                      <CardContent className="p-6">
-                        <div className="relative">
-                          {/* Timeline line */}
-                          <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200 hidden md:block" />
-
-                          <div className="space-y-6">
-                            {admissionProcess.steps.map((step: string, idx: number) => (
-                              <div key={idx} className="flex gap-4 relative group">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform duration-300 z-10">
-                                  {idx + 1}
-                                </div>
-                                <div className="flex-1 bg-gradient-to-r from-orange-50 to-white p-4 rounded-xl border border-orange-100 group-hover:shadow-md transition-shadow duration-300">
-                                  <p className="text-gray-800 font-medium text-[15px] leading-relaxed">{step}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        {admissionProcess.description && (
-                          <p className="mt-6 text-gray-600 text-sm bg-gray-50 p-4 rounded-lg">
-                            {admissionProcess.description}
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </section>
-                )}
-
-                {/* Why Choose Us */}
-                {whyChooseUs?.features && (
-                  <section id="why-choose" className="scroll-mt-24">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-200">
-                        <Star className="w-5 h-5 text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {whyChooseUs.title || 'Why Choose Us'}
-                      </h2>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-5">
-                      {whyChooseUs.features.map((feature: any, idx: number) => (
-                        <Card
-                          key={idx}
-                          className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
-                        >
-                          {/* Top gradient bar */}
-                          <div className="h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400" />
-
-                          <CardContent className="p-6 relative">
-                            {/* Background decoration */}
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500" />
-
-                            <div className="relative">
-                              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-orange-200 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                                <span className="text-2xl">
-                                  {idx === 0 ? '🏆' : idx === 1 ? '📚' : idx === 2 ? '🌟' : '🎯'}
-                                </span>
-                              </div>
-                              <h3 className="font-bold text-gray-900 mb-3 text-lg">{feature.title}</h3>
-                              <p className="text-gray-600 text-[15px] leading-relaxed">{feature.description}</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {/* Placements Section */}
-                <section id="placements" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200">
-                      <Briefcase className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Placements</h2>
-                  </div>
-
-                  <Card className="border-0 shadow-lg overflow-hidden">
-                    <div className="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-                    <CardContent className="p-6">
-                      {/* Stats Grid */}
-                      <div className="grid md:grid-cols-3 gap-6 mb-6">
-                        <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                          <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-200">
-                            <TrendingUp className="w-6 h-6 text-white" />
-                          </div>
-                          <p className="text-3xl font-bold text-blue-600">95%</p>
-                          <p className="text-sm text-gray-600 mt-1 font-medium">Placement Rate</p>
-                        </div>
-                        <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-                          <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-200">
-                            <Wallet className="w-6 h-6 text-white" />
-                          </div>
-                          <p className="text-3xl font-bold text-green-600">₹25 LPA</p>
-                          <p className="text-sm text-gray-600 mt-1 font-medium">Average Package</p>
-                        </div>
-                        <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
-                          <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-orange-200">
-                            <Award className="w-6 h-6 text-white" />
-                          </div>
-                          <p className="text-3xl font-bold text-orange-600">₹1.2 Cr</p>
-                          <p className="text-sm text-gray-600 mt-1 font-medium">Highest Package</p>
-                        </div>
-                      </div>
-
-                      {/* Recruiters */}
-                      <div className="pt-6 border-t border-gray-100">
-                        <p className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                          <Building2 className="w-4 h-4" />
-                          Top Recruiters
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {['Google', 'Microsoft', 'Amazon', 'McKinsey', 'BCG', 'Goldman Sachs', 'JPMorgan', 'Deloitte'].map((company) => (
-                            <Badge
-                              key={company}
-                              variant="secondary"
-                              className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 transition-colors cursor-default"
-                            >
-                              {company}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </section>
-
-                {/* Cutoffs Section */}
-                <section id="cutoff" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-200">
-                      <span className="text-xl font-bold text-white">✂️</span>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Cutoffs</h2>
-                  </div>
-
-                  <Card className="border-0 shadow-lg overflow-hidden">
-                    <div className="h-1 bg-gradient-to-r from-red-500 via-rose-500 to-pink-500" />
-                    <CardContent className="p-6">
-                      <div className="grid gap-4">
-                        {[
-                          { category: 'General', percentile: '99+', color: 'blue' },
-                          { category: 'OBC', percentile: '95+', color: 'green' },
-                          { category: 'SC/ST', percentile: '85+', color: 'orange' },
-                          { category: 'EWS', percentile: '97+', color: 'purple' },
-                        ].map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-lg bg-${item.color}-100 flex items-center justify-center`}>
-                                <span className={`font-bold text-${item.color}-600`}>{item.category[0]}</span>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-900">CAT 2025 ({item.category})</p>
-                                <p className="text-xs text-gray-500">Minimum required percentile</p>
-                              </div>
-                            </div>
-                            <div className={`text-2xl font-bold text-${item.color}-600`}>
-                              {item.percentile} <span className="text-sm">Percentile</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </section>
-
-                {/* Scholarships Section */}
-                <section id="scholarship" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-200">
-                      <Award className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Scholarships</h2>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    {[
-                      { title: 'Merit Scholarship', desc: '100% tuition waiver for top 10 rank holders', icon: '🏆', color: 'yellow' },
-                      { title: 'Need-Based Financial Aid', desc: 'Up to 75% fee waiver based on family income', icon: '💰', color: 'blue' },
-                      { title: 'Sports Excellence', desc: '50% fee waiver for national level athletes', icon: '⚽', color: 'green' },
-                      { title: 'Research Fellowship', desc: 'Monthly stipend for research scholars', icon: '🔬', color: 'purple' },
-                    ].map((item, idx) => (
-                      <Card key={idx} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                        <div className={`h-1 bg-${item.color}-500`} />
-                        <CardContent className="p-5">
-                          <div className="flex items-start gap-4">
-                            <div className={`w-12 h-12 rounded-xl bg-${item.color}-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform`}>
-                              {item.icon}
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 text-lg mb-1">{item.title}</h4>
-                              <p className="text-gray-600 text-[15px]">{item.desc}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Rankings Section */}
-                <section id="ranking" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
-                      <Trophy className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Rankings</h2>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <Card className="border-0 shadow-lg overflow-hidden group hover:shadow-xl transition-all">
-                      <div className="h-2 bg-gradient-to-r from-blue-500 to-cyan-500" />
-                      <CardContent className="p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                          <span className="text-3xl">🇮🇳</span>
-                        </div>
-                        <p className="text-5xl font-bold text-blue-600 mb-2">#{college.Countryranking || '1'}</p>
-                        <p className="font-semibold text-gray-700">NIRF Ranking 2025</p>
-                        <p className="text-sm text-gray-500 mt-1">Among Top Business Schools in India</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-0 shadow-lg overflow-hidden group hover:shadow-xl transition-all">
-                      <div className="h-2 bg-gradient-to-r from-orange-500 to-red-500" />
-                      <CardContent className="p-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                          <span className="text-3xl">🌍</span>
-                        </div>
-                        <p className="text-5xl font-bold text-orange-600 mb-2">#{college.Internationalranking || '100'}</p>
-                        <p className="font-semibold text-gray-700">QS World Ranking</p>
-                        <p className="text-sm text-gray-500 mt-1">Global MBA Rankings 2025</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </section>
-
-                {/* Hostel Section */}
-                <section id="hostel" className="scroll-mt-24">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-200">
-                      <Building2 className="w-5 h-5 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900">Hostel & Campus</h2>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    {[
-                      { icon: '🏠', title: 'Accommodation', desc: 'Separate hostels for boys and girls with modern amenities', color: 'blue' },
-                      { icon: '📶', title: 'Wi-Fi Campus', desc: 'High-speed internet connectivity throughout the campus', color: 'green' },
-                      { icon: '🏥', title: 'Medical Facilities', desc: '24/7 security and on-campus medical facilities', color: 'red' },
-                      { icon: '🏋️', title: 'Sports Complex', desc: 'State-of-the-art gym and sports facilities', color: 'orange' },
-                      { icon: '📚', title: 'Library', desc: 'Library with 100,000+ books and digital resources', color: 'purple' },
-                      { icon: '🍽️', title: 'Cafeteria', desc: 'Hygienic cafeteria with diverse food options', color: 'yellow' },
-                    ].map((item, idx) => (
-                      <Card key={idx} className="group border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                        <CardContent className="p-5 flex items-start gap-4">
-                          <div className={`w-12 h-12 rounded-xl bg-${item.color}-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform`}>
-                            {item.icon}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-gray-900 mb-1">{item.title}</h4>
-                            <p className="text-gray-600 text-sm">{item.desc}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Documents Required */}
-                {documentsRequired?.documents && (
-                  <section id="documents" className="scroll-mt-24">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">{documentsRequired.title || 'Documents Required'}</h2>
-                    <Card>
-                      <CardContent className="p-6">
-                        <div className="grid md:grid-cols-2 gap-3">
-                          {documentsRequired.documents.map((doc: string, idx: number) => (
-                            <div key={idx} className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-blue-500" />
-                              <span className="text-gray-700">{doc}</span>
-                            </div>
-                          ))}
-                        </div>
-                        {documentsRequired.description && (
-                          <p className="mt-4 text-sm text-gray-600">{documentsRequired.description}</p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </section>
-                )}
-
-                {/* Campus Highlights */}
-                {campusHighlights?.highlights && (
-                  <section id="campus" className="scroll-mt-24">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">{campusHighlights.title || 'Campus Highlights'}</h2>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {campusHighlights.highlights.map((highlight: any, idx: number) => (
-                        <div key={idx} className="relative rounded-lg overflow-hidden aspect-video">
-                          {typeof highlight === 'string' && highlight.startsWith('data:') ? (
-                            <Image
-                              src={highlight}
-                              alt={`Campus ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-500">{highlight}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {/* Gallery Section */}
-                <section id="gallery" className="scroll-mt-24">
-                  <GallerySection images={campusHighlights?.highlights || []} />
-                </section>
-
-                {/* Exams Section */}
-                {college.exams.length > 0 && (
-                  <section className="scroll-mt-24">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-bold text-gray-900">Accepted Exams</h2>
-                      <Link href="/exams">
-                        <Button variant="outline" size="sm" className="border-gray-200 hover:bg-orange-50 hover:border-orange-200">
-                          View All Exams
-                        </Button>
-                      </Link>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {college.exams.map((exam) => (
-                        <Link key={exam.id} href={`/exams/${exam.slug}`}>
-                          <Badge variant="secondary" className="text-sm px-4 py-2 hover:bg-orange-100 hover:text-orange-700 transition-colors cursor-pointer">
-                            {exam.name}
-                          </Badge>
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {/* Reviews Section */}
-                <section id="reviews" className="scroll-mt-24">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
-                  <Card>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="text-center">
-                          <p className="text-4xl font-bold text-blue-600">4.8</p>
-                          <p className="text-sm text-gray-600">out of 5</p>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex gap-1 mb-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg
-                                key={star}
-                                className={`w-5 h-5 ${star <= 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
-                            ))}
-                          </div>
-                          <p className="text-sm text-gray-600">Based on 1,247 reviews</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 border-t pt-4">
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600">
-                              R
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">Rahul Sharma</p>
-                              <p className="text-sm text-gray-500">MBA Batch 2025</p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-700">"Excellent faculty and great placement opportunities. The campus life is amazing!"</p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-600">
-                              P
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">Priya Patel</p>
-                              <p className="text-sm text-gray-500">B.Tech Batch 2024</p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-700">"World-class infrastructure and research facilities. Highly recommended!"</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </section>
-              </div>
-            </div>
+            <Suspense fallback={<SectionFallback />}>
+              <ContentSectionWrapper slug={slug} />
+            </Suspense>
           </div>
 
-          {/* Right: Sidebar */}
           <div className="w-full lg:w-80 shrink-0">
-            <div className="sticky top-[140px] space-y-6">
-              <ContactSidebar />
-              <NewsSidebar collegeName={college.name} />
-              <RecommendedColleges colleges={relatedColleges} />
+            <Suspense fallback={<div className="h-64 bg-gray-100 rounded-xl animate-pulse" />}>
+              <SidebarWrapper slug={slug} />
+            </Suspense>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BreadcrumbFallback() {
+  return (
+    <div className="animate-pulse">
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="h-4 bg-gray-200 rounded w-64" />
+        </div>
+      </div>
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex gap-6">
+            <div className="w-24 h-24 bg-gray-200 rounded-lg" />
+            <div className="flex-1 space-y-3">
+              <div className="h-8 bg-gray-200 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+              <div className="h-6 bg-gray-200 rounded w-1/3" />
             </div>
           </div>
         </div>

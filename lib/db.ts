@@ -12,7 +12,13 @@ const createPrismaClient = () => {
     throw new Error("DATABASE_URL is not set in environment variables");
   }
 
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({
+    connectionString,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    maxUses: 7500,
+  });
 
   // Type cast required due to @prisma/adapter-pg having different @types/pg version than project's pg package
   // This is a known issue with Prisma adapter type compatibility

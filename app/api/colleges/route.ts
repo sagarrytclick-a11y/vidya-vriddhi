@@ -123,7 +123,9 @@ export async function GET(request: NextRequest) {
       db.college.count({ where })
     ])
 
-    return NextResponse.json(createPaginationResponse(colleges, total, page, limit))
+    return NextResponse.json(createPaginationResponse(colleges, total, page, limit), {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    })
   } catch (error) {
     console.error('Error fetching colleges:', error)
     return NextResponse.json(

@@ -14,29 +14,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Find the course by name
-    const course = await db.course.findFirst({
-      where: { 
-        name: {
-          equals: courseName,
-          mode: 'insensitive'
-        }
-      }
-    })
-
-    if (!course) {
-      return NextResponse.json(
-        { error: 'Course not found' },
-        { status: 404 }
-      )
-    }
-
-    // Fetch colleges that offer this course
+    // Single query: filter colleges directly by course name
     const colleges = await db.college.findMany({
       where: {
         courses: {
           some: {
-            id: course.id
+            name: { equals: courseName, mode: 'insensitive' }
           }
         },
         active: true

@@ -4,160 +4,27 @@ import { db } from '@/lib/db'
 // GET all tables with their data
 export async function GET(request: NextRequest) {
   try {
-    // Get all tables data in parallel with selective fields
+    // Get paginated table data with limits
     const [countries, cities, colleges, categories, exams, courses] = await Promise.all([
-      db.country.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          flagEmoji: true,
-          description: true,
-          active: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: { cities: true }
-          }
-        }
-      }),
-
-      db.city.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          cityImageURL: true,
-          features: true,
-          active: true,
-          countryId: true,
-          createdAt: true,
-          updatedAt: true,
-          country: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              flagEmoji: true
-            }
-          },
-          _count: {
-            select: { colleges: true }
-          }
-        }
-      }),
-
-      db.college.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          active: true,
-          establishment_year: true,
-          Countryranking: true,
-          Internationalranking: true,
-          logoURL: true,
-          imageURL: true,
-          countryId: true,
-          cityId: true,
-          createdAt: true,
-          updatedAt: true,
-          city: {
-            select: {
-              id: true,
-              name: true,
-              slug: true
-            }
-          },
-          country: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              flagEmoji: true
-            }
-          },
-          _count: {
-            select: {
-              categories: true,
-              courses: true,
-              exams: true
-            }
-          }
-        }
-      }),
-
-      db.category.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          active: true,
-          categoryImageUrl: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: { colleges: true }
-          }
-        }
-      }),
-
-      db.exam.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          shortName: true,
-          description: true,
-          active: true,
-          conductingBody: true,
-          frequency: true,
-          examMode: true,
-          examType: true,
-          examImageurl: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: { colleges: true }
-          }
-        }
-      }),
-
-      db.course.findMany({
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          active: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: { colleges: true }
-          }
-        }
-      })
+      db.country.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, flagEmoji: true, active: true, _count: { select: { cities: true } } } }),
+      db.city.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, active: true, country: { select: { name: true } }, _count: { select: { colleges: true } } } }),
+      db.college.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, active: true, establishment_year: true, Countryranking: true, city: { select: { name: true } }, country: { select: { name: true } }, _count: { select: { categories: true, courses: true, exams: true } } } }),
+      db.category.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, active: true, _count: { select: { colleges: true } } } }),
+      db.exam.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, shortName: true, active: true, _count: { select: { colleges: true } } } }),
+      db.course.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, active: true, _count: { select: { colleges: true } } } }),
     ])
 
-    return NextResponse.json({
-      countries: countries,
-      cities: cities,
-      colleges: colleges,
-      categories: categories,
-      exams: exams,
-      courses: courses,
-      counts: {
-        countries: countries.length,
-        cities: cities.length,
-        colleges: colleges.length,
-        categories: categories.length,
-        exams: exams.length,
-        courses: courses.length
-      }
-    })
+    // Get total counts separately (lightweight)
+    const counts = {
+      countries: await db.country.count(),
+      cities: await db.city.count(),
+      colleges: await db.college.count(),
+      categories: await db.category.count(),
+      exams: await db.exam.count(),
+      courses: await db.course.count(),
+    }
+
+    return NextResponse.json({ countries, cities, colleges, categories, exams, courses, counts })
   } catch (error) {
     console.error('Error fetching tables:', error)
     return NextResponse.json(

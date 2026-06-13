@@ -69,19 +69,26 @@ async function handleResponse<T>(response: Response): Promise<T> {
 /**
  * Generic GET request
  */
-export async function get<T>(path: string, options?: RequestInit): Promise<T> {
+export async function get<T>(path: string, options?: RequestInit & { timeout?: number }): Promise<T> {
   const url = buildUrl(path)
-  
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      ...defaultHeaders,
-      ...options?.headers,
-    },
-    ...options,
-  })
+  const timeout = options?.timeout ?? 15000
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
 
-  return handleResponse<T>(response)
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        ...defaultHeaders,
+        ...options?.headers,
+      },
+      signal: controller.signal,
+      ...options,
+    })
+    return handleResponse<T>(response)
+  } finally {
+    clearTimeout(timeoutId)
+  }
 }
 
 /**
