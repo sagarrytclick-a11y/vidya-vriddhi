@@ -4,6 +4,7 @@ import React from 'react'
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building, ExternalLink } from 'lucide-react'
 import { useCities } from '@/hooks/useCities'
 import { CityWithStats } from '@/types/domain'
+import { SkeletonPulse } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
 interface CityCardProps {
@@ -81,8 +82,23 @@ const TopStudyPlaces: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="relative">
+            <div className="flex items-center space-x-4">
+              <SkeletonPulse className="h-12 w-12 rounded-full hidden sm:block" />
+              <div className="flex space-x-6 overflow-hidden flex-1 pb-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="shrink-0 w-44 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <SkeletonPulse className="h-32 w-full" />
+                    <div className="p-4 space-y-3">
+                      <SkeletonPulse className="h-4 w-3/4 mx-auto" />
+                      <SkeletonPulse className="h-3 w-1/2 mx-auto" />
+                      <SkeletonPulse className="h-8 w-10 mx-auto rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <SkeletonPulse className="h-12 w-12 rounded-full hidden sm:block" />
+            </div>
           </div>
         )}
 

@@ -3,7 +3,7 @@ import { SignIn } from '@clerk/nextjs'
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-orange-50 px-4 py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full flex flex-col items-center max-w-md">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="VidyaVriddhi" className="h-14 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900">Welcome to VidyaVriddhi</h1>

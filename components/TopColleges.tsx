@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
+import { TableSkeleton } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
 interface College {
@@ -58,10 +59,8 @@ const TopColleges: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden p-8">
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-            </div>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <TableSkeleton rows={6} columns={6} />
           </div>
         )}
 

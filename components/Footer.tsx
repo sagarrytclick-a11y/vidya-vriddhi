@@ -72,29 +72,29 @@ const Footer = () => {
             </div>
             {/* Top Colleges */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Colleges</h3>
+              <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Courses</h3>
               <ul className="space-y-2">
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">M.B.A</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">B.Tech/B.E</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MCA</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">BCA</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">M.Tech</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MA</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">BA</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">M.B.A</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">B.Tech/B.E</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">MCA</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">BCA</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">M.Tech</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">MA</Link></li>
+                <li><Link href="/courses" className="text-gray-300 hover:text-white transition-colors">BA</Link></li>
               </ul>
             </div>
 
             {/* Top Universities */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Universities</h3>
+              <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Colleges</h3>
               <ul className="space-y-2">
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Engineering</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Management</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Medical</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Law</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Commerce</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Science</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Arts</Link></li>
+                <li><Link href="/colleges/national-law-school-of-india-university-bangalore" className="text-gray-300 hover:text-white transition-colors">NLSI</Link></li>
+                <li><Link href="/colleges/all-india-institute-of-medical-sciences-aiims" className="text-gray-300 hover:text-white transition-colors">AIIMS</Link></li>
+                <li><Link href="/colleges/Indian%20Institute%20of%20Management%20Bangalore" className="text-gray-300 hover:text-white transition-colors">IIM Bangalore</Link></li>
+                <li><Link href="/colleges/hindu-college-university-of-delhi" className="text-gray-300 hover:text-white transition-colors">Hindu College</Link></li>
+                <li><Link href="/colleges/dr-d-y-patil-vidyapeeth-deemed-to-be-university" className="text-gray-300 hover:text-white transition-colors">Dr. D.Y. Patil University</Link></li>
+                <li><Link href="/colleges/vardhman-mahavir-medical-college-vmmc" className="text-gray-300 hover:text-white transition-colors">VMMC</Link></li>
+                <li><Link href="/colleges/the-institute-of-hotel-management-bangalore" className="text-gray-300 hover:text-white transition-colors">IHM Bangalore</Link></li>
               </ul>
             </div>
 
@@ -102,13 +102,10 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Top Exam</h3>
               <ul className="space-y-2">
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">CAT</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">GATE</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Jee-Main</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">NEET</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">XAT</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">CLAT</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">MAT</Link></li>
+                <li><Link href="/exams/common-admission-test" className="text-gray-300 hover:text-white transition-colors">CAT</Link></li>
+                <li><Link href="/exams/national-eligibility-entrance-test-undergraduate" className="text-gray-300 hover:text-white transition-colors">GATE</Link></li>
+                <li><Link href="/exams/joint-entrance-examination-main" className="text-gray-300 hover:text-white transition-colors">Jee-Main</Link></li>
+                <li><Link href="/exams/joint-entrance-examination-advanced" className="text-gray-300 hover:text-white transition-colors">Jee-Advanced</Link></li>
               </ul>
             </div>
 
@@ -116,13 +113,12 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-orange-400">Study Abroad</h3>
               <ul className="space-y-2">
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Canada</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">USA</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">UK</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">UAE</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Australia</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Germany</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">Sweden</Link></li>
+                <li><Link href="/countries/bangladesh" className="text-gray-300 hover:text-white transition-colors">Bangladesh</Link></li>
+                <li><Link href="/countries/georgia" className="text-gray-300 hover:text-white transition-colors">Georgia</Link></li>
+                <li><Link href="/countries/uzbekistan" className="text-gray-300 hover:text-white transition-colors">Uzbekistan</Link></li>
+                <li><Link href="/countries/russia" className="text-gray-300 hover:text-white transition-colors">Russia</Link></li>
+                <li><Link href="/colleges" className="text-gray-300 hover:text-white transition-colors">India</Link></li>
+               
               </ul>
             </div>
 
@@ -153,47 +149,39 @@ const Footer = () => {
                 <span className="text-gray-400">© {new Date().getFullYear()} {SITE_IDENTITY.name}. All Rights Reserved</span>
               </div>
 
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-300">Download the {SITE_IDENTITY.name} app on</span>
-                <a href="#" className="bg-black hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors">
-                  <span className="text-sm">Google Play</span>
-                </a>
-                <a href="#" className="bg-black hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors">
-                  <span className="text-sm">App Store</span>
-                </a>
-              </div>
+          
 
               {/* Social Media Icons */}
               <div className="flex items-center space-x-3 ml-0 md:ml-8">
                 {SITE_IDENTITY.contact.socials.whatsapp && (
-                  <a href={SITE_IDENTITY.contact.socials.whatsapp} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.whatsapp} className="text-gray-400 hover:text-white transition-colors">
                     <MessageCircle className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
                 {SITE_IDENTITY.contact.socials.instagram && (
-                  <a href={SITE_IDENTITY.contact.socials.instagram} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.instagram} className="text-gray-400 hover:text-white transition-colors">
                     <Instagram className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
                 {SITE_IDENTITY.contact.socials.linkedin && (
-                  <a href={SITE_IDENTITY.contact.socials.linkedin} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.linkedin} className="text-gray-400 hover:text-white transition-colors">
                     <Linkedin className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
                 {SITE_IDENTITY.contact.socials.youtube && (
-                  <a href={SITE_IDENTITY.contact.socials.youtube} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.youtube} className="text-gray-400 hover:text-white transition-colors">
                     <Youtube className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
                 {SITE_IDENTITY.contact.socials.facebook && (
-                  <a href={SITE_IDENTITY.contact.socials.facebook} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.facebook} className="text-gray-400 hover:text-white transition-colors">
                     <Facebook className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
                 {SITE_IDENTITY.contact.socials.twitter && (
-                  <a href={SITE_IDENTITY.contact.socials.twitter} className="text-gray-400 hover:text-white transition-colors">
+                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.twitter} className="text-gray-400 hover:text-white transition-colors">
                     <Twitter className="w-5 h-5" />
-                  </a>
+                  </Link>
                 )}
               </div>
             </div>

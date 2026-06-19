@@ -81,8 +81,8 @@ export const SITE_IDENTITY: SiteIdentity = {
       additional: ["+91-9839865347", "+91-9569985339"]
     },
     email: {
-      support: "support@vidyavriddhi.com",
-      admissions: "admissions@vidyavriddhi.com",
+      support: "Abhishek@vidyavriddhi.com",
+      admissions: "Abhishek@vidyavriddhi.com",
       general: "Abhishek@vidyavriddhi.com",
     },
     address: {
