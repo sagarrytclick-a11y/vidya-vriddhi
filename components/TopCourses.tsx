@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink, MapPin } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
 import { CourseWithColleges } from '@/types/domain'
+import { SkeletonPulse } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
 interface CourseCardProps {
@@ -74,8 +75,22 @@ const TopCourses: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="relative">
+            <div className="flex space-x-6 overflow-hidden pb-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="shrink-0 w-80 bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="space-y-4">
+                    <SkeletonPulse className="h-6 w-3/4" />
+                    <SkeletonPulse className="h-4 w-full" />
+                    <SkeletonPulse className="h-4 w-2/3" />
+                    <div className="flex items-center space-x-2 pt-2">
+                      <SkeletonPulse className="h-4 w-4 rounded-full" />
+                      <SkeletonPulse className="h-4 w-24" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

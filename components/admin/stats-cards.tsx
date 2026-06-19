@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { StatsSkeleton } from '@/components/ui/skeletons'
 import { 
   Globe, 
   GraduationCap, 
@@ -10,8 +11,7 @@ import {
   Folder, 
   MessageSquare,
   Library,
-  Newspaper,
-  Loader2
+  Newspaper
 } from 'lucide-react'
 import { useColleges } from '@/hooks/useColleges'
 import { useCountryContext } from '@/contexts/country-context'
@@ -151,11 +151,8 @@ export function StatsCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-8">
       {isLoading ? (
-        <div className="col-span-full flex items-center justify-center min-h-32">
-          <div className="flex items-center space-x-2 text-gray-400">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading statistics...</span>
-          </div>
+        <div className="col-span-full">
+          <StatsSkeleton count={8} />
         </div>
       ) : (
         statsData.map((stat, index) => {

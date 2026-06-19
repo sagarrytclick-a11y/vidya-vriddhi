@@ -11,6 +11,7 @@ import { DeleteCollegeModal } from './delete-college-modal'
 import { useCollegeContext } from '@/contexts/college-context'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
+import { TableSkeleton } from '@/components/ui/skeletons'
 import { College, CollegeFormData } from '@/types/college'
 
 export function CollegeList() {
@@ -80,8 +81,8 @@ export function CollegeList() {
   if (isLoading && colleges.length === 0) {
     return (
       <div className="p-8">
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-gray-400">Loading colleges...</div>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
+          <TableSkeleton rows={6} columns={6} />
         </div>
       </div>
     )

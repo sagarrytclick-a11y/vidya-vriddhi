@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Calendar, Clock, ExternalLink, FileText } from 'lucide-react'
 import { useExams } from '@/hooks/useExams'
+import { SkeletonPulse } from '@/components/ui/skeletons'
 
 interface Exam {
   id: string
@@ -84,8 +85,20 @@ const UpcomingExams: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="flex space-x-6 overflow-hidden pb-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="shrink-0 w-72 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="flex h-full">
+                  <SkeletonPulse className="w-20 h-32" />
+                  <div className="flex-1 p-4 space-y-3">
+                    <SkeletonPulse className="h-5 w-3/4" />
+                    <SkeletonPulse className="h-4 w-1/3" />
+                    <SkeletonPulse className="h-4 w-1/2" />
+                    <SkeletonPulse className="h-9 w-full rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

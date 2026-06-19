@@ -3,6 +3,7 @@
 import React from 'react'
 import { GraduationCap, MapPin, Award, Building2, ChevronRight, Globe } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
+import { CardSkeleton } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
 const CollegeListing: React.FC = () => {
@@ -29,10 +30,7 @@ const CollegeListing: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent mb-4"></div>
-            <p className="text-gray-500 font-medium">Loading colleges...</p>
-          </div>
+          <CardSkeleton count={3} />
         )}
 
         {/* Error State */}

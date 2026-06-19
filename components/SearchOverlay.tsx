@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Search, TrendingUp, X, Building, FileText, Newspaper, BookOpen, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/hooks/useSearch'
 import { useRouter } from 'next/navigation'
+import { SkeletonPulse } from '@/components/ui/skeletons'
 
 interface SearchOverlayProps {
   isOpen: boolean
@@ -136,9 +137,17 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
         {searchQuery && (
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             {isLoading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                <p className="text-gray-600">Searching...</p>
+              <div className="p-4 space-y-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex items-center space-x-4 p-3">
+                    <SkeletonPulse className="w-14 h-14 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <SkeletonPulse className="h-4 w-3/4" />
+                      <SkeletonPulse className="h-3 w-1/2" />
+                    </div>
+                    <SkeletonPulse className="w-5 h-5 rounded-full" />
+                  </div>
+                ))}
               </div>
             ) : searchResults && searchResults.length > 0 ? (
               <div>

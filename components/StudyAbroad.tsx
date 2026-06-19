@@ -3,6 +3,7 @@
 import React from 'react'
 import { Globe, DollarSign, Building, ChevronRight, ArrowRight, Map as MapIcon, ExternalLink } from 'lucide-react'
 import { useCountries } from '@/hooks/useCountries'
+import { SkeletonPulse } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
 interface Country {
@@ -109,8 +110,33 @@ const StudyAbroad: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="flex space-x-6 overflow-hidden pb-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="shrink-0 w-96 bg-white rounded-xl border border-gray-200 p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <SkeletonPulse className="h-8 w-8 rounded-full" />
+                    <SkeletonPulse className="h-6 w-48" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <SkeletonPulse className="h-4 w-16" />
+                      <SkeletonPulse className="h-5 w-12" />
+                    </div>
+                    <div className="space-y-2">
+                      <SkeletonPulse className="h-4 w-24" />
+                      <SkeletonPulse className="h-5 w-16" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <SkeletonPulse className="h-4 w-16" />
+                    <SkeletonPulse className="h-4 w-full" />
+                    <SkeletonPulse className="h-4 w-2/3" />
+                  </div>
+                  <SkeletonPulse className="h-11 w-full rounded-lg" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
