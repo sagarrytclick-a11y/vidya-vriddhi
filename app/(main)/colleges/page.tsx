@@ -15,8 +15,6 @@ import CompareButton from '@/components/ui/compare-button'
 import { usePublicColleges } from '@/hooks/usePublicColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 
-export const dynamic = 'force-dynamic'
-
 function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newParams: Record<string, string | undefined>) {
   const params = new URLSearchParams(currentParams)
 

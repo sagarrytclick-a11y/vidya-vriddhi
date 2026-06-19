@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { db } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export default async function StudyAbroadPage() {
   const colleges = await db.college.findMany({
     where: {
@@ -15,7 +17,15 @@ export default async function StudyAbroadPage() {
         }
       }
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      imageURL: true,
+      logoURL: true,
+      Countryranking: true,
+      Internationalranking: true,
       country: {
         select: {
           id: true,
@@ -35,12 +45,14 @@ export default async function StudyAbroadPage() {
         select: {
           name: true,
           slug: true,
-        }
-      }
+        },
+        take: 6,
+      },
     },
     orderBy: {
       createdAt: 'desc'
-    }
+    },
+    take: 24,
   })
 
   return (
