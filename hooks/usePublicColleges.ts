@@ -78,18 +78,28 @@ const fetchColleges = async (searchParams: SearchParams): Promise<PaginationResp
 
 export function usePublicColleges(searchParams: SearchParams) {
   const page = parseInt(searchParams.page || '1')
-  
+  const paramsKey = {
+    category: searchParams.category || '',
+    course: searchParams.course || '',
+    city: searchParams.city || '',
+    exam: searchParams.exam || '',
+    search: searchParams.search || '',
+    page: searchParams.page || '1'
+  }
+
   const {
     data,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: ['public-colleges', searchParams],
+    queryKey: ['public-colleges', paramsKey],
     queryFn: () => fetchColleges(searchParams),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
-  
+
   return {
     colleges: data?.colleges || [],
     pagination: data?.pagination || {

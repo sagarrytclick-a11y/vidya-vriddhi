@@ -1,24 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { get, set } from '@/lib/cache'
 
 // GET Indian colleges with pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10')))
     const skip = (page - 1) * limit
-    
+
     // Get filter parameters
-    const category = searchParams.get('category')
-    const course = searchParams.get('course')
-    const city = searchParams.get('city')
-    const exam = searchParams.get('exam')
-    const search = searchParams.get('search')
-    
+    const category = searchParams.get('category')?.trim()
+    const course = searchParams.get('course')?.trim()
+    const city = searchParams.get('city')?.trim()
+    const exam = searchParams.get('exam')?.trim()
+    const search = searchParams.get('search')?.trim()
+
+    const cacheKey = `indian-colleges:${page}:${limit}:${category || ''}:${course || ''}:${city || ''}:${exam || ''}:${search || ''}`
+    const cached = get<{
+      colleges: any[]
+      pagination: {
+        page: number
+        limit: number
+        total: number
+        totalPages: number
+        hasNext: boolean
+        hasPrev: boolean
+      }
+    }>(cacheKey)
+
+    if (cached) {
+      return NextResponse.json(cached, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+        }
+      })
+    }
+
     // Find India country (case-insensitive)
     const india = await db.country.findFirst({
-      where: { 
+      where: {
         name: {
           equals: 'India',
           mode: 'insensitive'
@@ -28,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     // If India not found, return empty results
     if (!india) {
-      return NextResponse.json({
+      const emptyResponse = {
         colleges: [],
         pagination: {
           page,
@@ -37,6 +59,14 @@ export async function GET(request: NextRequest) {
           totalPages: 0,
           hasNext: false,
           hasPrev: false
+        }
+      }
+
+      set(cacheKey, emptyResponse)
+
+      return NextResponse.json(emptyResponse, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
         }
       })
     }
@@ -104,14 +134,10 @@ export async function GET(request: NextRequest) {
           name: true,
           slug: true,
           description: true,
-          active: true,
           establishment_year: true,
           Countryranking: true,
-          Internationalranking: true,
           logoURL: true,
           imageURL: true,
-          createdAt: true,
-          updatedAt: true,
           city: {
             select: {
               id: true,
@@ -127,14 +153,6 @@ export async function GET(request: NextRequest) {
               flagEmoji: true
             }
           },
-          courses: {
-            select: {
-              id: true,
-              name: true,
-              slug: true
-            },
-            take: 5
-          },
           categories: {
             select: {
               id: true,
@@ -145,9 +163,7 @@ export async function GET(request: NextRequest) {
           },
           _count: {
             select: {
-              categories: true,
-              courses: true,
-              exams: true
+              courses: true
             }
           }
         }
@@ -157,7 +173,7 @@ export async function GET(request: NextRequest) {
       })
     ])
 
-    return NextResponse.json({
+    const response = {
       colleges,
       pagination: {
         page,
@@ -166,6 +182,14 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(totalCount / limit),
         hasNext: page < Math.ceil(totalCount / limit),
         hasPrev: page > 1
+      }
+    }
+
+    set(cacheKey, response)
+
+    return NextResponse.json(response, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
       }
     })
   } catch (error) {
