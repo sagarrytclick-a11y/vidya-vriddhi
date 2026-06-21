@@ -195,23 +195,23 @@ const ExplorePrograms: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
             Explore <span className="text-orange-500">Programs</span>
           </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">
+          <p className="text-gray-500 text-sm sm:text-base max-w-2xl mx-auto">
             Everything you need for your academic journey—from finding the right
             college to predicting your admission chances.
           </p>
         </div>
 
         {/* Tabs - Centered & Scrollable on Mobile */}
-        <div className="flex justify-start md:justify-center mb-12 overflow-x-auto no-scrollbar pb-2">
-          <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-200">
+        <div className="flex justify-start md:justify-center mb-8 sm:mb-12 overflow-x-auto no-scrollbar pb-2 -mx-4 sm:mx-0 px-4 sm:px-0">
+          <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-gray-200">
             {programs.map((program) => (
               <button
                 key={program}
                 onClick={() => setSelectedProgram(program)}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-200 ${selectedProgram === program
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-[11px] sm:text-sm whitespace-nowrap transition-all duration-200 ${selectedProgram === program
                     ? "bg-orange-500 text-white shadow-md"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
                   }`}

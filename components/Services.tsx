@@ -18,14 +18,14 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon, title, description, fea
         <div className="p-3 bg-orange-50 rounded-lg group-hover:bg-orange-100 transition-colors">
           {icon}
         </div>
-        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h3>
       </div>
       
-      <p className="text-gray-600 mb-4">{description}</p>
+      <p className="text-gray-600 text-sm sm:text-base mb-4">{description}</p>
       
       <ul className="space-y-2">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-center space-x-2 text-sm text-gray-600">
+          <li key={index} className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
             <ChevronRight className="w-4 h-4 text-orange-500 shrink-0" />
             <span>{feature}</span>
           </li>
@@ -109,8 +109,8 @@ const Services: React.FC = () => {
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Services</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Our Services</h2>
+          <p className="text-sm sm:text-lg text-gray-600 max-w-3xl mx-auto">
             We provide comprehensive educational services to help students achieve their academic and career goals
           </p>
         </div>

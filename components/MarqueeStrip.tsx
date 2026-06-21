@@ -33,7 +33,7 @@ export default function MarqueeStrip() {
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-orange-500 py-3 overflow-hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-orange-500 py-2 sm:py-3 overflow-hidden">
       <div
         ref={containerRef}
         className="flex whitespace-nowrap animate-marquee"

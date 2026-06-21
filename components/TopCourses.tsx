@@ -13,7 +13,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
-    <div className="shrink-0 w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="shrink-0 w-64 sm:w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex flex-col h-full">
       <div className="flex items-center space-x-2 text-[#94A3B8] mb-3">
       <MapPin className="w-6 h-6 text-orange-500" />
@@ -64,11 +64,11 @@ const TopCourses: React.FC = () => {
     <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Top Courses</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Top Courses</h2>
           <Link href="/courses">
-            <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+            <button className="flex items-center space-x-1 sm:space-x-2 text-orange-500 hover:text-orange-600 font-medium text-xs sm:text-sm">
               <span>View all courses</span>
-              <ExternalLink className="w-5 h-5" />
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </Link>
         </div>

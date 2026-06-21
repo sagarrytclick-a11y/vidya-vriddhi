@@ -30,18 +30,18 @@ const FloatingActions: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex items-end space-x-4">
+    <div className="fixed bottom-16 sm:bottom-6 left-3 sm:left-6 z-50 flex items-end space-x-4">
       {/* Action Buttons */}
-      <div className="flex flex-col space-y-3">
+      <div className="flex flex-col space-y-2 sm:space-y-3">
         {/* Notification Button */}
         <button
           onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-          className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group relative"
+          className="w-11 h-11 sm:w-14 sm:h-14 bg-orange-500 hover:bg-orange-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group relative"
           title="Latest News"
         >
-          <Bell className="w-7 h-7 text-white" />
+          <Bell className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
           {newsItems && newsItems.length > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+            <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-red-500 text-white text-[10px] sm:text-xs rounded-full flex items-center justify-center font-medium">
               {newsItems.length}
             </span>
           )}
@@ -51,10 +51,10 @@ const FloatingActions: React.FC = () => {
         {/* WhatsApp Button */}
         <button
           onClick={handleWhatsAppClick}
-          className="w-14 h-14 py-4 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group"
+          className="w-11 h-11 sm:w-14 sm:h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group"
           title="Chat on WhatsApp"
         >
-          <MessageCircle className="w-7 h-7 text-white" />
+          <MessageCircle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
         </button>
       </div>
 

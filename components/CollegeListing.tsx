@@ -20,10 +20,10 @@ const CollegeListing: React.FC = () => {
             <GraduationCap className="w-5 h-5" />
             <span className="font-semibold tracking-wide uppercase text-xs">Featured Institutions</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
             Top Indian Colleges
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
             Discover the best educational institutions in India offering world-class education and opportunities.
           </p>
         </div>

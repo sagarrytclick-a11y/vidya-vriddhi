@@ -154,6 +154,114 @@ export function StatsSkeleton({ count = 4 }: { count?: number }) {
   )
 }
 
+/**
+ * Compare Colleges Skeleton - For compare colleges page
+ */
+export function CompareCollegesSkeleton({ collegeCounts = 3, rowCount = 6 }: { collegeCounts?: number; rowCount?: number }) {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Skeleton */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <SkeletonPulse className="h-8 w-64 mb-3" />
+              <SkeletonPulse className="h-5 w-40" />
+            </div>
+            <div className="flex items-center gap-3">
+              <SkeletonPulse className="h-10 w-32" />
+              <SkeletonPulse className="h-10 w-24" />
+            </div>
+          </div>
+        </div>
+
+        {/* Comparison Table Skeleton */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+          <div className="overflow-x-auto">
+            {/* Table Header */}
+            <div className="border-b border-gray-200">
+              <div className="flex">
+                {/* Criteria Column Header */}
+                <div className="p-6 font-bold text-gray-900 bg-gray-50/50 w-40 md:w-64 border-r border-gray-100">
+                  <SkeletonPulse className="h-5 w-20" />
+                </div>
+                {/* College Column Headers */}
+                {Array.from({ length: collegeCounts }).map((_, i) => (
+                  <div key={i} className="p-6 font-bold text-gray-900 bg-gray-50/50 min-w-50 md:min-w-75 border-l border-gray-100 flex-1">
+                    <div className="space-y-3">
+                      <div className="flex justify-center mb-2">
+                        <SkeletonPulse className="h-8 w-8 rounded" />
+                      </div>
+                      <SkeletonPulse className="h-4 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Table Rows */}
+            <div className="divide-y divide-gray-100">
+              {Array.from({ length: rowCount }).map((_, rowIndex) => (
+                <div key={rowIndex} className="flex">
+                  {/* Criteria Label */}
+                  <div className="p-6 bg-gray-50/30 w-40 md:w-64 border-r border-gray-100">
+                    <SkeletonPulse className="h-5 w-32" />
+                  </div>
+                  {/* College Data Cells */}
+                  {Array.from({ length: collegeCounts }).map((_, colIndex) => (
+                    <div key={colIndex} className="p-6 border-l border-gray-100 flex-1">
+                      <div className="space-y-3">
+                        {rowIndex === 0 && (
+                          <>
+                            <div className="flex justify-center mb-3">
+                              <SkeletonPulse className="h-16 w-16 rounded-lg" />
+                            </div>
+                            <SkeletonPulse className="h-4 w-full" />
+                          </>
+                        )}
+                        {rowIndex === 1 && (
+                          <>
+                            <SkeletonPulse className="h-4 w-full" />
+                            <SkeletonPulse className="h-4 w-5/6" />
+                            <SkeletonPulse className="h-4 w-4/5" />
+                          </>
+                        )}
+                        {rowIndex === 2 && (
+                          <>
+                            <SkeletonPulse className="h-6 w-32" />
+                            <SkeletonPulse className="h-4 w-24" />
+                            <SkeletonPulse className="h-3 w-20" />
+                          </>
+                        )}
+                        {(rowIndex === 3 || rowIndex === 4 || rowIndex === 5) && (
+                          <>
+                            <SkeletonPulse className="h-4 w-full" />
+                            <SkeletonPulse className="h-4 w-5/6" />
+                            <SkeletonPulse className="h-4 w-4/5" />
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {/* CTA Button Row */}
+              <div className="flex">
+                <div className="p-6 bg-gray-50/30 w-40 md:w-64"></div>
+                {Array.from({ length: collegeCounts }).map((_, i) => (
+                  <div key={i} className="p-6 border-l border-gray-100 flex-1">
+                    <SkeletonPulse className="h-12 w-full rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default {
   Card: CardSkeleton,
   Table: TableSkeleton,
@@ -161,5 +269,6 @@ export default {
   Hero: HeroSkeleton,
   Detail: DetailSkeleton,
   Stats: StatsSkeleton,
+  CompareColleges: CompareCollegesSkeleton,
   Pulse: SkeletonPulse,
 }

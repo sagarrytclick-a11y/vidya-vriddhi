@@ -28,7 +28,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
   const examDate = exam.examDates?.importantDates?.[0]?.date || 'TBA'
   
   return (
-    <div className="shrink-0 w-72 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+    <div className="shrink-0 w-64 sm:w-72 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
       <div className="flex h-full">
         {/* Logo - Left side taking full height */}
         <div className="w-20 h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center flex-shrink-0">
@@ -76,10 +76,10 @@ const UpcomingExams: React.FC = () => {
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Upcoming Exams</h2>
-          <Link href="/exams" className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Upcoming Exams</h2>
+          <Link href="/exams" className="flex items-center space-x-1 sm:space-x-2 text-orange-500 hover:text-orange-600 font-medium text-xs sm:text-sm">
             <span>View all exams</span>
-            <ExternalLink className="w-5 h-5" />
+            <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
           </Link>
         </div>
 

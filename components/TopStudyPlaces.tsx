@@ -71,11 +71,11 @@ const TopStudyPlaces: React.FC = () => {
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Top Study Places</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Top Study Places</h2>
           <Link href="/cities">
-            <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+            <button className="flex items-center space-x-1 sm:space-x-2 text-orange-500 hover:text-orange-600 font-medium text-xs sm:text-sm">
               <span>Explore all cities</span>
-              <ExternalLink className="w-5 h-5" />
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </Link>
         </div>

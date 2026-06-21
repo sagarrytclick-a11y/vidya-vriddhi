@@ -32,7 +32,7 @@ export function TrendingInsights() {
           {/* Left Side - Trending Blogs */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <h2 className="text-4xl font-bold text-slate-800">Trending Education Insights</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">Trending Education Insights</h2>
             </div>
 
             <div className="space-y-6">
@@ -52,34 +52,34 @@ export function TrendingInsights() {
                 <p className="text-slate-500">No blogs available</p>
               ) : (
                 blogs.slice(0, 4).map((blog) => (
-                  <article
-                    key={blog.id}
-                    className="flex gap-4 group cursor-pointer border-b border-black pb-6 last:border-0"
-                  >
-                    <div className="flex-1">
-                      <Link href={`/blogs/${blog.slug}`} className="block">
-                        <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">
-                          {blog.title}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-2 text-sm text-slate-500">
-                          <span className="font-medium text-slate-600">{getAuthorName()}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(blog.createdAt)}
-                          </span>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="w-28 h-20 relative shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                      <Image
-                        src={blog.imageUrl || '/default-blog.png'}
-                        alt={blog.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  </article>
+                    <article
+                      key={blog.id}
+                      className="flex gap-3 sm:gap-4 group cursor-pointer border-b border-black pb-6 last:border-0"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/blogs/${blog.slug}`} className="block">
+                          <h3 className="text-base sm:text-lg md:text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">
+                            {blog.title}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">
+                            <span className="font-medium text-slate-600">{getAuthorName()}</span>
+                            <span>•</span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {formatDate(blog.createdAt)}
+                            </span>
+                          </div>
+                        </Link>
+                      </div>
+                      <div className="w-20 h-16 sm:w-28 sm:h-20 relative shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                        <Image
+                          src={blog.imageUrl || '/default-blog.png'}
+                          alt={blog.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </article>
                 ))
               )}
             </div>
@@ -87,7 +87,7 @@ export function TrendingInsights() {
             {/* View More Blogs Button */}
             <Link
               href="/blogs"
-              className="inline-flex items-center justify-center  w-full mt-6 px-6 py-3 border-2  rounded-lg text-white bg-blue-600 font-medium  hover:bg-blue-700 hover:text-white group"
+              className="inline-flex items-center justify-center w-full mt-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-white bg-blue-600 font-medium text-sm sm:text-base hover:bg-blue-700 hover:text-white group"
             >
               View more blogs
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
