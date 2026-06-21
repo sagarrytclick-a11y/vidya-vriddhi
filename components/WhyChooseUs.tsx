@@ -17,10 +17,10 @@ const Feature: React.FC<FeatureProps> = ({ icon, title, description, stats }) =>
       <div className="mx-auto w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-100 transition-colors">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 mb-3">{description}</p>
+      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm sm:text-base mb-3">{description}</p>
       {stats && (
-        <div className="text-2xl font-bold text-orange-500">{stats}</div>
+        <div className="text-xl sm:text-2xl font-bold text-orange-500">{stats}</div>
       )}
     </div>
   )
@@ -80,8 +80,8 @@ const WhyChooseUs: React.FC = () => {
     <div className="bg-white py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Vidya Vridhi</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Vidya Vridhi</h2>
+          <p className="text-sm sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
             We are committed to helping students achieve their educational dreams with our comprehensive and personalized approach
           </p>
         </div>
@@ -115,8 +115,8 @@ const WhyChooseUs: React.FC = () => {
         {/* CTA Section */}
         <div className="text-center">
           <div className="bg-gray-900 text-white rounded-2xl p-8">
-            <h3 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4">Ready to Start Your Journey?</h3>
+            <p className="text-gray-300 text-sm sm:text-base mb-6 max-w-2xl mx-auto">
               Join thousands of successful students who have transformed their careers with our guidance
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

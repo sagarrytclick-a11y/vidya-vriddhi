@@ -131,8 +131,8 @@ const Navbar = () => {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <Link href="/" className="bg-white p-1.5 rounded-lg">
-                <Image src={'/logo.png'} height={80} width={80} alt="VidyaVriddhi Logo" className="h-8 w-auto sm:h-10" />
+              <Link href="/" className="bg-white p-1 rounded-lg sm:p-1.5">
+                <Image src={'/logo.png'} height={80} width={80} alt="VidyaVriddhi Logo" className="h-7 w-auto sm:h-10" />
               </Link>
             </div>
 
@@ -318,8 +318,8 @@ const Navbar = () => {
         />
 
         {/* Mobile Menu Panel */}
-        <div className={`absolute top-15 sm:top-16 left-0 right-0 bg-white shadow-xl transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
-          <div className="max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className={`absolute top-[60px] sm:top-16 left-0 right-0 bg-white shadow-xl transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+          <div className="max-h-[calc(100vh-60px)] sm:max-h-[calc(100vh-80px)] overflow-y-auto">
             {/* Compare Colleges Link */}
             <div className="border-b border-gray-100">
               <Link

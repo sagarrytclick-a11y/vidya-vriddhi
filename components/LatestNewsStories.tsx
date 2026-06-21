@@ -26,7 +26,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
   })
 
   return (
-    <div className="shrink-0 w-96 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="shrink-0 w-72 sm:w-96 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex flex-col h-full">
         {news.imageUrl && (
           <img
@@ -73,10 +73,10 @@ const LatestNewsStories: React.FC = () => {
     <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Latest News & Stories</h2>
-          <button className="flex items-center space-x-2 text-orange-500 hover:text-orange-600 font-medium">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Latest News & Stories</h2>
+          <button className="flex items-center space-x-1 sm:space-x-2 text-orange-500 hover:text-orange-600 font-medium text-xs sm:text-sm">
             <span>View all news</span>
-             <ExternalLink className="w-5 h-5" />
+             <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 

@@ -99,15 +99,15 @@ const slides = [
     }
 
     return (
-        <section className="relative h-[500px] w-full flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-[400px] sm:h-[500px] w-full flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <div
                     className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
                     style={{ backgroundImage: `url('${slides[currentSlide].image}')` }}
                 >
-                    <div className="absolute bottom-4 left-4 text-white">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2">
-                            <p className="text-sm font-semibold text-gray-900">{slides[currentSlide].collegeName}</p>
+                    <div className="absolute bottom-4 left-2 sm:left-4 text-white right-2 sm:right-auto">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                            <p className="text-[10px] sm:text-sm font-semibold text-gray-900 truncate max-w-[200px] sm:max-w-none">{slides[currentSlide].collegeName}</p>
                         </div>
                     </div>
                     <div className="absolute inset-0 bg-black/40"></div>
@@ -115,49 +115,49 @@ const slides = [
             </div>
 
             {/* Navigation Buttons */}
-            <button onClick={prevSlide} className="absolute left-4 z-20 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors">
-                <ChevronLeft size={20} />
+            <button onClick={prevSlide} className="absolute left-1 sm:left-4 z-20 bg-black/30 text-white p-1 sm:p-2 rounded-full hover:bg-black/50 transition-colors">
+                <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
             </button>
-            <button onClick={nextSlide} className="absolute right-4 z-20 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors">
-                <ChevronRight size={20} />
+            <button onClick={nextSlide} className="absolute right-1 sm:right-4 z-20 bg-black/30 text-white p-1 sm:p-2 rounded-full hover:bg-black/50 transition-colors">
+                <ChevronRight size={16} className="sm:w-5 sm:h-5" />
             </button>
 
             {/* Content */}
             <div className="relative z-10 w-full max-w-5xl px-6 text-center text-white">
-                <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg min-h-[3.5rem] md:min-h-[4rem]">
+                <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-3 drop-shadow-lg min-h-[2.5rem] sm:min-h-[3.5rem] md:min-h-[4rem]">
                     {displayedTitle}
                     <span className="animate-pulse text-[#F27121]">|</span>
                 </h1>
 
-                <p className="text-lg md:text-xl mb-8 text-gray-100 min-h-[1.75rem]">
+                <p className="text-sm sm:text-base md:text-xl mb-4 sm:mb-8 text-gray-100 min-h-[1.25rem] sm:min-h-[1.75rem]">
                     {displayedSubtitle}
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-8">
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-8">
                     {stats.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-                            <span className="text-[#F27121] bg-white p-1 rounded-full flex items-center justify-center">
+                        <div key={index} className="flex items-center space-x-1.5 sm:space-x-2 bg-white/10 backdrop-blur-sm px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-white/20">
+                            <span className="text-[#F27121] bg-white p-0.5 sm:p-1 rounded-full flex items-center justify-center">
                                 {item.icon}
                             </span>
-                            <span className="text-sm font-medium">{item.label}</span>
+                            <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">{item.label}</span>
                         </div>
                     ))}
                 </div>
 
                 {/* Search Bar */}
                 <div 
-                    className="max-w-3xl mx-auto bg-white rounded-lg p-1.5 flex items-center shadow-lg cursor-pointer"
+                    className="max-w-3xl mx-auto bg-white rounded-lg p-1 sm:p-1.5 flex items-center shadow-lg cursor-pointer"
                     onClick={() => setIsSearchOpen(true)}
                 >
-                    <div className="flex-1 flex items-center px-4">
+                    <div className="flex-1 flex items-center px-2 sm:px-4">
                         <input
                             type="text"
                             placeholder="Search Colleges, Courses, Exams..."
-                            className="w-full py-2 bg-transparent border-none focus:ring-0 text-gray-800 placeholder:text-gray-500 outline-none cursor-pointer"
+                            className="w-full py-1.5 sm:py-2 bg-transparent border-none focus:ring-0 text-gray-800 placeholder:text-gray-500 outline-none cursor-pointer text-xs sm:text-sm"
                             readOnly
                         />
                     </div>
-                    <button className="bg-[#F27121] text-white px-6 py-2 rounded-md font-medium hover:bg-[#E05A1B] transition-colors">
+                    <button className="bg-[#F27121] text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-md font-medium hover:bg-[#E05A1B] transition-colors text-xs sm:text-sm">
                         Search
                     </button>
                 </div>

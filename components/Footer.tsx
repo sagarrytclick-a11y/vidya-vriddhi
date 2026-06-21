@@ -125,9 +125,9 @@ const Footer = () => {
             {/* Study Abroad - Column 2 */}
           </div>
 
-          {/* Other Links */}
+            {/* Other Links */}
           <div className="border-t border-gray-800 mt-8 pt-8">
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8 text-xs sm:text-sm">
               <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</Link>
               <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link>
               <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</Link>
@@ -193,7 +193,7 @@ const Footer = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 p-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-2 sm:bottom-8 right-2 sm:right-8 p-2 sm:p-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 z-50"
           aria-label="Scroll to top"
         >
           <ChevronUp className="w-6 h-6" />
