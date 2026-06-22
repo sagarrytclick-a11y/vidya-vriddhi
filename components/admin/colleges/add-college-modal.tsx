@@ -92,7 +92,6 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
       features: [],
       logoURL: '',
       imageURL: '',
-      overview: null,
       keyHighlights: {
         title: "Key Highlights",
         description: "",
@@ -405,22 +404,10 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           highlights: [...(prev.campusHighlights?.highlights || []), url]
         }
       }))
+      toast.success('Campus image uploaded')
     } catch (error) {
       console.error('Campus image upload failed:', error)
-      // Fallback to base64 for development
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          campusHighlights: {
-            ...prev.campusHighlights!,
-            title: prev.campusHighlights?.title || 'Campus Highlights',
-            description: prev.campusHighlights?.description || '',
-            highlights: [...(prev.campusHighlights?.highlights || []), reader.result as string]
-          }
-        }))
-      }
-      reader.readAsDataURL(file)
+      toast.error('Failed to upload campus image. Please try again.')
     }
   }
 
@@ -436,19 +423,14 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
     }))
   }
 
-  // ImageKit upload function
+  // ImageKit upload function via server API
   const uploadToImageKit = async (file: File): Promise<string> => {
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('fileName', file.name)
-    formData.append('useUniqueFileName', 'true')
     
     try {
-      const response = await fetch(`https://upload.imagekit.io/api/v1/files/upload`, {
+      const response = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY + ':' + process.env.NEXT_PUBLIC_IMAGEKIT_PRIVATE_KEY)}`,
-        },
         body: formData
       })
       
@@ -456,10 +438,11 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         const result = await response.json()
         return result.url
       } else {
-        throw new Error('Upload failed')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Upload failed')
       }
     } catch (error) {
-      console.error('ImageKit upload error:', error)
+      console.error('Upload error:', error)
       throw error
     }
   }
@@ -471,17 +454,10 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
         ...prev,
         [type]: url
       }))
+      toast.success('Image uploaded successfully')
     } catch (error) {
       console.error('Image upload failed:', error)
-      // Fallback to base64 for development
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          [type]: reader.result as string
-        }))
-      }
-      reader.readAsDataURL(file)
+      toast.error('Failed to upload image. Please try again.')
     }
   }
 
@@ -580,7 +556,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                 id="establishment_year"
                 type="number"
                 value={formData.establishment_year || ''}
-                onChange={(e) => handleInputChange('establishment_year', e.target.value ? parseInt(e.target.value) : undefined)}
+                onChange={(e) => handleInputChange('establishment_year', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
                 className="bg-slate-700 border-slate-600"
                 placeholder="e.g., 1950"
                 min="1800"
@@ -593,7 +569,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                 id="Countryranking"
                 type="number"
                 value={formData.Countryranking || ''}
-                onChange={(e) => handleInputChange('Countryranking', e.target.value ? parseInt(e.target.value) : undefined)}
+                onChange={(e) => handleInputChange('Countryranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
                 className="bg-slate-700 border-slate-600"
                 placeholder="e.g., 1"
                 min="1"
@@ -605,7 +581,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                 id="Internationalranking"
                 type="number"
                 value={formData.Internationalranking || ''}
-                onChange={(e) => handleInputChange('Internationalranking', e.target.value ? parseInt(e.target.value) : undefined)}
+                onChange={(e) => handleInputChange('Internationalranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
                 className="bg-slate-700 border-slate-600"
                 placeholder="e.g., 100"
                 min="1"
@@ -640,7 +616,9 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <div>
               <Label htmlFor="categories">Categories</Label>
               <div className="space-y-2">
-                {categories.length === 0 ? (
+                {loading ? (
+                  <p className="text-sm text-gray-400">Loading categories...</p>
+                ) : categories.length === 0 ? (
                   <p className="text-sm text-gray-400">No categories found. Please add categories first.</p>
                 ) : (
                   categories.map((category) => (

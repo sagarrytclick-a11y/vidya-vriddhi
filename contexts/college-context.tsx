@@ -87,8 +87,18 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   // Modal actions
-  const openViewModal = (college: College) => {
-    setSelectedCollege(college)
+  const openViewModal = async (college: College) => {
+    try {
+      const response = await fetch(`/api/colleges/${college.id}`)
+      if (response.ok) {
+        const completeCollege = await response.json()
+        setSelectedCollege(completeCollege)
+      } else {
+        setSelectedCollege(college)
+      }
+    } catch {
+      setSelectedCollege(college)
+    }
     setIsViewModalOpen(true)
   }
 
