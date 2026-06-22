@@ -100,11 +100,18 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <span>{college.establishment_year}</span>
               </div>
             )}
-            {college.ranking && (
+            {college.Countryranking && (
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <Award className="w-4 h-4 text-gray-400" />
-                <span className="font-medium">Ranking:</span>
-                <span>#{college.ranking}</span>
+                <span className="font-medium">Country Ranking:</span>
+                <span>#{college.Countryranking}</span>
+              </div>
+            )}
+            {college.Internationalranking && (
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <Globe className="w-4 h-4 text-gray-400" />
+                <span className="font-medium">International Ranking:</span>
+                <span>#{college.Internationalranking}</span>
               </div>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-300">
@@ -192,7 +199,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <Users className="w-5 h-5 text-blue-300" />
                 <h4 className="font-semibold text-blue-100">Categories</h4>
               </div>
-              <p className="text-2xl font-bold text-blue-100">{college.categories?.length || 0}</p>
+              <p className="text-2xl font-bold text-blue-100">{college.categories?.length || college._count?.categories || 0}</p>
               <p className="text-sm text-blue-300">Associated categories</p>
             </div>
             <div className="bg-green-900 p-4 rounded-lg">
@@ -200,7 +207,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <GraduationCap className="w-5 h-5 text-green-300" />
                 <h4 className="font-semibold text-green-100">Courses</h4>
               </div>
-              <p className="text-2xl font-bold text-green-100">{college.courses?.length || 0}</p>
+              <p className="text-2xl font-bold text-green-100">{college.courses?.length || college._count?.courses || 0}</p>
               <p className="text-sm text-green-300">Available courses</p>
             </div>
             <div className="bg-purple-900 p-4 rounded-lg">
@@ -208,7 +215,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <FileText className="w-5 h-5 text-purple-300" />
                 <h4 className="font-semibold text-purple-100">Exams</h4>
               </div>
-              <p className="text-2xl font-bold text-purple-100">{college.exams?.length || 0}</p>
+              <p className="text-2xl font-bold text-purple-100">{college.exams?.length || college._count?.exams || 0}</p>
               <p className="text-sm text-purple-300">Accepted exams</p>
             </div>
           </div>
