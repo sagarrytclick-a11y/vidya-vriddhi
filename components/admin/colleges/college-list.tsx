@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Plus, Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,8 +14,6 @@ import { TableSkeleton } from '@/components/ui/skeletons'
 import { College, CollegeFormData } from '@/types/college'
 
 export function CollegeList() {
-  const [searchTerm, setSearchTerm] = useState('');
-
   const {
     colleges,
     isLoading,
@@ -43,17 +40,12 @@ export function CollegeList() {
     pagination,
     page,
     setPage,
+    search,
+    setSearch,
   } = useCollegeContext()
   
   const { countries } = useCountryContext()
   const { cities } = useCityContext()
-
-  const filteredColleges = colleges
-    .filter((college: College) =>
-      college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      college.slug.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a: College, b: College) => (a.displayOrder || 0) - (b.displayOrder || 0))
 
   const handleAddCollege = async (data: CollegeFormData) => {
     try {
@@ -101,8 +93,8 @@ export function CollegeList() {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Search colleges..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-blue-500"
         />
       </div>
@@ -123,7 +115,7 @@ export function CollegeList() {
           {colleges.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-400">
-                {searchTerm ? 'No colleges found matching your search.' : 'No colleges found. Create your first college!'}
+                {search ? 'No colleges found matching your search.' : 'No colleges found. Create your first college!'}
               </p>
             </div>
           ) : (

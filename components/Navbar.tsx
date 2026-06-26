@@ -40,14 +40,15 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const getSlug = (name: string) =>
+    name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
   const mainNavItems = [
     {
       name: "All colleges",
       hasDropdown: true,
       dropdownContent: {
-        colleges: ['IIT Bombay', 'IIT Delhi', 'IIT Madras', 'IIT Kanpur', 'BITS Pilani', 'NIT Trichy', 'VIT Vellore'],
-        exams: ['JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE', 'SRMJEEE'],
-        predictors: ['JEE Main Rank Predictor', 'JEE Advanced Predictor', 'COMEDK Predictor'],
+        colleges: ['Indian Institute of Technology Delhi (IIT Delhi)', 'Xavier School of Management', 'Lady Shri Ram College for Women (LSR), Delhi', 'Christian Medical College (CMC)', 'Maulana Azad Medical College (MAMC), Delhi', 'Hansraj College, Delhi', 'St. Stephens College, Delhi', 'Vardhman Mahavir Medical College (VMMC)', 'Vellore Institute of Technology (VIT)'],
         viewAllLink: 'View all Engineering colleges',
       },
     },
@@ -55,9 +56,7 @@ const Navbar = () => {
       name: 'Engineering',
       hasDropdown: true,
       dropdownContent: {
-        colleges: ['IIT Bombay', 'IIT Delhi', 'IIT Madras', 'IIT Kanpur', 'BITS Pilani', 'NIT Trichy', 'VIT Vellore'],
-        exams: ['JEE Main', 'JEE Advanced', 'BITSAT', 'VITEEE', 'SRMJEEE'],
-        predictors: ['JEE Main Rank Predictor', 'JEE Advanced Predictor', 'COMEDK Predictor'],
+        colleges: ['National Law School of India University, Bangalore', 'Indian Institute of Technology Delhi (IIT Delhi)', 'Indian Institute of Technology Bombay (IITB)', 'Vellore Institute of Technology (VIT)', 'SRM Institute of Science and Technology (SRMIST)', 'Birla Institute of Technology and Science (BITS), Pilani', 'Thapar Institute of Engineering and Technology (TIET)' , 'Delhi Technological University (DTU), Delhi'],
         viewAllLink: 'View all Engineering colleges',
       },
     },
@@ -65,9 +64,7 @@ const Navbar = () => {
       name: 'Management',
       hasDropdown: true,
       dropdownContent: {
-        colleges: ['IIM Ahmedabad', 'IIM Bangalore', 'IIM Calcutta', 'XLRI Jamshedpur', 'FMS Delhi', 'SPJIMR Mumbai'],
-        exams: ['CAT', 'XAT', 'MAT', 'SNAP', 'NMAT', 'CMAT'],
-        predictors: ['CAT Percentile Predictor', 'XAT Percentile Predictor', 'IIM Call Predictor'],
+        colleges: ['IIM Ahmedabad (Indian Institute of Management)', 'Indian Institute of Management Calcutta (IIMC)', 'Indian Institute of Management Bangalore', 'Indian Institute of Technology Bombay (IITB)', 'The Institute of Hotel Management, Bangalore', 'Faculty of Management Studies, University of Delhi (FMS Delhi)' , 'Xavier School of Management (XLRI), Jamshedpur', 'Indian Institute of Foreign Trade (IIFT), Delhi' , 'Xavier School of Management' , 'SRM Institute of Science and Technology (SRMIST)' , 'Symbiosis Institute of Business Management (SIBM)'],
         viewAllLink: 'View all Management colleges',
       },
     },
@@ -75,9 +72,7 @@ const Navbar = () => {
       name: 'Medical',
       hasDropdown: true,
       dropdownContent: {
-        colleges: ['AIIMS Delhi', 'CMC Vellore', 'JIPMER Puducherry', 'KGMU Lucknow', 'MAMC Delhi'],
-        exams: ['NEET UG', 'NEET PG', 'INI CET', 'FMGE'],
-        predictors: ['NEET College Predictor', 'NEET PG Rank Predictor'],
+        colleges: ['Maulana Azad Medical College (MAMC)', 'All India Institute of Medical Sciences (AIIMS)', 'Maulana Azad Medical College (MAMC), Delhi', 'Christian Medical College (CMC)', 'Kasturba Medical College (KMC), Manipal' , 'Grant Government Medical College & Sir J.J. Group of Hospitals (GMC Mumbai)' , 'King Georges Medical University (KGMU), Lucknow' , 'SRM Institute of Science and Technology (SRMIST)' , 'St. Johns Medical College' , 'Vardhman Mahavir Medical College (VMMC)' ],
         viewAllLink: 'View all Medical colleges',
       },
     },
@@ -85,47 +80,15 @@ const Navbar = () => {
       name: 'Commerce',
       hasDropdown: true,
       dropdownContent: {
-        colleges: ['SRCC Delhi', 'LSR Delhi', 'Hindu College', 'St. Xavier\'s Mumbai', 'Loyola College'],
-        exams: ['CUET', 'IPMAT', 'NPAT', 'SET'],
-        predictors: ['CUET College Predictor', 'DU Admission Predictor'],
+        colleges: ['Miranda House, Delhi', 'Shri Ram College of Commerce (SRCC)', 'Indian Institute of Management Bangalore', 'Loyola College, Chennai', 'Lady Shri Ram College for Women (LSR), Delhi' , 'Vellore Institute of Technology (VIT)' , 'Hansraj College, Delhi' , 'SRM Institute of Science and Technology (SRMIST)' , 'St. Stephens College, Delhi'],
         viewAllLink: 'View all Commerce colleges',
       },
-    },
-    {
-      name: 'Law',
-      hasDropdown: true,
-      dropdownContent: {
-        colleges: ['NLSIU Bangalore', 'NALSAR Hyderabad', 'WBNUJS Kolkata', 'NLU Delhi', 'Symbiosis Law'],
-        exams: ['CLAT', 'AILET', 'LSAT India', 'MH CET Law'],
-        predictors: ['CLAT Rank Predictor', 'AILET Predictor'],
-        viewAllLink: 'View all Law colleges',
-      },
-    },
-    {
-      name: 'Science',
-      hasDropdown: true,
-      dropdownContent: {
-        colleges: ['IISc Bangalore', 'IISER Pune', 'St. Stephen\'s Delhi', 'Miranda House', 'Madras Christian College'],
-        exams: ['NEST', 'IAT (IISER)', 'CUET UG', 'IIT JAM'],
-        predictors: ['IISER Admission Predictor', 'CUET Science Predictor'],
-        viewAllLink: 'View all Science colleges',
-      },
-    },
-    {
-      name: 'Design',
-      hasDropdown: true,
-      dropdownContent: {
-        colleges: ['NID Ahmedabad', 'NIFT Delhi', 'IIT Bombay (IDC)', 'Pearl Academy', 'Srishti Manipal'],
-        exams: ['UCEED', 'CEED', 'NID DAT', 'NIFT Entrance'],
-        predictors: ['NIFT Rank Predictor', 'UCEED College Predictor'],
-        viewAllLink: 'View all Design colleges',
-      },
-    },
+    }
   ]
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 w-full shadow-sm">
+      <div className="fixed top-0 left-0 right-0 z-[100] w-full shadow-sm">
         {/* Top Navbar: VidyaVriddhi Blue/Dark Theme */}
         <nav className="bg-slate-900 px-4 sm:px-6 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -250,42 +213,18 @@ const Navbar = () => {
                 {/* Desktop Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
                   <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-[500px] xl:w-[550px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 p-5 animate-in fade-in slide-in-from-top-2 duration-200"
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-[500px] xl:w-[550px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-[110] p-5 animate-in fade-in slide-in-from-top-2 duration-200"
                   >
-                    <div className="grid grid-cols-3 gap-6">
+                    <div>
                       {item.dropdownContent.colleges && (
                         <div className="space-y-3">
-                          <h3 className="font-bold text-slate-900 text-xs uppercase tracking-widest border-b border-slate-50 pb-2">Top Colleges</h3>
+                          <h3 className="font-bold text-slate-900 text-xs uppercase tracking-widest border-b border-slate-50 pb-2">Colleges</h3>
                           <ul className="space-y-2">
                             {item.dropdownContent.colleges.map((college, i) => (
-                              <li key={i} className="text-sm text-gray-500 hover:text-orange-500 cursor-pointer transition-colors leading-tight">
-                                {college}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {item.dropdownContent.exams && (
-                        <div className="space-y-3">
-                          <h3 className="font-bold text-slate-900 text-xs uppercase tracking-widest border-b border-slate-50 pb-2">Exams</h3>
-                          <ul className="space-y-2">
-                            {item.dropdownContent.exams.map((exam, i) => (
-                              <li key={i} className="text-sm text-gray-500 hover:text-orange-500 cursor-pointer transition-colors leading-tight">
-                                {exam}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {item.dropdownContent.predictors && (
-                        <div className="space-y-3">
-                          <h3 className="font-bold text-slate-900 text-xs uppercase tracking-widest border-b border-slate-50 pb-2">Predictors</h3>
-                          <ul className="space-y-2">
-                            {item.dropdownContent.predictors.map((pred, i) => (
-                              <li key={i} className="text-sm text-gray-500 hover:text-orange-500 cursor-pointer transition-colors leading-tight">
-                                {pred}
+                              <li key={i}>
+                                <Link href={`/colleges/${getSlug(college)}`} className="text-sm text-gray-500 hover:text-orange-500 cursor-pointer transition-colors leading-tight">
+                                  {college}
+                                </Link>
                               </li>
                             ))}
                           </ul>
@@ -366,32 +305,14 @@ const Navbar = () => {
                   <div className="bg-gray-50 px-4 py-4 space-y-4">
                     {item.dropdownContent.colleges && (
                       <div>
-                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Top Colleges</h3>
+                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Colleges</h3>
                         <ul className="space-y-2">
                           {item.dropdownContent.colleges.map((college, i) => (
-                            <li key={i} className="text-sm text-gray-600 py-1">{college}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {item.dropdownContent.exams && (
-                      <div>
-                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Exams</h3>
-                        <ul className="space-y-2">
-                          {item.dropdownContent.exams.map((exam, i) => (
-                            <li key={i} className="text-sm text-gray-600 py-1">{exam}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {item.dropdownContent.predictors && (
-                      <div>
-                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Predictors</h3>
-                        <ul className="space-y-2">
-                          {item.dropdownContent.predictors.map((pred, i) => (
-                            <li key={i} className="text-sm text-gray-600 py-1">{pred}</li>
+                            <li key={i}>
+                              <Link href={`/colleges/${getSlug(college)}`} className="text-sm text-gray-600 py-1 block hover:text-orange-500">
+                                {college}
+                              </Link>
+                            </li>
                           ))}
                         </ul>
                       </div>

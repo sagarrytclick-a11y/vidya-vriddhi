@@ -35,7 +35,7 @@ interface StatCard {
 
 export function StatsCards() {
   const router = useRouter()
-  const { colleges, isLoading: collegesLoading } = useColleges()
+  const { colleges, pagination: collegePagination, isLoading: collegesLoading } = useColleges()
   const { countries, isLoading: countriesLoading } = useCountryContext()
   const { cities, pagination: cityPagination, isLoading: citiesLoading } = useCityContext()
   const { count: categoryCount, isLoading: categoriesLoading } = useCategoryCount()
@@ -56,7 +56,7 @@ export function StatsCards() {
     },
     {
       title: 'Total Colleges',
-      value: colleges.length,
+      value: collegePagination?.total || colleges.length,
       description: 'Educational institutions',
       icon: GraduationCap,
       color: 'text-green-400',

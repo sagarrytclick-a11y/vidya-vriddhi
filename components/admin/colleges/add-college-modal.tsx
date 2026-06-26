@@ -146,6 +146,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
   const [exams, setExams] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [courses, setCourses] = useState<any[]>([])
+  const [allCities, setAllCities] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
   // Update form data when initialData changes (for edit mode)
@@ -199,6 +200,14 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           // API returns { data: [...], pagination: {...} }
           const coursesArray = coursesData.data || []
           setCourses(Array.isArray(coursesArray) ? coursesArray : [])
+        }
+
+        // Fetch all cities (no pagination limit)
+        const citiesResponse = await fetch('/api/cities?limit=100')
+        if (citiesResponse.ok) {
+          const citiesData = await citiesResponse.json()
+          const citiesArray = citiesData.data || []
+          setAllCities(Array.isArray(citiesArray) ? citiesArray : [])
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -461,7 +470,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
     }
   }
 
-  const filteredCities = cities.filter(city => city.countryId === formData.countryId)
+  const filteredCities = (allCities.length > 0 ? allCities : cities).filter(city => city.countryId === formData.countryId)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
