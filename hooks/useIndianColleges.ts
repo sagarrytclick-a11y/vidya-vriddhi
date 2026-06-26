@@ -47,8 +47,13 @@ interface PaginationResponse {
   }
 }
 
-const fetchIndianColleges = async (page: number = 1, limit: number = 10): Promise<PaginationResponse> => {
-  const response = await fetch(`/api/colleges/indian?page=${page}&limit=${limit}`)
+const fetchIndianColleges = async (page: number = 1, limit: number = 10, search?: string, category?: string, course?: string, city?: string): Promise<PaginationResponse> => {
+  const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() })
+  if (search) params.append('search', search)
+  if (category) params.append('category', category)
+  if (course) params.append('course', course)
+  if (city) params.append('city', city)
+  const response = await fetch(`/api/colleges/indian?${params.toString()}`)
   
   if (!response.ok) {
     throw new Error('Failed to fetch Indian colleges')
@@ -57,10 +62,10 @@ const fetchIndianColleges = async (page: number = 1, limit: number = 10): Promis
   return response.json()
 }
 
-export const useIndianColleges = (page: number = 1, limit: number = 10) => {
+export const useIndianColleges = (page: number = 1, limit: number = 10, search?: string, category?: string, course?: string, city?: string) => {
   return useQuery({
-    queryKey: ['colleges', 'indian', page, limit],
-    queryFn: () => fetchIndianColleges(page, limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ['colleges', 'indian', page, limit, search, category, course, city],
+    queryFn: () => fetchIndianColleges(page, limit, search, category, course, city),
+    staleTime: 5 * 60 * 1000,
   })
 }
