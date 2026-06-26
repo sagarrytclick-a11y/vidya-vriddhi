@@ -50,8 +50,8 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
 
 const TopStudyPlaces: React.FC = () => {
   // Fetch cities using custom hook
-  const { data: response, isLoading, error } = useCities(10)
-  const cities = response?.data || []
+  const { data: response, isLoading, error } = useCities(100)
+  const cities = (response?.data || []).filter(city => city.country?.slug === 'india')
 
   const scrollLeft = () => {
     const element = document.getElementById('cities-scroll-container')

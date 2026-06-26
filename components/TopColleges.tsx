@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
-import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink, Search, X } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
+import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 import { TableSkeleton } from '@/components/ui/skeletons'
 import Link from 'next/link'
 
@@ -34,13 +35,50 @@ interface College {
 
 const TopColleges: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchInput, setSearchInput] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
   const itemsPerPage = 10
 
+  // Fetch filter options
+  const { categories, courses, cities, isLoading: filtersLoading } = useCollegesFilters()
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
+  // Reset to page 1 when any filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [debouncedSearch, selectedCategory, selectedCourse, selectedCity])
+
   // Fetch Indian colleges using custom hook
-  const { data, isLoading, error } = useIndianColleges(currentPage, itemsPerPage)
+  const { data, isLoading, error } = useIndianColleges(currentPage, itemsPerPage, debouncedSearch || undefined, selectedCategory || undefined, selectedCourse || undefined, selectedCity || undefined)
 
   const colleges = data?.colleges || []
   const pagination = data?.pagination
+
+  const clearSearch = () => {
+    setSearchInput('')
+    setDebouncedSearch('')
+  }
+
+  const clearFilters = () => {
+    setSearchInput('')
+    setDebouncedSearch('')
+    setSelectedCategory('')
+    setSelectedCourse('')
+    setSelectedCity('')
+    setCurrentPage(1)
+  }
+
+  const hasActiveFilters = debouncedSearch || selectedCategory || selectedCourse || selectedCity
 
 
   return (
@@ -55,6 +93,63 @@ const TopColleges: React.FC = () => {
             <span>Explore all colleges</span>
             <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
           </Link>
+        </div>
+
+        {/* Search & Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search colleges..."
+              className="w-full pl-10 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+            {searchInput && (
+              <button onClick={clearSearch} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.slug}>{cat.name}</option>
+            ))}
+          </select>
+          <select
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+          >
+            <option value="">All Courses</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.slug}>{c.name}</option>
+            ))}
+          </select>
+          <select
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+          >
+            <option value="">All Cities</option>
+            {cities.map((c) => (
+              <option key={c.id} value={c.slug}>{c.name}</option>
+            ))}
+          </select>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-2 text-sm text-red-500 hover:text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors whitespace-nowrap"
+            >
+              Clear All
+            </button>
+          )}
         </div>
 
         {/* Loading State */}
