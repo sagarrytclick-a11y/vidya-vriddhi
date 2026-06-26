@@ -49,7 +49,7 @@ export function Header() {
                 <AvatarFallback className="bg-blue-600 text-white">AD</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-white">
+            <DropdownMenuContent align="end" className="z-[60] bg-slate-800 border-slate-700 text-white">
               <DropdownMenuItem className="flex items-center gap-2 hover:bg-slate-700">
                 <User className="h-4 w-4" />
                 <span>Admin User</span>

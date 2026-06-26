@@ -43,6 +43,10 @@ interface CollegeContextType {
   openAddModal: () => void
   closeAddModal: () => void
 
+  // Search
+  search: string
+  setSearch: (search: string) => void
+
   // Refetch
   refetchColleges: () => Promise<any>
 
@@ -61,6 +65,8 @@ interface CollegeProviderProps {
 }
 
 export function CollegeProvider({ children }: CollegeProviderProps) {
+  const [search, setSearch] = useState('')
+
   const {
     colleges,
     isLoading,
@@ -77,7 +83,7 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
     setPage,
     limit,
     setLimit,
-  } = useColleges()
+  } = useColleges(search)
 
   // Modal state
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null)
@@ -189,6 +195,10 @@ export function CollegeProvider({ children }: CollegeProviderProps) {
     closeDeleteModal,
     openAddModal,
     closeAddModal,
+
+    // Search
+    search,
+    setSearch,
 
     // Refetch
     refetchColleges,
