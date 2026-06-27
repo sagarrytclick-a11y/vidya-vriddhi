@@ -1,5 +1,6 @@
 'use client'
 
+import NextImage from 'next/image'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { City } from '@/hooks/useAdminCities'
@@ -47,13 +48,16 @@ export function ViewCityModal({ isOpen, onClose, city }: ViewCityModalProps) {
           {city.cityImageURL && (
             <div>
               <h3 className="text-sm font-medium text-gray-400 mb-1">City Image</h3>
-              <img
+              <NextImage
                 src={city.cityImageURL}
                 alt="City"
-                className="w-full h-48 object-cover rounded-lg"
+                width={400}
+                height={192}
+                className="object-cover rounded-lg"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
                 }}
+                unoptimized
               />
             </div>
           )}

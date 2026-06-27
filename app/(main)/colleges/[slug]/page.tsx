@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { ChevronRight } from 'lucide-react'
 import { getCollegeBySlug, getRelatedColleges } from '@/lib/college-utils'
 import { CollegeTabs } from '@/components/college/CollegeTabs'
 import { HeroSection } from '@/components/college/sections/HeroSection'
@@ -20,12 +19,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const college = await getCollegeBySlug(slug)
 
   if (!college) {
-    return { title: 'College Not Found | Vidya Vriddhi' }
+    return { title: 'College Not Found | VidyaVriddhi' }
   }
 
   return {
-    title: `${college.name} | Admission, Fees, Courses, Placements`,
-    description: college.description || `Explore ${college.name} - Get details on admission process, courses, fees, placements, rankings, and more.`,
+    title: `${college.name} | Admission, Fees, Courses, Placements, Rankings`,
+    description: college.description ? college.description.slice(0, 160) : `Explore ${college.name} — admission process, courses offered, fees structure, placements, rankings, and more.`,
+    openGraph: {
+      title: `${college.name} - College Details | VidyaVriddhi`,
+      description: college.description?.slice(0, 160),
+      images: college.imageURL ? [{ url: college.imageURL }] : [],
+    },
   }
 }
 

@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useCollegesByCourse } from '@/hooks/useCollegesByCourse'
+import Image from 'next/image'
 import { Building, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 
 const PER_PAGE = 5
@@ -73,11 +74,13 @@ const CollegeCards = () => {
             href={college.slug ? `/colleges/${college.slug}` : '#'}
             className="group bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 block"
           >
-            <div className="relative">
-              <img
+            <div className="relative h-48 overflow-hidden">
+              <Image
                 src={college.imageURL || 'https://via.placeholder.com/400x200?text=College'}
                 alt={college.name}
-                className="w-full h-48 object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               {college.Countryranking && (
                 <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">

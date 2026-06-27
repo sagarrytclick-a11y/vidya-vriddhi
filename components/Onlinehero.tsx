@@ -1,4 +1,4 @@
-
+import Image from 'next/image'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 const Onlinehero = () => {
@@ -7,10 +7,12 @@ const Onlinehero = () => {
     <div className="relative bg-linear-to-br from-orange-50 to-white py-20 overflow-hidden border-b border-orange-200">
       <div className="absolute inset-0 w-full h-full opacity-10">
         <div className="absolute inset-0 bg-linear-to-r from-white to-transparent z-10" />
-        <img
+        <Image
           src="/online-mba/online-hero.png"
           alt="Background"
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          sizes="100vw"
         />
       </div>
 
@@ -28,10 +30,12 @@ const Onlinehero = () => {
         </div>
 
         <div className="relative w-full md:w-1/2 h-80 rounded-2xl overflow-hidden border border-orange-200 shadow-2xl">
-          <img
+          <Image
             src="/online-mba/online-hero.png" 
             alt="Online Learning"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       </div>

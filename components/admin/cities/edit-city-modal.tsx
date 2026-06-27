@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useEffect, useRef } from 'react'
+import NextImage from 'next/image'
 import { useCityContext } from '@/contexts/city-context'
 import { useCountryContext } from '@/contexts/country-context'
 import { City } from '@/hooks/useAdminCities'
@@ -213,10 +214,12 @@ export function EditCityModal({ isOpen, onClose, city }: EditCityModalProps) {
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                       <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden flex-shrink-0">
-                        <img
-                          src={uploadedImage || formData.cityImageURL}
+                        <NextImage
+                          src={uploadedImage || formData.cityImageURL || ''}
                           alt="City preview"
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             e.currentTarget.nextElementSibling?.classList.remove('hidden')
@@ -228,7 +231,7 @@ export function EditCityModal({ isOpen, onClose, city }: EditCityModalProps) {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white truncate">
-                          {uploadedImage || formData.cityImageURL}
+{uploadedImage || formData.cityImageURL || ''}
                         </p>
                         <p className="text-xs text-slate-400">Image uploaded to ImageKit</p>
                       </div>

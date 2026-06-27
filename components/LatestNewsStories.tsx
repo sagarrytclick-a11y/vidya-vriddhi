@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Calendar, ArrowRight, ChevronRight, Newspaper, ExternalLink } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 import { SkeletonPulse } from '@/components/ui/skeletons'
@@ -29,11 +30,15 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
     <div className="shrink-0 w-72 sm:w-96 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex flex-col h-full">
         {news.imageUrl && (
-          <img
-            src={news.imageUrl}
-            alt={news.title}
-            className="w-full h-48 object-cover rounded-lg mb-4"
-          />
+          <div className="relative w-full h-48 overflow-hidden rounded-lg mb-4">
+            <Image
+              src={news.imageUrl}
+              alt={news.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 384px"
+            />
+          </div>
         )}
         <div className="flex-1">
           <h3 className="text-lg font-bold text-gray-900 mb-3 leading-tight line-clamp-2">{news.title}</h3>

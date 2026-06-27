@@ -1,5 +1,6 @@
 "use client"
 import dynamic from 'next/dynamic'
+import NextImage from 'next/image'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
@@ -188,10 +189,12 @@ export default function NewsPage() {
                             {newsItem.imageUrl ? (
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-slate-600 rounded overflow-hidden shrink-0">
-                                  <img
+                                  <NextImage
                                     src={newsItem.imageUrl}
                                     alt={newsItem.title}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    sizes="32px"
                                     onError={(e) => {
                                       e.currentTarget.style.display = 'none'
                                       e.currentTarget.nextElementSibling?.classList.remove('hidden')

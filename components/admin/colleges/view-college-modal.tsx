@@ -3,7 +3,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, MapPin, Globe, Award, Image, FileText, DollarSign, GraduationCap, Users, CheckCircle, XCircle } from 'lucide-react'
+import NextImage from 'next/image'
+import { Calendar, MapPin, Globe, Award, ImageIcon, FileText, DollarSign, GraduationCap, Users, CheckCircle, XCircle } from 'lucide-react'
 
 interface ViewCollegeModalProps {
   isOpen: boolean
@@ -51,10 +52,12 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
           <div className="flex gap-6">
             {college.logoURL && (
               <div className="shrink-0">
-                <img
+                <NextImage
                   src={college.logoURL}
                   alt={`${college.name} logo`}
-                  className="w-24 h-24 object-contain rounded-lg border"
+                  width={96}
+                  height={96}
+                  className="object-contain rounded-lg border"
                 />
               </div>
             )}
@@ -73,10 +76,12 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
             </div>
             {college.imageURL && (
               <div className="shrink-0">
-                <img
+                <NextImage
                   src={college.imageURL}
                   alt={`${college.name} image`}
-                  className="w-32 h-24 object-cover rounded-lg"
+                  width={128}
+                  height={96}
+                  className="object-cover rounded-lg"
                 />
               </div>
             )}
@@ -181,7 +186,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
           {college.galleryImages && (
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-white">
-                <Image className="w-5 h-5" />
+                <ImageIcon className="w-5 h-5" />
                 Gallery Images
               </h3>
               <div className="bg-slate-700 p-4 rounded-lg">

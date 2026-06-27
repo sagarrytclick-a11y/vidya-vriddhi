@@ -1,8 +1,18 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone, Mail, Globe } from 'lucide-react'
 import { SITE_IDENTITY, getFullAddress } from '../site-identity'
+
+export const metadata: Metadata = {
+  title: 'About Us | VidyaVriddhi',
+  description: 'Learn about VidyaVriddhi — our mission to help students find top colleges, get career counseling, exam guidance, and admission support across India and abroad.',
+  openGraph: {
+    title: 'About VidyaVriddhi - College Guidance & Career Counseling',
+    description: 'Comprehensive education services helping students secure admissions to their dream universities across India and abroad.',
+  },
+}
 
 const AboutPage = () => {
   return (

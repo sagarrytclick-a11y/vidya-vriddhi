@@ -1,13 +1,30 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { Calendar, Clock, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { db } from '@/lib/db'
 
 interface CountryPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const country = await db.country.findUnique({ where: { slug, active: true }, select: { name: true, description: true } })
+  if (!country) return { title: 'Country Not Found' }
+  return {
+    title: `Study in ${country.name} | Colleges, Courses & Universities`,
+    description: country.description?.slice(0, 160) || `Explore educational opportunities in ${country.name}. Find top colleges, courses, and admission guidance.`,
+    openGraph: {
+      title: `Study in ${country.name} - VidyaVriddhi`,
+      description: country.description?.slice(0, 160),
+    },
+  }
 }
 
 export default async function CountryPage({ params }: CountryPageProps) {
@@ -87,11 +104,15 @@ export default async function CountryPage({ params }: CountryPageProps) {
       <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <Link href="/countries">
-            <Button variant="ghost" className="text-white hover:bg-green-400/20 mb-6">
+            <Button variant="ghost" className="text-white hover:bg-green-400/20 mb-2">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Countries
             </Button>
           </Link>
+          <Breadcrumbs dark items={[
+            { label: 'Countries', href: '/countries' },
+            { label: country.name },
+          ]} />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="text-7xl">
@@ -154,11 +175,13 @@ export default async function CountryPage({ params }: CountryPageProps) {
                             <CardContent className="p-6">
                               {/* College Image */}
                               {college.imageURL && (
-                                <div className="mb-4 rounded-lg overflow-hidden">
-                                  <img 
+                                <div className="mb-4 rounded-lg overflow-hidden relative h-40">
+                                  <Image 
                                     src={college.imageURL} 
                                     alt={college.name}
-                                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                   />
                                 </div>
                               )}
@@ -166,11 +189,15 @@ export default async function CountryPage({ params }: CountryPageProps) {
                               {/* College Header */}
                               <div className="flex items-start gap-4 mb-4">
                                 {college.logoURL && (
-                                  <img 
-                                    src={college.logoURL} 
-                                    alt={college.name}
-                                    className="w-14 h-14 object-contain rounded-lg bg-white"
-                                  />
+                                  <div className="relative w-14 h-14 shrink-0">
+                                    <Image 
+                                      src={college.logoURL} 
+                                      alt={college.name}
+                                      fill
+                                      className="object-contain rounded-lg bg-white"
+                                      sizes="56px"
+                                    />
+                                  </div>
                                 )}
                                 <div className="flex-1">
                                   <h3 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors mb-2">
@@ -263,11 +290,13 @@ export default async function CountryPage({ params }: CountryPageProps) {
                             <CardContent className="p-4">
                               <div className="space-y-3">
                                 {city.cityImageURL && (
-                                  <div className="rounded-lg overflow-hidden">
-                                    <img 
+                                  <div className="rounded-lg overflow-hidden relative h-32">
+                                    <Image 
                                       src={city.cityImageURL} 
                                       alt={city.name}
-                                      className="w-full h-32 object-cover"
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 100vw, 50vw"
                                     />
                                   </div>
                                 )}

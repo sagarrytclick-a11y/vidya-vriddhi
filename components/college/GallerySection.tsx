@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
@@ -39,10 +40,12 @@ export function GallerySection({ images }: GallerySectionProps) {
       
       {/* Main Image */}
       <div className="relative rounded-lg overflow-hidden aspect-video bg-gray-100">
-        <img
+        <Image
           src={validImages[currentIndex]}
           alt={`Gallery image ${currentIndex + 1}`}
-          className="w-full h-full object-cover cursor-pointer"
+          fill
+          className="object-cover cursor-pointer"
+          sizes="(max-width: 768px) 100vw, 50vw"
           onClick={() => setIsDialogOpen(true)}
         />
         
@@ -80,10 +83,12 @@ export function GallerySection({ images }: GallerySectionProps) {
                 idx === currentIndex ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
               }`}
             >
-              <img
+              <Image
                 src={img}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="80px"
               />
             </button>
           ))}
@@ -104,10 +109,12 @@ export function GallerySection({ images }: GallerySectionProps) {
         <DialogContent className="max-w-5xl p-0 bg-black/95 border-none">
           <DialogTitle className="sr-only">Image Gallery</DialogTitle>
           <div className="relative aspect-video">
-            <img
+            <Image
               src={validImages[currentIndex]}
               alt={`Gallery image ${currentIndex + 1}`}
-              className="w-full h-full object-contain"
+              fill
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 1024px"
             />
             
             {validImages.length > 1 && (
@@ -138,10 +145,12 @@ export function GallerySection({ images }: GallerySectionProps) {
                   idx === currentIndex ? 'border-blue-500' : 'border-transparent'
                 }`}
               >
-                <img
+                <Image
                   src={img}
                   alt={`Thumbnail ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="64px"
                 />
               </button>
             ))}

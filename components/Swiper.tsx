@@ -1,4 +1,4 @@
-
+import Image from 'next/image'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 const Swiper = () => {
@@ -27,10 +27,12 @@ const Swiper = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
                     {institutions.map((institution, index) => (
                         <div key={index} className="flex flex-col border-1 border-black items-center justify-center p-6  rounded-lg hover:bg-gray-100 transition-colors">
-                            <img 
+                            <Image 
                                 src={institution.logo} 
                                 alt={institution.name}
-                                className="h-27 w-auto object-contain"
+                                width={100}
+                                height={100}
+                                className="object-contain"
                             />
                             <span className="text-sm font-medium text-orange-500 text-center">{institution.name}</span>
                         </div>

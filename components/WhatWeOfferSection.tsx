@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 const WhatWeOfferSection = () => {
@@ -38,9 +39,11 @@ const WhatWeOfferSection = () => {
           </button>
         </div>
         <div className="flex justify-center">
-          <img 
+          <Image 
             src="https://i.pinimg.com/1200x/72/11/af/7211af4a0cb44d9fcae0d4eea1b8e7d1.jpg" 
             alt="Students group"
+            width={500}
+            height={500}
             className="rounded-lg shadow-lg w-full max-w-md"
           />
         </div>

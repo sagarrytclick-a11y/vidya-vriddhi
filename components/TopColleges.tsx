@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink, Search, X } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
@@ -216,11 +217,15 @@ const TopColleges: React.FC = () => {
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap max-w-[120px] sm:max-w-none">
                           <div className="flex items-center gap-2 sm:gap-3">
                             {college.logoURL && (
-                              <img
-                                src={college.logoURL}
-                                alt={college.name}
-                                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-contain shrink-0"
-                              />
+                              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 overflow-hidden">
+                                <Image
+                                  src={college.logoURL}
+                                  alt={college.name}
+                                  fill
+                                  className="object-contain"
+                                  sizes="40px"
+                                />
+                              </div>
                             )}
                             <Link
                               href={`/colleges/${college.slug}`}

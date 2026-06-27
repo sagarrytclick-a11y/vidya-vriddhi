@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Suspense, cloneElement } from 'react'
 import { cn } from "@/lib/utils"
@@ -79,8 +80,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const exam = await getExamBySlug(slug)
   if (!exam) return { title: 'Exam Not Found' }
   return {
-    title: `${exam.name} 2026 | Vidya Vriddhi`,
-    description: exam.description || `Guide for ${exam.name} 2026.`,
+    title: `${exam.name} 2026 | Exam Dates, Pattern, Registration`,
+    description: exam.description ? exam.description.slice(0, 160) : `Complete guide for ${exam.name} 2026 — exam dates, pattern, syllabus, registration, and preparation tips.`,
+    openGraph: {
+      title: `${exam.name} 2026 - Complete Exam Guide | VidyaVriddhi`,
+      description: exam.description?.slice(0, 160),
+      images: exam.examImageurl ? [{ url: exam.examImageurl }] : [],
+    },
   }
 }
 
@@ -108,13 +114,10 @@ export default async function ExamDetailPage({ params }: PageProps) {
         <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <nav className="flex items-center text-sm font-medium text-slate-400 mb-8">
-            <Link href="/" className="hover:text-orange-400 transition-colors">Home</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            <Link href="/exams" className="hover:text-orange-400 transition-colors">Exams</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            <span className="text-slate-100">{exam.shortName}</span>
-          </nav>
+          <Breadcrumbs dark items={[
+            { label: 'Exams', href: '/exams' },
+            { label: exam.shortName || exam.name },
+          ]} />
 
           <div className="grid lg:grid-cols-12 gap-12 items-end">
             <div className="lg:col-span-8">

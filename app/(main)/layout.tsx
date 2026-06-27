@@ -1,9 +1,11 @@
+import { ClerkProvider } from '@clerk/nextjs'
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingActions from "@/components/FloatingActions";
 import MarqueeStrip from "@/components/MarqueeStrip";
 import { AdmissionModalProvider } from "@/contexts/admission-modal-context";
-import { AdmissionModal } from "@/components/AdmissionModal";
+import dynamic from "next/dynamic";
+const AdmissionModal = dynamic(() => import("@/components/AdmissionModal").then((m) => m.AdmissionModal));
 import { VVSaarthiProvider } from "@/contexts/vv-saarthi-context";
 import { VVSaarthiSidebar } from "@/components/VVSaarthiSidebar";
 import { VVSaarthiFloatingButton } from "@/components/VVSaarthiFloatingButton";
@@ -14,6 +16,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
     <AdmissionModalProvider>
       <VVSaarthiProvider>
         <Navbar />
@@ -28,5 +31,6 @@ export default function MainLayout({
         <VVSaarthiFloatingButton />
       </VVSaarthiProvider>
     </AdmissionModalProvider>
+    </ClerkProvider>
   );
 }

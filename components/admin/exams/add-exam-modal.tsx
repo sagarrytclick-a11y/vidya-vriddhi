@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef, useEffect } from 'react'
+import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
 
 interface AddExamModalProps {
@@ -628,10 +629,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                 <div className="relative group">
                   <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                     <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
-                      <img
-                        src={uploadedImage || formData.examImageurl}
+                      <NextImage
+                        src={uploadedImage || formData.examImageurl || ''}
                         alt="Exam preview"
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="64px"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
                           e.currentTarget.nextElementSibling?.classList.remove('hidden')
@@ -643,7 +646,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-white truncate">
-                        {uploadedImage || formData.examImageurl}
+{uploadedImage || formData.examImageurl || ''}
                       </p>
                       <p className="text-xs text-slate-400">Image uploaded to ImageKit</p>
                     </div>

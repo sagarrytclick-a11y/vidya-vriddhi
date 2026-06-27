@@ -1,4 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { MapPin, Globe, Building2, Star, GraduationCap, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -6,6 +8,15 @@ import { Badge } from '@/components/ui/badge'
 import { db } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Study Abroad Programs | International Colleges & Universities',
+  description: 'Explore study abroad opportunities — international colleges and universities across the globe. Get expert guidance for overseas education, visa support, and admissions.',
+  openGraph: {
+    title: 'Study Abroad - International Education with VidyaVriddhi',
+    description: 'Discover world-class universities and get expert guidance for studying abroad.',
+  },
+}
 
 export default async function StudyAbroadPage() {
   const colleges = await db.college.findMany({
@@ -124,24 +135,30 @@ export default async function StudyAbroadPage() {
                     <div className="space-y-4">
                       {/* College Image */}
                       {college.imageURL && (
-                        <div className="mb-4 rounded-lg overflow-hidden">
-                          <img 
+                        <div className="mb-4 rounded-lg overflow-hidden relative h-48">
+                          <Image 
                             src={college.imageURL} 
                             alt={college.name}
-                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
                         </div>
                       )}
 
                       {/* College Header */}
                       <div className="flex items-start gap-3">
-                        {college.logoURL && (
-                          <img 
+                      {college.logoURL && (
+                        <div className="relative w-12 h-12 shrink-0">
+                          <Image 
                             src={college.logoURL} 
                             alt={college.name}
-                            className="w-12 h-12 object-contain rounded-lg bg-white"
+                            fill
+                            className="object-contain rounded-lg bg-white"
+                            sizes="48px"
                           />
-                        )}
+                        </div>
+                      )}
                         <div className="flex-1">
                           <h3 className="font-bold text-slate-900 group-hover:text-purple-600 transition-colors mb-1">
                             {college.name}

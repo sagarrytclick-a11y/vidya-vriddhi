@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LoadingTable } from '@/components/ui/loading'
 import { Pagination } from '@/components/ui/pagination'
-import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit, Upload, X } from 'lucide-react'
+import NextImage from "next/image";
+import { Search, Plus, Trash2, ImageIcon, Eye, Edit, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -121,7 +122,7 @@ function AddCategoryModal({ isOpen, onClose, onSuccess, createCategory, isCreati
                 {formData.categoryImageUrl && (
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
-                      <img src={formData.categoryImageUrl} alt="Category" className="w-16 h-16 object-cover rounded" />
+                      <NextImage src={formData.categoryImageUrl} alt="Category" width={64} height={64} className="object-cover rounded" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{formData.categoryImageUrl}</p>
                         <p className="text-xs text-slate-400">Image uploaded</p>
@@ -276,7 +277,7 @@ function EditCategoryModal({ isOpen, onClose, category, onSuccess, updateCategor
                 {formData.categoryImageUrl && (
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
-                      <img src={formData.categoryImageUrl} alt="Category" className="w-16 h-16 object-cover rounded" />
+                      <NextImage src={formData.categoryImageUrl} alt="Category" width={64} height={64} className="object-cover rounded" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white truncate">{formData.categoryImageUrl}</p>
                         <p className="text-xs text-slate-400">Image uploaded</p>
@@ -322,7 +323,7 @@ function ViewCategoryModal({ isOpen, onClose, category }: { isOpen: boolean; onC
       <DialogContent className="bg-slate-800 border-slate-700 text-white">
         <DialogHeader><DialogTitle>Category Details</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          {category.categoryImageUrl && <img src={category.categoryImageUrl} alt={category.name} className="w-full h-40 object-cover rounded" />}
+          {category.categoryImageUrl && <NextImage src={category.categoryImageUrl} alt={category.name} width={400} height={160} className="w-full h-40 object-cover rounded" />}
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="text-slate-400">Name:</div><div className="text-white">{category.name}</div>
             <div className="text-slate-400">Slug:</div><div className="text-white">{category.slug}</div>
@@ -490,7 +491,7 @@ export default function CategoriesPage() {
                         <tr key={category.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                           <td className="py-3 px-4">
                             {category.categoryImageUrl ? (
-                              <img src={category.categoryImageUrl} alt={category.name} className="w-12 h-12 rounded-lg object-cover" />
+                              <NextImage src={category.categoryImageUrl} alt={category.name} width={48} height={48} className="rounded-lg object-cover" />
                             ) : (
                               <div className="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
                                 <ImageIcon className="h-5 w-5 text-slate-400" />

@@ -1,6 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { ArrowLeft, GraduationCap, Users, BookOpen, Award, Globe, Briefcase, ChevronRight } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Our Services | College Counseling, Admissions & Study Abroad',
+  description: 'Explore VidyaVriddhi services — college counseling, admission support, test preparation, scholarship assistance, study abroad programs, and career guidance.',
+  openGraph: {
+    title: 'VidyaVriddhi Services - Educational Guidance & Support',
+    description: 'Comprehensive educational services including college counseling, test prep, and career guidance.',
+  },
+}
 
 const ServicesPage = () => {
   const services = [

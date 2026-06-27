@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef, useEffect } from 'react'
 import { useBlogContext, BlogFormData } from '@/contexts/blog-context'
+import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { generateSlug } from '@/lib/utils'
 
@@ -243,10 +244,12 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                       <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
-                        <img
-                          src={uploadedImage || formData.imageUrl}
+                        <NextImage
+                          src={uploadedImage || formData.imageUrl || ''}
                           alt="Blog preview"
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             e.currentTarget.nextElementSibling?.classList.remove('hidden')

@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ArrowLeft, Calendar, Newspaper } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 
@@ -71,10 +72,12 @@ export default function NewsSlugPage() {
         <article className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {newsItem.imageUrl && (
             <div className="relative w-full h-72 sm:h-96">
-              <img
+              <Image
                 src={newsItem.imageUrl}
                 alt={newsItem.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 1024px"
               />
             </div>
           )}
@@ -108,11 +111,15 @@ export default function NewsSlugPage() {
                   className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow"
                 >
                   {item.imageUrl && (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="w-full h-40 object-cover rounded-lg mb-4"
-                    />
+                    <div className="relative w-full h-40 overflow-hidden rounded-lg mb-4">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
                   )}
                   <p className="text-sm text-gray-500 mb-2">{formatDate(item.createdAt)}</p>
                   <h3 className="font-semibold text-gray-900 line-clamp-2">{item.title}</h3>

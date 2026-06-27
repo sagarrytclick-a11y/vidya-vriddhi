@@ -1,5 +1,6 @@
 "use client"
 
+import Image from 'next/image'
 import React, { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay, Pagination } from 'swiper/modules'
@@ -79,11 +80,12 @@ const Slider = () => {
             {institutions.map((institution, idx) => (
               <SwiperSlide key={idx}>
                 <div className="h-32 flex items-center justify-center bg-white rounded-xl border border-gray-100 hover:border-[#4A90E2] transition-all duration-300 shadow-sm hover:shadow-md p-6 group">
-                  <img 
+                  <Image 
                     src={institution.logo} 
                     alt={institution.name} 
-                    /* Original Colors: Grayscale filter completely removed */
-                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    width={100}
+                    height={100}
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement;

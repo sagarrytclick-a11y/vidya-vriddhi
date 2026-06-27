@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import NextImage from 'next/image'
 import { Calendar, Clock, Users, FileText, Award, BookOpen, Globe, CheckCircle } from 'lucide-react'
 
 interface ViewExamModalProps {
@@ -265,10 +266,12 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">
-                  <img 
+                  <NextImage 
                     src={exam.examImageurl} 
                     alt={exam.name}
-                    className="max-w-full h-auto rounded-lg border border-slate-600"
+                    width={300}
+                    height={200}
+                    className="rounded-lg border border-slate-600"
                   />
                 </div>
               </CardContent>

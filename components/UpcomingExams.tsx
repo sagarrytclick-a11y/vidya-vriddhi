@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Calendar, Clock, ExternalLink, FileText } from 'lucide-react'
 import { useExams } from '@/hooks/useExams'
 import { SkeletonPulse } from '@/components/ui/skeletons'
@@ -31,12 +32,14 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
     <div className="shrink-0 w-64 sm:w-72 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
       <div className="flex h-full">
         {/* Logo - Left side taking full height */}
-        <div className="w-20 h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center flex-shrink-0">
+        <div className="relative w-20 shrink-0 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center flex-shrink-0">
           {exam.examImageurl ? (
-            <img
+            <Image
               src={exam.examImageurl}
               alt={exam.shortName}
-              className="w-full h-full object-contain p-2"
+              fill
+              className="object-contain p-2"
+              sizes="80px"
             />
           ) : (
             <FileText className="w-8 h-8 text-orange-500" />

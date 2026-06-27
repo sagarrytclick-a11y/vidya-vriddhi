@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 const Hero = () => {
@@ -24,9 +25,11 @@ const Hero = () => {
           </div>
           <div className="md:w-1/2 relative flex justify-center md:justify-end">
             <div className="relative w-full max-w-md lg:max-w-lg rounded-xl overflow-hidden shadow-2xl">
-              <img
+              <Image
                 src="/btech/hero.png"
                 alt="Students working with a robotic arm"
+                width={768}
+                height={512}
                 className="w-full h-auto object-cover rounded-xl"
               />
               <div className="absolute bottom-8 left-8 bg-white/70 backdrop-blur-md rounded-lg p-4 flex items-center shadow-xl">
