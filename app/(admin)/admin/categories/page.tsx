@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useAdminCategories, Category, CreateCategoryData, UpdateCategoryData } from '@/hooks/useAdminCategories'
+import { useDebounce } from '@/hooks/useDebounce'
 
 // Add Category Modal
 function AddCategoryModal({ isOpen, onClose, onSuccess, createCategory, isCreating }: { isOpen: boolean; onClose: () => void; onSuccess: () => void; createCategory: (data: CreateCategoryData) => Promise<Category>; isCreating: boolean }) {
@@ -358,6 +359,7 @@ export default function CategoriesPage() {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -368,7 +370,7 @@ export default function CategoriesPage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const { categories, pagination, isLoading, refetch } = useAdminCategories(page, limit, search)
+  const { categories, pagination, isLoading, refetch } = useAdminCategories(page, limit, debouncedSearch)
 
 
   const handleDelete = async () => {

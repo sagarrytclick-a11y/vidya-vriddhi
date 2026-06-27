@@ -107,8 +107,8 @@ const Navbar = () => {
       href: '/online-mba',
     },
     {
-      name: 'MBA/PGDM',
-      href: '/mba-pgdm',
+      name: 'NEET Rank Predictor',
+      href: '/neet-rank-predictor',
     },
   ]
 

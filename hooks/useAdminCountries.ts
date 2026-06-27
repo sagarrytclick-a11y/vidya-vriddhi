@@ -128,6 +128,7 @@ export function useAdminCountries() {
         newCountry,
         ...oldCountries,
       ])
+      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
       toast.success('Country created successfully!')
     },
     onError: (error: Error) => {
@@ -144,6 +145,7 @@ export function useAdminCountries() {
           country.id === updatedCountry.id ? updatedCountry : country
         )
       )
+      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
       toast.success('Country updated successfully!')
     },
     onError: (error: Error) => {
@@ -158,6 +160,7 @@ export function useAdminCountries() {
       queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) =>
         oldCountries.filter((country) => country.id !== deletedId)
       )
+      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
       toast.success('Country deleted successfully!')
     },
     onError: (error: Error) => {

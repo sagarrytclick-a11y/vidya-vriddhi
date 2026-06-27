@@ -173,15 +173,20 @@ export function useColleges(search?: string): UseCollegesReturn {
   } = useQuery({
     queryKey: collegeKeys.list({ search: search || '', page, limit }),
     queryFn: () => fetchCollegesWithPagination(search, page, limit),
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Create college mutation
   const createCollegeMutation = useMutation({
     mutationFn: createCollege,
-    onSuccess: () => {
+    onSuccess: (newCollege) => {
       toast.success('College created successfully')
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all })
+      queryClient.setQueryData(collegeKeys.list({ search: search || '', page, limit }), (old: PaginatedCollegesResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: [newCollege, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+      })
+      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create college')
@@ -191,24 +196,50 @@ export function useColleges(search?: string): UseCollegesReturn {
   // Update college mutation
   const updateCollegeMutation = useMutation({
     mutationFn: updateCollege,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: collegeKeys.all })
+      const keys = collegeKeys.list({ search: search || '', page, limit })
+      const previous = queryClient.getQueryData(keys)
+      queryClient.setQueryData(keys, (old: PaginatedCollegesResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.map((c) => c.id === id ? { ...c, ...data } : c) }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('College updated successfully')
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(collegeKeys.list({ search: search || '', page, limit }), context.previous)
       toast.error(error.message || 'Failed to update college')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
     },
   })
 
   // Delete college mutation
   const deleteCollegeMutation = useMutation({
     mutationFn: deleteCollege,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: collegeKeys.all })
+      const keys = collegeKeys.list({ search: search || '', page, limit })
+      const previous = queryClient.getQueryData(keys)
+      queryClient.setQueryData(keys, (old: PaginatedCollegesResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.filter((c) => c.id !== id), pagination: { ...old.pagination, total: old.pagination.total - 1 } }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('College deleted successfully')
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(collegeKeys.list({ search: search || '', page, limit }), context.previous)
       toast.error(error.message || 'Failed to delete college')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
     },
   })
 

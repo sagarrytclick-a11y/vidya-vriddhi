@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,10 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoadingPage } from '@/components/ui/loading'
 import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCityContext } from '@/contexts/city-context'
-import { AddCityModal } from '@/components/admin/cities/add-city-modal'
-import { ViewCityModal } from '@/components/admin/cities/view-city-modal'
-import { EditCityModal } from '@/components/admin/cities/edit-city-modal'
-import { DeleteCityModal } from '@/components/admin/cities/delete-city-modal'
+
+const AddCityModal = dynamic(() => import('@/components/admin/cities/add-city-modal').then(m => ({ default: m.AddCityModal })))
+const ViewCityModal = dynamic(() => import('@/components/admin/cities/view-city-modal').then(m => ({ default: m.ViewCityModal })))
+const EditCityModal = dynamic(() => import('@/components/admin/cities/edit-city-modal').then(m => ({ default: m.EditCityModal })))
+const DeleteCityModal = dynamic(() => import('@/components/admin/cities/delete-city-modal').then(m => ({ default: m.DeleteCityModal })))
 
 export default function CitiesPage() {
   const {

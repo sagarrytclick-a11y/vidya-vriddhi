@@ -4,15 +4,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Search, GraduationCap, FileText, MonitorPlay, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
 
-const Hero = () => {
-    const [isSearchOpen, setIsSearchOpen] = useState(false)
-    const [currentSlide, setCurrentSlide] = useState(0)
-    
-    // --- Typing Effect States ---
-    const [displayedTitle, setDisplayedTitle] = useState("")
-    const [displayedSubtitle, setDisplayedSubtitle] = useState("")
-    const intervalRef = useRef<NodeJS.Timeout | null>(null)
-    
 const slides = [
     {
         image: "https://i.pinimg.com/1200x/46/43/f8/4643f8e7ec4b3bd90e949b544bf6da15.jpg",
@@ -33,6 +24,15 @@ const slides = [
         collegeName: "IISc Bangalore (Indian Institute of Science)"
     }
 ];
+
+const Hero = () => {
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [currentSlide, setCurrentSlide] = useState(0)
+    
+    // --- Typing Effect States ---
+    const [displayedTitle, setDisplayedTitle] = useState(slides[0].title)
+    const [displayedSubtitle, setDisplayedSubtitle] = useState(slides[0].subtitle)
+    const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
     // Combined Typing Logic for Title & Subtitle
     useEffect(() => {

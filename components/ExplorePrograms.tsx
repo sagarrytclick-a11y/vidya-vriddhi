@@ -173,6 +173,7 @@ const CollegeCard: React.FC<CollegeCardProps> = ({ college }) => {
 
 const ExplorePrograms: React.FC = () => {
   const [selectedProgram, setSelectedProgram] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(3);
   const programs = [
     "All",
     "MBA Colleges",
@@ -189,6 +190,15 @@ const ExplorePrograms: React.FC = () => {
   // Strip "Colleges" from program name for API (e.g., "B.Tech Colleges" → "B.Tech")
   const courseName = selectedProgram === "All" ? "All" : selectedProgram.replace(" Colleges", "");
   const { data: colleges, isLoading, error } = useCollegesByCourse(courseName);
+
+  // Reset visible count when tab changes
+  const handleProgramChange = (program: string) => {
+    setSelectedProgram(program);
+    setVisibleCount(3);
+  };
+
+  const visibleColleges = colleges?.slice(0, visibleCount) || [];
+  const hasMore = colleges ? visibleCount < colleges.length : false;
 
   return (
     <section className="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8">
@@ -210,7 +220,7 @@ const ExplorePrograms: React.FC = () => {
             {programs.map((program) => (
               <button
                 key={program}
-                onClick={() => setSelectedProgram(program)}
+                onClick={() => handleProgramChange(program)}
                 className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-[11px] sm:text-sm whitespace-nowrap transition-all duration-200 ${selectedProgram === program
                     ? "bg-orange-500 text-white shadow-md"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
@@ -328,7 +338,19 @@ const ExplorePrograms: React.FC = () => {
               </div>
             </div>
           ) : colleges && colleges.length > 0 ? (
-            colleges.map((college) => <CollegeCard key={college.id} college={college} />)
+            <>
+              {visibleColleges.map((college) => <CollegeCard key={college.id} college={college} />)}
+              {hasMore && (
+                <div className="col-span-full flex justify-center mt-4">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 3)}
+                    className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="col-span-full text-center py-12">
               <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 max-w-md mx-auto">

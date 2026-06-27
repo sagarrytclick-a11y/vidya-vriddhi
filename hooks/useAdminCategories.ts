@@ -68,6 +68,7 @@ export function useAdminCategories(page: number = 1, limit: number = 10, search:
   } = useQuery({
     queryKey,
     queryFn: fetchCategories,
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000,
     refetchOnMount: 'always',
     retry: 3,

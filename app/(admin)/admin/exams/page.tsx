@@ -1,17 +1,20 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AddExamModal, ExamFormData } from '@/components/admin/exams/add-exam-modal'
-import { ViewExamModal } from '@/components/admin/exams/view-exam-modal'
-import { DeleteExamModal } from '@/components/admin/exams/delete-exam-modal'
 import { LoadingTable } from '@/components/ui/loading'
 import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useExamContext } from '@/contexts/exam-context'
+import { ExamFormData } from '@/hooks/useAdminExams'
+
+const AddExamModal = dynamic(() => import('@/components/admin/exams/add-exam-modal').then(m => ({ default: m.AddExamModal })))
+const ViewExamModal = dynamic(() => import('@/components/admin/exams/view-exam-modal').then(m => ({ default: m.ViewExamModal })))
+const DeleteExamModal = dynamic(() => import('@/components/admin/exams/delete-exam-modal').then(m => ({ default: m.DeleteExamModal })))
 
 export default function ExamsPage() {
   const [searchTerm, setSearchTerm] = useState('')

@@ -1,19 +1,21 @@
 "use client"
+import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AddCourseModal } from '@/components/admin/courses/add-course-modal'
-import { ViewCourseModal } from '@/components/admin/courses/view-course-modal'
-import { EditCourseModal } from '@/components/admin/courses/edit-course-modal'
-import { DeleteCourseModal } from '@/components/admin/courses/delete-course-modal'
 import { LoadingPage } from '@/components/ui/loading'
 import { useCourseContext } from '@/contexts/course-context'
 import { CourseUIProvider, useCourseUIContext } from '@/contexts/course-ui-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
 import { Search, Plus, Trash2, Eye, Edit, Building, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const AddCourseModal = dynamic(() => import('@/components/admin/courses/add-course-modal').then(m => ({ default: m.AddCourseModal })))
+const ViewCourseModal = dynamic(() => import('@/components/admin/courses/view-course-modal').then(m => ({ default: m.ViewCourseModal })))
+const EditCourseModal = dynamic(() => import('@/components/admin/courses/edit-course-modal').then(m => ({ default: m.EditCourseModal })))
+const DeleteCourseModal = dynamic(() => import('@/components/admin/courses/delete-course-modal').then(m => ({ default: m.DeleteCourseModal })))
 
 // Inner component that uses the UI context
 function CoursesPageContent() {

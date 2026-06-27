@@ -87,6 +87,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
   } = useQuery({
     queryKey: [...cityKeys.lists(), page, limit],
     queryFn: fetchCities,
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
@@ -99,6 +100,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
         newCity,
         ...oldCities,
       ])
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create city')
@@ -115,6 +117,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
           city.id === updatedCity.id ? updatedCity : city
         )
       )
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update city')
@@ -129,6 +132,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
       queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) =>
         oldCities.filter((city) => city.id !== deletedId)
       )
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to delete city')

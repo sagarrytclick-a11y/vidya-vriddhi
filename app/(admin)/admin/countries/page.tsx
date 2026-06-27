@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,10 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoadingPage } from '@/components/ui/loading'
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useCountryContext } from '@/contexts/country-context'
-import { AddCountryModal } from '@/components/admin/countries/add-country-modal'
-import { ViewCountryModal } from '@/components/admin/countries/view-country-modal'
-import { EditCountryModal } from '@/components/admin/countries/edit-country-modal'
-import { DeleteCountryModal } from '@/components/admin/countries/delete-country-modal'
+
+const AddCountryModal = dynamic(() => import('@/components/admin/countries/add-country-modal').then(m => ({ default: m.AddCountryModal })))
+const ViewCountryModal = dynamic(() => import('@/components/admin/countries/view-country-modal').then(m => ({ default: m.ViewCountryModal })))
+const EditCountryModal = dynamic(() => import('@/components/admin/countries/edit-country-modal').then(m => ({ default: m.EditCountryModal })))
+const DeleteCountryModal = dynamic(() => import('@/components/admin/countries/delete-country-modal').then(m => ({ default: m.DeleteCountryModal })))
 
 export default function CountriesPage() {
   const {

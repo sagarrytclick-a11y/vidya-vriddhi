@@ -1,18 +1,20 @@
 "use client"
+import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AddNewsModal, NewsFormData } from '@/components/admin/news/add-news-modal'
-import { ViewNewsModal } from '@/components/admin/news/view-news-modal'
-import { EditNewsModal } from '@/components/admin/news/edit-news-modal'
-import { DeleteNewsModal } from '@/components/admin/news/delete-news-modal'
 import { LoadingPage, LoadingTable } from '@/components/ui/loading'
 import { useNewsContext } from '@/contexts/news-context'
-import { useAdminNews, News } from '@/hooks/useAdminNews'
+import { useAdminNews, News, NewsFormData } from '@/hooks/useAdminNews'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const AddNewsModal = dynamic(() => import('@/components/admin/news/add-news-modal').then(m => ({ default: m.AddNewsModal })))
+const ViewNewsModal = dynamic(() => import('@/components/admin/news/view-news-modal').then(m => ({ default: m.ViewNewsModal })))
+const EditNewsModal = dynamic(() => import('@/components/admin/news/edit-news-modal').then(m => ({ default: m.EditNewsModal })))
+const DeleteNewsModal = dynamic(() => import('@/components/admin/news/delete-news-modal').then(m => ({ default: m.DeleteNewsModal })))
 
 export default function NewsPage() {
   const [searchTerm, setSearchTerm] = useState('')

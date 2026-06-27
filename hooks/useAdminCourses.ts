@@ -90,15 +90,20 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
   } = useQuery({
     queryKey: [...courseKeys.lists(), page, limit],
     queryFn: fetchCourses,
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Create course mutation
   const createCourseMutation = useMutation({
     mutationFn: createCourse,
-    onSuccess: () => {
+    onSuccess: (newCourse) => {
       toast.success('Course created successfully')
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+      queryClient.setQueryData([...courseKeys.lists(), page, limit], (old: { data: CourseWithColleges[], pagination: any } | undefined) => {
+        if (!old) return old
+        return { ...old, data: [newCourse, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+      })
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create course')
@@ -108,26 +113,50 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
   // Update course mutation
   const updateCourseMutation = useMutation({
     mutationFn: updateCourse,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: courseKeys.lists() })
+      const previous = queryClient.getQueryData([...courseKeys.lists(), page, limit])
+      queryClient.setQueryData([...courseKeys.lists(), page, limit], (old: { data: CourseWithColleges[], pagination: any } | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.map((c) => c.id === id ? { ...c, ...data } : c) }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Course updated successfully')
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: courseKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData([...courseKeys.lists(), page, limit], context.previous)
       toast.error(error.message || 'Failed to update course')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'all' })
     },
   })
 
   // Delete course mutation
   const deleteCourseMutation = useMutation({
     mutationFn: deleteCourse,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: courseKeys.lists() })
+      const previous = queryClient.getQueryData([...courseKeys.lists(), page, limit])
+      queryClient.setQueryData([...courseKeys.lists(), page, limit], (old: { data: CourseWithColleges[], pagination: any } | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.filter((c) => c.id !== id), pagination: { ...old.pagination, total: old.pagination.total - 1 } }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Course deleted successfully')
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: courseKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData([...courseKeys.lists(), page, limit], context.previous)
       toast.error(error.message || 'Failed to delete course')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'all' })
     },
   })
 

@@ -93,6 +93,7 @@ model News {
 
   @@index([active])
   @@index([createdAt])
+  @@index([title])
 }
 
 model Blog {
@@ -107,6 +108,7 @@ model Blog {
 
   @@index([active])
   @@index([createdAt])
+  @@index([title])
 }
 
 model Enquiry {
@@ -123,6 +125,9 @@ model Enquiry {
   @@index([status])
   @@index([createdAt])
   @@index([email])
+  @@index([name])
+  @@index([phone])
+  @@index([city])
 }
 
 model City {

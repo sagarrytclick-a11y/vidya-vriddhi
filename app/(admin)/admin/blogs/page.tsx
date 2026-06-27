@@ -1,18 +1,20 @@
 "use client"
+import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AddBlogModal } from '@/components/admin/blogs/add-blog-modal'
-import { ViewBlogModal } from '@/components/admin/blogs/view-blog-modal'
-import { EditBlogModal } from '@/components/admin/blogs/edit-blog-modal'
-import { DeleteBlogModal } from '@/components/admin/blogs/delete-blog-modal'
 import { LoadingPage, LoadingTable } from '@/components/ui/loading'
 import { useAdminBlogs } from '@/hooks/useAdminBlogs'
 import { Blog, BlogFormData } from '@/contexts/blog-context'
 import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const AddBlogModal = dynamic(() => import('@/components/admin/blogs/add-blog-modal').then(m => ({ default: m.AddBlogModal })))
+const ViewBlogModal = dynamic(() => import('@/components/admin/blogs/view-blog-modal').then(m => ({ default: m.ViewBlogModal })))
+const EditBlogModal = dynamic(() => import('@/components/admin/blogs/edit-blog-modal').then(m => ({ default: m.EditBlogModal })))
+const DeleteBlogModal = dynamic(() => import('@/components/admin/blogs/delete-blog-modal').then(m => ({ default: m.DeleteBlogModal })))
 
 export default function BlogsPage() {
   const [searchTerm, setSearchTerm] = useState('')

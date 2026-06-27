@@ -255,15 +255,20 @@ export function useAdminExams(search?: string): UseAdminExamsReturn {
   } = useQuery({
     queryKey: examKeys.list({ search: search || '', page, limit }),
     queryFn: () => fetchExamsWithPagination(search, page, limit),
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Create exam mutation
   const createExamMutation = useMutation({
     mutationFn: createExam,
-    onSuccess: () => {
+    onSuccess: (newExam) => {
       toast.success('Exam created successfully')
-      queryClient.invalidateQueries({ queryKey: examKeys.all })
+      queryClient.setQueryData(examKeys.list({ search: search || '', page, limit }), (old: PaginatedExamsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: [newExam, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+      })
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create exam')
@@ -273,24 +278,50 @@ export function useAdminExams(search?: string): UseAdminExamsReturn {
   // Update exam mutation
   const updateExamMutation = useMutation({
     mutationFn: updateExam,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: examKeys.all })
+      const keys = examKeys.list({ search: search || '', page, limit })
+      const previous = queryClient.getQueryData(keys)
+      queryClient.setQueryData(keys, (old: PaginatedExamsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.map((e) => e.id === id ? { ...e, ...data } : e) }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Exam updated successfully')
-      queryClient.invalidateQueries({ queryKey: examKeys.all })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(examKeys.list({ search: search || '', page, limit }), context.previous)
       toast.error(error.message || 'Failed to update exam')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
     },
   })
 
   // Delete exam mutation
   const deleteExamMutation = useMutation({
     mutationFn: deleteExam,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: examKeys.all })
+      const keys = examKeys.list({ search: search || '', page, limit })
+      const previous = queryClient.getQueryData(keys)
+      queryClient.setQueryData(keys, (old: PaginatedExamsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.filter((e) => e.id !== id), pagination: { ...old.pagination, total: old.pagination.total - 1 } }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Exam deleted successfully')
-      queryClient.invalidateQueries({ queryKey: examKeys.all })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(examKeys.list({ search: search || '', page, limit }), context.previous)
       toast.error(error.message || 'Failed to delete exam')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
     },
   })
 

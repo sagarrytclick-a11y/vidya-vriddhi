@@ -118,15 +118,20 @@ export function useAdminBlogs(limit: number = 10, skip: number = 0) {
   } = useQuery({
     queryKey: blogKeys.list({ limit, skip }),
     queryFn: () => fetchBlogs(limit, skip),
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Create blog mutation
   const createBlogMutation = useMutation({
     mutationFn: createBlog,
-    onSuccess: () => {
+    onSuccess: (newBlog) => {
       toast.success('Blog created successfully')
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists() })
+      queryClient.setQueryData(blogKeys.list({ limit, skip }), (old: BlogsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: [newBlog, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+      })
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create blog')
@@ -136,26 +141,50 @@ export function useAdminBlogs(limit: number = 10, skip: number = 0) {
   // Update blog mutation
   const updateBlogMutation = useMutation({
     mutationFn: updateBlog,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: blogKeys.lists() })
+      const previous = queryClient.getQueryData(blogKeys.list({ limit, skip }))
+      queryClient.setQueryData(blogKeys.list({ limit, skip }), (old: BlogsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.map((b) => b.id === id ? { ...b, ...data } : b) }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Blog updated successfully')
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: blogKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(blogKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to update blog')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'all' })
     },
   })
 
   // Delete blog mutation
   const deleteBlogMutation = useMutation({
     mutationFn: deleteBlog,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: blogKeys.lists() })
+      const previous = queryClient.getQueryData(blogKeys.list({ limit, skip }))
+      queryClient.setQueryData(blogKeys.list({ limit, skip }), (old: BlogsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.filter((b) => b.id !== id), pagination: { ...old.pagination, total: old.pagination.total - 1 } }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('Blog deleted successfully')
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: blogKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(blogKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to delete blog')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'all' })
     },
   })
 

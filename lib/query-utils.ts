@@ -12,47 +12,47 @@ import { newsKeys } from '@/hooks/useAdminNews'
 export const queryInvalidation = {
   // Invalidate all admin-related queries
   invalidateAdmin: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: collegeKeys.all })
-    queryClient.invalidateQueries({ queryKey: countryKeys.all })
-    queryClient.invalidateQueries({ queryKey: cityKeys.all })
-    queryClient.invalidateQueries({ queryKey: categoryKeys.all })
-    queryClient.invalidateQueries({ queryKey: courseKeys.all })
-    queryClient.invalidateQueries({ queryKey: examKeys.all })
-    queryClient.invalidateQueries({ queryKey: blogKeys.all })
-    queryClient.invalidateQueries({ queryKey: newsKeys.all })
+    queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: countryKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: cityKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: categoryKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: courseKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: blogKeys.all, refetchType: 'all' })
+    queryClient.invalidateQueries({ queryKey: newsKeys.all, refetchType: 'all' })
   },
 
   // Invalidate specific entity types
   invalidateColleges: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: collegeKeys.all })
+    queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
   },
   
   invalidateCountries: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: countryKeys.all })
+    queryClient.invalidateQueries({ queryKey: countryKeys.all, refetchType: 'all' })
   },
   
   invalidateCities: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: cityKeys.all })
+    queryClient.invalidateQueries({ queryKey: cityKeys.all, refetchType: 'all' })
   },
   
   invalidateCategories: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: categoryKeys.all })
+    queryClient.invalidateQueries({ queryKey: categoryKeys.all, refetchType: 'all' })
   },
   
   invalidateCourses: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: courseKeys.all })
+    queryClient.invalidateQueries({ queryKey: courseKeys.all, refetchType: 'all' })
   },
   
   invalidateExams: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: examKeys.all })
+    queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
   },
   
   invalidateBlogs: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: blogKeys.all })
+    queryClient.invalidateQueries({ queryKey: blogKeys.all, refetchType: 'all' })
   },
   
   invalidateNews: (queryClient: QueryClient) => {
-    queryClient.invalidateQueries({ queryKey: newsKeys.all })
+    queryClient.invalidateQueries({ queryKey: newsKeys.all, refetchType: 'all' })
   },
 
   // Optimistic updates

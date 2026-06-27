@@ -117,15 +117,20 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
   } = useQuery({
     queryKey: newsKeys.list({ limit, skip }),
     queryFn: () => fetchNews(limit, skip),
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Create news mutation
   const createNewsMutation = useMutation({
     mutationFn: createNews,
-    onSuccess: () => {
+    onSuccess: (newNews) => {
       toast.success('News created successfully')
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
+      queryClient.setQueryData(newsKeys.list({ limit, skip }), (old: NewsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: [newNews, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+      })
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create news')
@@ -135,26 +140,50 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
   // Update news mutation
   const updateNewsMutation = useMutation({
     mutationFn: updateNews,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: newsKeys.lists() })
+      const previous = queryClient.getQueryData(newsKeys.list({ limit, skip }))
+      queryClient.setQueryData(newsKeys.list({ limit, skip }), (old: NewsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.map((n) => n.id === id ? { ...n, ...data } : n) }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('News updated successfully')
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: newsKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(newsKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to update news')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'all' })
     },
   })
 
   // Delete news mutation
   const deleteNewsMutation = useMutation({
     mutationFn: deleteNews,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: newsKeys.lists() })
+      const previous = queryClient.getQueryData(newsKeys.list({ limit, skip }))
+      queryClient.setQueryData(newsKeys.list({ limit, skip }), (old: NewsResponse | undefined) => {
+        if (!old) return old
+        return { ...old, data: old.data.filter((n) => n.id !== id), pagination: { ...old.pagination, total: old.pagination.total - 1 } }
+      })
+      return { previous }
+    },
     onSuccess: () => {
       toast.success('News deleted successfully')
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: newsKeys.details() })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(newsKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to delete news')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'all' })
     },
   })
 
