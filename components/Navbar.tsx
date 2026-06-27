@@ -40,6 +40,19 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const getViewAllHref = (name: string) => {
+    const map: Record<string, string> = {
+      'All colleges': '/colleges',
+      'Engineering': '/colleges?category=engineering',
+      'Management': '/colleges?category=management',
+      'Medical': '/colleges?category=medical',
+      'Commerce': '/colleges?category=commerce',
+      'B.Tech': '/btech',
+      'Online MBA': '/online-mba',
+    }
+    return map[name] || '/colleges'
+  }
+
   const getSlug = (name: string) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
@@ -83,7 +96,20 @@ const Navbar = () => {
         colleges: ['Miranda House, Delhi', 'Shri Ram College of Commerce (SRCC)', 'Indian Institute of Management Bangalore', 'Loyola College, Chennai', 'Lady Shri Ram College for Women (LSR), Delhi' , 'Vellore Institute of Technology (VIT)' , 'Hansraj College, Delhi' , 'SRM Institute of Science and Technology (SRMIST)' , 'St. Stephens College, Delhi'],
         viewAllLink: 'View all Commerce colleges',
       },
-    }
+      
+    },
+    {
+      name: 'B.Tech',
+      href: '/btech',
+    },
+    {
+      name: 'Online MBA',
+      href: '/online-mba',
+    },
+    {
+      name: 'MBA/PGDM',
+      href: '/mba-pgdm',
+    },
   ]
 
   return (
@@ -196,19 +222,28 @@ const Navbar = () => {
               <div
                 key={item.name}
                 className="relative py-3 xl:py-4 group"
-                onMouseEnter={() => setActiveDropdown(item.name)}
+                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.name)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 {/* Trigger Button */}
-                <button
-                  className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap ${activeDropdown === item.name ? 'text-orange-500' : 'text-gray-600 hover:text-orange-500'
-                    }`}
-                >
-                  <span>{item.name}</span>
-                  {item.hasDropdown && (
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
-                  )}
-                </button>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap text-gray-600 hover:text-orange-500"
+                  >
+                    <span>{item.name}</span>
+                  </Link>
+                ) : (
+                  <button
+                    className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap ${activeDropdown === item.name ? 'text-orange-500' : 'text-gray-600 hover:text-orange-500'
+                      }`}
+                  >
+                    <span>{item.name}</span>
+                    {item.hasDropdown && (
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
+                    )}
+                  </button>
+                )}
 
                 {/* Desktop Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
@@ -234,10 +269,10 @@ const Navbar = () => {
 
                     {item.dropdownContent.viewAllLink && (
                       <div className="mt-5 pt-3 border-t border-gray-50">
-                        <button className="flex items-center text-orange-500 font-bold text-xs hover:gap-2 transition-all">
+                        <Link href={getViewAllHref(item.name)} className="flex items-center text-orange-500 font-bold text-xs hover:gap-2 transition-all">
                           {item.dropdownContent.viewAllLink}
                           <ArrowRight size={14} className="ml-1" />
-                        </button>
+                        </Link>
                       </div>
                     )}
                   </div>
@@ -290,15 +325,26 @@ const Navbar = () => {
 
             {mainNavItems.map((item) => (
               <div key={item.name} className="border-b border-gray-100">
-                <button
-                  onClick={() => setMobileOpenDropdown(mobileOpenDropdown === item.name ? null : item.name)}
-                  className="w-full flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <span className="font-semibold text-gray-800">{item.name}</span>
-                  {item.hasDropdown && (
-                    <ChevronDown size={20} className={`text-gray-500 transition-transform duration-200 ${mobileOpenDropdown === item.name ? 'rotate-180' : ''}`} />
-                  )}
-                </button>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
+                  >
+                    <span className="font-semibold text-gray-800">{item.name}</span>
+                    <ArrowRight size={16} className="text-gray-500" />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => setMobileOpenDropdown(mobileOpenDropdown === item.name ? null : item.name)}
+                    className="w-full flex items-center justify-between px-4 py-4 text-left"
+                  >
+                    <span className="font-semibold text-gray-800">{item.name}</span>
+                    {item.hasDropdown && (
+                      <ChevronDown size={20} className={`text-gray-500 transition-transform duration-200 ${mobileOpenDropdown === item.name ? 'rotate-180' : ''}`} />
+                    )}
+                  </button>
+                )}
 
                 {/* Mobile Dropdown Content */}
                 {item.hasDropdown && mobileOpenDropdown === item.name && (
@@ -319,10 +365,10 @@ const Navbar = () => {
                     )}
 
                     {item.dropdownContent.viewAllLink && (
-                      <button className="flex items-center text-orange-500 font-bold text-sm pt-2">
+                      <Link href={getViewAllHref(item.name)} className="flex items-center text-orange-500 font-bold text-sm pt-2">
                         {item.dropdownContent.viewAllLink}
                         <ArrowRight size={16} className="ml-1" />
-                      </button>
+                      </Link>
                     )}
                   </div>
                 )}
