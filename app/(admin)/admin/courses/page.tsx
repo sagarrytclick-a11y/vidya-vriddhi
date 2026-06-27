@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LoadingPage } from '@/components/ui/loading'
-import { useCourseContext } from '@/contexts/course-context'
+import { CourseProvider, useCourseContext } from '@/contexts/course-context'
 import { CourseUIProvider, useCourseUIContext } from '@/contexts/course-ui-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
 import { Search, Plus, Trash2, Eye, Edit, Building, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -295,11 +295,12 @@ function CoursesPageContent() {
   )
 }
 
-// Main export wrapped with CourseUIProvider
 export default function CoursesPage() {
   return (
-    <CourseUIProvider>
-      <CoursesPageContent />
-    </CourseUIProvider>
+    <CourseProvider>
+      <CourseUIProvider>
+        <CoursesPageContent />
+      </CourseUIProvider>
+    </CourseProvider>
   )
 }

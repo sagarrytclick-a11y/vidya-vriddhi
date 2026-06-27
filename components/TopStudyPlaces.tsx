@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building, ExternalLink } from 'lucide-react'
 import { useCities } from '@/hooks/useCities'
 import { CityWithStats } from '@/types/domain'
@@ -17,10 +18,12 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
       {/* Image/Icon Banner */}
       <div className="h-32 bg-gradient-to-br from-orange-100 via-orange-50 to-blue-50 relative overflow-hidden">
         {city.cityImageURL ? (
-          <img
+          <Image
             src={city.cityImageURL}
             alt={city.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="176px"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

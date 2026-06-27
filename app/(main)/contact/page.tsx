@@ -1,8 +1,18 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { ArrowLeft, Mail, Phone, MapPin, Send, MessageSquare, Clock, GraduationCap, Users, Award, Target, BookOpen, Globe } from 'lucide-react'
 import { SITE_IDENTITY, getFullAddress } from '../site-identity'
+
+export const metadata: Metadata = {
+  title: 'Contact Us | VidyaVriddhi',
+  description: 'Get in touch with VidyaVriddhi for college admissions, career counseling, exam guidance, and study abroad support. Call, email, or visit our office.',
+  openGraph: {
+    title: 'Contact VidyaVriddhi - Education Counseling & Admissions',
+    description: 'Reach out to VidyaVriddhi for personalized educational guidance and admission support.',
+  },
+}
 
 const ContactPage = () => {
   return (

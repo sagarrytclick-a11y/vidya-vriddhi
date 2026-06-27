@@ -1,13 +1,34 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { db } from '@/lib/db'
 
 interface BlogPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const blog = await db.blog.findUnique({ where: { slug, active: true } })
+  if (!blog) return { title: 'Blog Not Found' }
+  return {
+    title: `${blog.title} | VidyaVriddhi Blogs`,
+    description: blog.content?.slice(0, 160) || 'Read expert insights on education, college admissions, and career guidance.',
+    openGraph: {
+      title: `${blog.title} - VidyaVriddhi`,
+      description: blog.content?.slice(0, 160),
+      type: 'article',
+      publishedTime: blog.createdAt.toISOString(),
+      modifiedTime: blog.updatedAt.toISOString(),
+      images: blog.imageUrl ? [{ url: blog.imageUrl }] : [],
+    },
+  }
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {
@@ -25,16 +46,20 @@ export default async function BlogPage({ params }: BlogPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/20 to-white">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/20 to-white">
       {/* Header */}
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-12 px-4 sm:px-6 lg:px-8">
+      <header className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link href="/blogs">
-            <Button variant="ghost" className="text-white hover:bg-orange-400/20 mb-6">
+            <Button variant="ghost" className="text-white hover:bg-orange-400/20 mb-2">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Blogs
             </Button>
           </Link>
+          <Breadcrumbs dark items={[
+            { label: 'Blogs', href: '/blogs' },
+            { label: blog.title },
+          ]} />
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200">
@@ -54,7 +79,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
             </h1>
           </div>
         </div>
-      </section>
+      </header>
 
       {/* Blog Content */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
@@ -63,11 +88,13 @@ export default async function BlogPage({ params }: BlogPageProps) {
             <CardContent className="p-8">
               {/* Blog Image */}
               {blog.imageUrl && (
-                <div className="mb-8 rounded-xl overflow-hidden">
-                  <img 
+                <div className="mb-8 rounded-xl overflow-hidden relative" style={{ aspectRatio: '16/9' }}>
+                  <Image 
                     src={blog.imageUrl} 
                     alt={blog.title}
-                    className="w-full h-auto object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 1024px"
                   />
                 </div>
               )}
@@ -112,6 +139,6 @@ export default async function BlogPage({ params }: BlogPageProps) {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   )
 }

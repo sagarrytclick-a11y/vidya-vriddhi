@@ -1,31 +1,18 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import { Suspense } from "react";
-import { ClerkProvider } from '@clerk/nextjs'
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/providers/query-provider";
-import { CountryProvider } from "@/contexts/country-context";
-import { CityProvider } from "@/contexts/city-context";
-import { CategoryProvider } from "@/contexts/category-context";
-import { CourseProvider } from "@/contexts/course-context";
-import { NewsProvider } from "@/contexts/news-context";
-import { BlogProvider } from "@/contexts/blog-context";
-import { ExamProvider } from "@/contexts/exam-context";
 import { PageLoadingBar } from "@/components/ui/page-loading-bar";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { SITE_IDENTITY, meta } from "./(main)/site-identity";
 
+export const viewport: Viewport = {
+  themeColor: SITE_IDENTITY.brand.primaryColor,
+};
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${SITE_IDENTITY.domain}`),
@@ -37,7 +24,6 @@ export const metadata: Metadata = {
   keywords: meta.keywords,
   authors: [{ name: meta.author }],
   creator: meta.author,
-  themeColor: SITE_IDENTITY.brand.primaryColor,
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
@@ -74,9 +60,6 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  alternates: {
-    canonical: `https://${SITE_IDENTITY.domain}`,
-  },
 };
 
 export default function RootLayout({
@@ -85,33 +68,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={cn("font-sans", inter.variable)}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Suspense fallback={null}>
-            <PageLoadingBar />
-          </Suspense>
-          <QueryProvider>
-            <CategoryProvider>
-              <ExamProvider>
-                <BlogProvider>
-                  <NewsProvider>
-                    <CourseProvider>
-                      <CountryProvider>
-                        <CityProvider>
-                          {children}
-                        </CityProvider>
-                      </CountryProvider>
-                    </CourseProvider>
-                  </NewsProvider>
-                </BlogProvider>
-              </ExamProvider>
-            </CategoryProvider>
-          </QueryProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={cn("font-sans", inter.variable)}>
+      <body className="antialiased">
+        <Suspense fallback={null}>
+          <PageLoadingBar />
+        </Suspense>
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
   );
 }

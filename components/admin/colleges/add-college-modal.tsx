@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useState, useRef, useEffect } from 'react'
+import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
 import { CollegeFormData } from '@/types/college'
 import { toast } from 'sonner'
@@ -752,10 +753,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               </div>
               {formData.imageURL && (
                 <div className="mt-2">
-                  <img
+                  <NextImage
                     src={formData.imageURL}
                     alt="College image"
-                    className="h-20 w-20 object-cover rounded"
+                    width={80}
+                    height={80}
+                    className="object-cover rounded"
                   />
                 </div>
               )}
@@ -796,10 +799,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               </div>
               {formData.logoURL && (
                 <div className="mt-2">
-                  <img
+                  <NextImage
                     src={formData.logoURL}
                     alt="College logo"
-                    className="h-20 w-20 object-cover rounded"
+                    width={80}
+                    height={80}
+                    className="object-cover rounded"
                   />
                 </div>
               )}
@@ -1212,10 +1217,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {formData.campusHighlights?.highlights?.map((highlight: string, index: number) => (
                       <div key={index} className="relative group">
-                        <img
+                        <NextImage
                           src={highlight}
                           alt={`Campus highlight ${index + 1}`}
-                          className="w-full h-32 object-cover rounded"
+                          fill
+                          className="object-cover rounded"
+                          sizes="(max-width: 768px) 50vw, 33vw"
                         />
                         <Button
                           type="button"

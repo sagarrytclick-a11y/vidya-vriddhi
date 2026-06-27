@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Search, TrendingUp, X, Building, FileText, Newspaper, BookOpen, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/hooks/useSearch'
 import { useRouter } from 'next/navigation'
@@ -166,15 +167,19 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                         className="w-full flex items-center space-x-4 p-4 hover:bg-gray-50 transition-colors text-left"
                       >
                         {/* Image */}
-                        <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                        <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                           {result.image ? (
-                            <img
+                            <Image
                               src={result.image}
                               alt={result.name}
-                              className="w-full h-full object-contain p-1"
+                              fill
+                              className="object-contain p-1"
+                              sizes="56px"
                             />
                           ) : (
-                            <TypeIcon className="w-7 h-7 text-gray-400" />
+                            <div className="w-full h-full flex items-center justify-center">
+                              <TypeIcon className="w-7 h-7 text-gray-400" />
+                            </div>
                           )}
                         </div>
 

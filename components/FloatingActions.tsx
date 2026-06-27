@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { MessageCircle, Bell, X, Newspaper } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 import { useRouter } from 'next/navigation'
@@ -86,11 +87,15 @@ const FloatingActions: React.FC = () => {
                 >
                   <div className="flex items-start space-x-3">
                     {news.imageUrl && (
-                      <img
-                        src={news.imageUrl}
-                        alt={news.title}
-                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                      />
+                      <div className="relative w-16 h-16 rounded-lg flex-shrink-0 overflow-hidden">
+                        <Image
+                          src={news.imageUrl}
+                          alt={news.title}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">

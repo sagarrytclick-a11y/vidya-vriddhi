@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { Calendar, ArrowLeft, Newspaper, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNews } from '@/hooks/useNews'
 import Link from 'next/link'
@@ -90,11 +91,15 @@ const NewsPage: React.FC = () => {
                   className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all text-left group"
                 >
                   {news.imageUrl && (
-                    <img
-                      src={news.imageUrl}
-                      alt={news.title}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
+                    <div className="relative w-full h-48 overflow-hidden rounded-lg mb-4">
+                      <Image
+                        src={news.imageUrl}
+                        alt={news.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
                   )}
                   <div className="flex items-center space-x-2 text-sm text-gray-500 mb-3">
                     <Calendar className="w-4 h-4" />

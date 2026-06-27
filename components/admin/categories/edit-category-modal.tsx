@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingButton } from '@/components/ui/loading'
 import { useState, useEffect, useRef } from 'react'
+import NextImage from 'next/image'
 import { useCategoryContext } from '@/contexts/category-context'
 import { generateSlug } from '@/lib/utils'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
@@ -218,10 +219,12 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                       <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
-                        <img
-                          src={uploadedImage || formData.categoryImageUrl}
+                        <NextImage
+                          src={uploadedImage || formData.categoryImageUrl || ''}
                           alt="Category preview"
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             e.currentTarget.nextElementSibling?.classList.remove('hidden')
@@ -233,7 +236,7 @@ export function EditCategoryModal({ isOpen, onClose, category, onUpdate, isUpdat
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white break-all" title={uploadedImage || formData.categoryImageUrl}>
-                          {uploadedImage || formData.categoryImageUrl}
+{uploadedImage || formData.categoryImageUrl || ''}
                         </p>
                         <p className="text-xs text-slate-400">Image uploaded to ImageKit</p>
                       </div>

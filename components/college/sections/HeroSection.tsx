@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, MapPin, GraduationCap, Award, Building2, BookOpen } from 'lucide-react'
+import { MapPin, GraduationCap, Award, Building2, BookOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollegeActions } from '@/components/college/CollegeActions'
 
 interface HeroSectionProps {
@@ -24,19 +24,11 @@ export function HeroSection({ college }: HeroSectionProps) {
     <>
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            <Link href="/colleges" className="hover:text-blue-600 transition-colors">Colleges</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            {college.categories[0] && (
-              <>
-                <span className="text-blue-600 font-medium">{college.categories[0].name}</span>
-                <ChevronRight className="w-4 h-4 mx-2" />
-              </>
-            )}
-            <span className="text-gray-900 font-medium">{college.name}</span>
-          </nav>
+          <Breadcrumbs items={[
+            { label: 'Colleges', href: '/colleges' },
+            ...(college.categories[0] ? [{ label: college.categories[0].name }] : []),
+            { label: college.name },
+          ]} />
         </div>
       </div>
 

@@ -6,8 +6,12 @@ import { ChevronRight } from 'lucide-react'
 import ExamsListClient from '@/components/exam/ExamsListClient'
 
 export const metadata: Metadata = {
-  title: 'Entrance Exams 2026 | Engineering, Medical, Law | Vidya Vriddhi',
-  description: 'Explore all entrance exams in India - JEE, NEET, CAT, GATE, CLAT, and more. Get exam dates, syllabus, registration details, and preparation tips.',
+  title: 'Entrance Exams 2026 | JEE, NEET, CAT, GATE, CLAT & More',
+  description: 'Explore all entrance exams in India — JEE, NEET, CAT, GATE, CLAT, and more. Get exam dates, syllabus, registration details, and preparation tips.',
+  openGraph: {
+    title: 'Entrance Exams 2026 - Complete Guide | VidyaVriddhi',
+    description: 'Explore all entrance exams in India including JEE, NEET, CAT, GATE, CLAT, and more.',
+  },
 }
 
 export const revalidate = 3600

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Image from 'next/image'
 import { Search, Clock, Star, Users, Award, TrendingUp } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Autoplay, Pagination } from 'swiper/modules'
@@ -199,10 +200,12 @@ export default function CourseGrid({ courses: propCourses }: CourseGridProps) {
                     <div className="bg-white rounded-xl border border-orange-200 hover:border-orange-400 transition-all overflow-hidden h-full shadow-sm">
                       {/* Course Image */}
                       <div className="h-48 bg-gray-100 relative">
-                        <img
+                        <Image
                           src={course.image}
                           alt={course.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
                           }}

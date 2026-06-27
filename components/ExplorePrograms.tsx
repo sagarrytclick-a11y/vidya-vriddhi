@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   FileText,
   Building,
@@ -51,10 +52,12 @@ const CollegeCard: React.FC<CollegeCardProps> = ({ college }) => {
       {/* College Banner Image */}
       {college.imageURL ? (
         <div className="h-40 w-full bg-gradient-to-br from-orange-100 to-blue-100 relative overflow-hidden">
-          <img
+          <Image
             src={college.imageURL}
             alt={college.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, 384px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
@@ -67,10 +70,12 @@ const CollegeCard: React.FC<CollegeCardProps> = ({ college }) => {
         <div className="absolute -top-10 left-5">
           <div className="w-20 h-20 bg-white rounded-2xl shadow-lg border-2 border-white flex items-center justify-center overflow-hidden">
             {college.logoURL ? (
-              <img
+              <Image
                 src={college.logoURL}
                 alt={`${college.name} logo`}
-                className="w-full h-full object-contain p-2"
+                fill
+                className="object-contain p-2"
+                sizes="80px"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">

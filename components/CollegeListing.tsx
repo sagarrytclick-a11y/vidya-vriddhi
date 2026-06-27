@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { GraduationCap, MapPin, Award, Building2, ChevronRight, Globe } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
 import { CardSkeleton } from '@/components/ui/skeletons'
@@ -53,10 +54,12 @@ const CollegeListing: React.FC = () => {
               >
                 {/* Campus Image */}
                 <div className="relative h-48 w-full overflow-hidden">
-                  <img
+                  <Image
                     src={college.imageURL || 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop'} 
                     alt="Campus"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   {college.Countryranking && (
                     <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
@@ -70,20 +73,19 @@ const CollegeListing: React.FC = () => {
                 <div className="p-5">
                   {/* Logo and Name */}
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="w-14 h-14 rounded-lg bg-gray-50 p-2 border border-gray-100 shrink-0">
-                      <img
+                    <div className="relative w-14 h-14 rounded-lg bg-gray-50 border border-gray-100 shrink-0 overflow-hidden">
+                      <Image
                         src={college.logoURL || '/placeholder-logo.png'}
                         alt={college.name}
-                        className="w-full h-full object-contain"
+                        fill
+                        className="object-contain p-2"
+                        sizes="56px"
                       />
                     </div>
                     <div>
-                      <Link
-                        href={`/colleges/${college.slug}`}
-                        className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 block"
-                      >
+                      <span className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 block">
                         {college.name}
-                      </Link>
+                      </span>
                       <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-orange-500" />

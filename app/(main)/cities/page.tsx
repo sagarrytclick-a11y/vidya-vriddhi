@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, MapPin, Building2, Globe, ArrowRight, GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -98,11 +99,13 @@ export default function CitiesPage() {
                   <div className="space-y-4">
                     {/* City Image */}
                     {city.cityImageURL && (
-                      <div className="mb-4 rounded-lg overflow-hidden">
-                        <img 
+                      <div className="rounded-lg overflow-hidden relative h-48">
+                        <Image 
                           src={city.cityImageURL} 
                           alt={city.name}
-                          className="w-full h-48 object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       </div>
                     )}

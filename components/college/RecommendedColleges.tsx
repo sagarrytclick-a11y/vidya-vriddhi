@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Building2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -42,15 +43,19 @@ export function RecommendedColleges({ colleges }: RecommendedCollegesProps) {
             className="flex items-start gap-3 group"
           >
             {/* Logo */}
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="relative w-12 h-12 bg-gray-100 rounded-lg shrink-0 overflow-hidden">
               {college.logoURL ? (
-                <img
+                <Image
                   src={college.logoURL}
                   alt={college.name}
-                  className="w-full h-full object-contain p-1"
+                  fill
+                  className="object-contain p-1"
+                  sizes="48px"
                 />
               ) : (
-                <Building2 className="w-6 h-6 text-gray-400" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-gray-400" />
+                </div>
               )}
             </div>
 

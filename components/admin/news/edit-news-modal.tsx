@@ -1,5 +1,6 @@
 'use client'
 
+import NextImage from 'next/image'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -217,10 +218,12 @@ export function EditNewsModal({ isOpen, onClose, news, onUpdate, isUpdating = fa
                   <div className="relative group">
                     <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
                       <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
-                        <img
-                          src={uploadedImage || formData.imageUrl}
+                        <NextImage
+                          src={uploadedImage || formData.imageUrl || ''}
                           alt="News preview"
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             e.currentTarget.nextElementSibling?.classList.remove('hidden')
@@ -232,7 +235,7 @@ export function EditNewsModal({ isOpen, onClose, news, onUpdate, isUpdating = fa
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white truncate">
-                          {uploadedImage || formData.imageUrl}
+{uploadedImage || formData.imageUrl || ''}
                         </p>
                         <p className="text-xs text-slate-400">Image uploaded to ImageKit</p>
                       </div>

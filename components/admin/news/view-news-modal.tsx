@@ -3,7 +3,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { News } from '@/hooks/useAdminNews'
-import { Calendar, Eye, Image as ImageIcon } from 'lucide-react'
+import NextImage from 'next/image'
+import { Calendar, Eye, ImageIcon } from 'lucide-react'
 
 interface ViewNewsModalProps {
   isOpen: boolean
@@ -44,10 +45,12 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
 
             {news.imageUrl && (
               <div className="relative w-full h-64 bg-slate-700 rounded-lg overflow-hidden">
-                <img
+                <NextImage
                   src={news.imageUrl}
                   alt={news.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 1024px"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none'
                     e.currentTarget.nextElementSibling?.classList.remove('hidden')

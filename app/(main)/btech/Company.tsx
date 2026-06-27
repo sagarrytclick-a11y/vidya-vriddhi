@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 const Company = () => {
     const partners = [
@@ -35,10 +35,12 @@ const Company = () => {
                         {duplicatedPartners.map((partner, index) => (
                             <div key={index} className="flex-shrink-0 w-1/2 md:w-1/4 px-4">
                                 <div className="flex items-center justify-center p-6 bg-white rounded-lg h-24">
-                                    <img 
+                                    <Image 
                                         src={partner.logo} 
                                         alt={partner.name}
-                                        className="h-25 w-auto object-contain"
+                                        width={100}
+                                        height={100}
+                                        className="object-contain"
                                     />
                                 </div>
                             </div>
