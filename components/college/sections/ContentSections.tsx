@@ -1,4 +1,4 @@
-import { Building2, CheckCircle2, Sparkles, GraduationCap, BookOpen, Clock, Wallet, Download, ListOrdered, Star, Briefcase, TrendingUp, Award, Trophy, FileText } from 'lucide-react'
+import { Building2, CheckCircle2, Sparkles, GraduationCap, BookOpen, Clock, Wallet, Download, ListOrdered, Star, Award, Trophy, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -295,107 +295,7 @@ export function ContentSections({ college, keyHighlights, whyChooseUs, documents
         </section>
       )}
 
-      {/* Placements Section */}
-      <section id="placements" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200">
-            <Briefcase className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Placements</h2>
-        </div>
 
-        <Card className="border-0 shadow-lg overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-3 gap-6 mb-6">
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-200">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-3xl font-bold text-blue-600">95%</p>
-                <p className="text-sm text-gray-600 mt-1 font-medium">Placement Rate</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-                <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-200">
-                  <Wallet className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-3xl font-bold text-green-600">Rs.25 LPA</p>
-                <p className="text-sm text-gray-600 mt-1 font-medium">Average Package</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
-                <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-orange-200">
-                  <Award className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-3xl font-bold text-orange-600">Rs.1.2 Cr</p>
-                <p className="text-sm text-gray-600 mt-1 font-medium">Highest Package</p>
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-gray-100">
-              <p className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
-                Top Recruiters
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {['Google', 'Microsoft', 'Amazon', 'McKinsey', 'BCG', 'Goldman Sachs', 'JPMorgan', 'Deloitte'].map((company) => (
-                  <Badge
-                    key={company}
-                    variant="secondary"
-                    className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 transition-colors cursor-default"
-                  >
-                    {company}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Cutoffs Section */}
-      <section id="cutoff" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-200">
-            <span className="text-xl font-bold text-white">✂️</span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Cutoffs</h2>
-        </div>
-
-        <Card className="border-0 shadow-lg overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-red-500 via-rose-500 to-pink-500" />
-          <CardContent className="p-6">
-            <div className="grid gap-4">
-              {[
-                { category: 'General', percentile: '99+', color: 'blue' },
-                { category: 'OBC', percentile: '95+', color: 'green' },
-                { category: 'SC/ST', percentile: '85+', color: 'orange' },
-                { category: 'EWS', percentile: '97+', color: 'purple' },
-              ].map((item, idx) => {
-                const c = getColorClasses(item.color)
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg ${c.bg} flex items-center justify-center`}>
-                        <span className={`font-bold ${c.text}`}>{item.category[0]}</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">CAT 2025 ({item.category})</p>
-                        <p className="text-xs text-gray-500">Minimum required percentile</p>
-                      </div>
-                    </div>
-                    <div className={`text-2xl font-bold ${c.text}`}>
-                      {item.percentile} <span className="text-sm">Percentile</span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </section>
 
       {/* Scholarships Section */}
       <section id="scholarship" className="scroll-mt-24">
@@ -532,22 +432,34 @@ export function ContentSections({ college, keyHighlights, whyChooseUs, documents
         <section id="campus" className="scroll-mt-24">
           <h2 className="text-xl font-bold text-gray-900 mb-4">{campusHighlights.title || 'Campus Highlights'}</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {campusHighlights.highlights.map((highlight: any, idx: number) => (
-              <div key={idx} className="relative rounded-lg overflow-hidden aspect-video">
-                {typeof highlight === 'string' && highlight.startsWith('data:') ? (
-                  <Image
-                    src={highlight}
-                    alt={`Campus ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-500">{highlight}</span>
-                  </div>
-                )}
-              </div>
-            ))}
+            {campusHighlights.highlights.map((highlight: any, idx: number) => {
+              const isDataUrl = typeof highlight === 'string' && highlight.startsWith('data:')
+              const isHttpUrl = typeof highlight === 'string' && (highlight.startsWith('http://') || highlight.startsWith('https://'))
+              return (
+                <div key={idx} className="relative rounded-lg overflow-hidden aspect-video">
+                  {isDataUrl ? (
+                    <Image
+                      src={highlight}
+                      alt={`Campus ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : isHttpUrl ? (
+                    <Image
+                      src={highlight}
+                      alt={`Campus ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-500">{highlight}</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </section>
       )}
@@ -580,58 +492,7 @@ export function ContentSections({ college, keyHighlights, whyChooseUs, documents
         </section>
       )}
 
-      {/* Reviews Section */}
-      <section id="reviews" className="scroll-mt-24">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="text-center">
-                <p className="text-4xl font-bold text-blue-600">4.8</p>
-                <p className="text-sm text-gray-600">out of 5</p>
-              </div>
-              <div className="flex-1">
-                <div className="flex gap-1 mb-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg
-                      key={star}
-                      className={`w-5 h-5 ${star <= 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600">Based on 1,247 reviews</p>
-              </div>
-            </div>
 
-            <div className="space-y-4 border-t pt-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600">R</div>
-                  <div>
-                    <p className="font-medium text-gray-900">Rahul Sharma</p>
-                    <p className="text-sm text-gray-500">MBA Batch 2025</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-700">&quot;Excellent faculty and great placement opportunities. The campus life is amazing!&quot;</p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-600">P</div>
-                  <div>
-                    <p className="font-medium text-gray-900">Priya Patel</p>
-                    <p className="text-sm text-gray-500">B.Tech Batch 2024</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-700">&quot;World-class infrastructure and research facilities. Highly recommended!&quot;</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
     </div>
   )
 }

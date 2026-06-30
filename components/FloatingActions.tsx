@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { MessageCircle, Bell, X, Newspaper } from 'lucide-react'
+import { Bell, X, Newspaper } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa6'
 import { useNews } from '@/hooks/useNews'
 import { useRouter } from 'next/navigation'
 
@@ -13,8 +14,7 @@ const FloatingActions: React.FC = () => {
   const router = useRouter()
 
   const handleWhatsAppClick = () => {
-    // WhatsApp number - replace with your actual WhatsApp number
-    const phoneNumber = '919876543210' // Example Indian number
+    const phoneNumber = '919839865347'
     const message = 'Hello, I have a question about Vidya Vriddhi.'
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -52,10 +52,10 @@ const FloatingActions: React.FC = () => {
         {/* WhatsApp Button */}
         <button
           onClick={handleWhatsAppClick}
-          className="w-11 h-11 sm:w-14 sm:h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group"
+          className="w-11 h-11 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20BD5A] rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group relative"
           title="Chat on WhatsApp"
         >
-          <MessageCircle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+          <FaWhatsapp className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </button>
       </div>
 

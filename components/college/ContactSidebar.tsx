@@ -58,12 +58,6 @@ export function ContactSidebar() {
               >
                 {contact.email.support}
               </a>
-              <a
-                href={`mailto:${contact.email.admissions}`}
-                className="text-sm text-blue-600 hover:text-blue-700 block"
-              >
-                {contact.email.admissions}
-              </a>
             </div>
           </div>
 
