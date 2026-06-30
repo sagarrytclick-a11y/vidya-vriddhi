@@ -69,7 +69,7 @@ export interface ExamFormData {
 }
 
 export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, initialData, isEdit = false }: AddExamModalProps) {
-  const [formData, setFormData] = useState<ExamFormData>(initialData || {
+  const [formData, setFormData] = useState<ExamFormData>({
     name: '',
     slug: '',
     shortName: '',
@@ -128,32 +128,32 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
         frequency: initialData.frequency || 'ONCE_A_YEAR',
         active: initialData.active !== undefined ? initialData.active : false,
         examImageurl: initialData.examImageurl || '',
-        overview: initialData.overview || {
-          title: 'Overview',
-          content: '',
-          keyHighlights: []
+        overview: {
+          title: initialData.overview?.title || 'Overview',
+          content: initialData.overview?.content || '',
+          keyHighlights: initialData.overview?.keyHighlights || []
         },
-        registration: initialData.registration || {
-          title: 'Registration',
-          description: '',
-          bulletPoints: []
+        registration: {
+          title: initialData.registration?.title || 'Registration',
+          description: initialData.registration?.description || '',
+          bulletPoints: initialData.registration?.bulletPoints || []
         },
-        examPattern: initialData.examPattern || {
-          title: 'Exam Pattern',
-          description: '',
-          totalDurationMins: 0,
-          scoreRange: '',
-          tableData: []
+        examPattern: {
+          title: initialData.examPattern?.title || 'Exam Pattern',
+          description: initialData.examPattern?.description || '',
+          totalDurationMins: initialData.examPattern?.totalDurationMins || 0,
+          scoreRange: initialData.examPattern?.scoreRange || '',
+          tableData: initialData.examPattern?.tableData || []
         },
-        examDates: initialData.examDates || {
-          title: 'Important Dates',
-          importantDates: []
+        examDates: {
+          title: initialData.examDates?.title || 'Important Dates',
+          importantDates: initialData.examDates?.importantDates || []
         },
-        resultStatistics: initialData.resultStatistics || {
-          title: 'Result Statistics',
-          description: '',
-          passingCriteria: '',
-          totalMarks: 0
+        resultStatistics: {
+          title: initialData.resultStatistics?.title || 'Result Statistics',
+          description: initialData.resultStatistics?.description || '',
+          passingCriteria: initialData.resultStatistics?.passingCriteria || '',
+          totalMarks: initialData.resultStatistics?.totalMarks || 0
         }
       })
       
