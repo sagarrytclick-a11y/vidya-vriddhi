@@ -87,6 +87,11 @@ export async function GET(request: NextRequest) {
           frequency: true,
           active: true,
           examImageurl: true,
+          overview: true,
+          registration: true,
+          examPattern: true,
+          examDates: true,
+          resultStatistics: true,
           createdAt: true,
           updatedAt: true
         }
