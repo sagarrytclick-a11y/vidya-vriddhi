@@ -1216,7 +1216,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {formData.campusHighlights?.highlights?.map((highlight: string, index: number) => (
-                      <div key={index} className="relative group">
+                      <div key={index} className="relative group aspect-video">
                         <NextImage
                           src={highlight}
                           alt={`Campus highlight ${index + 1}`}
