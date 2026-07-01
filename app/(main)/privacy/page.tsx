@@ -253,9 +253,9 @@ const PrivacyPage = () => {
               If you have any questions about this Privacy Policy or want to exercise your rights, please contact us:
             </p>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <p className="text-gray-700"><strong>Email:</strong> privacy@vidyavridhi.com</p>
-              <p className="text-gray-700"><strong>Phone:</strong> +91 80123 45678</p>
-              <p className="text-gray-700"><strong>Address:</strong> Bangalore, Karnataka, India</p>
+              <p className="text-gray-700"><strong>Email:</strong> Abhishek@vidyavriddhi.com</p>
+              <p className="text-gray-700"><strong>Phone:</strong> +91-98398 65347</p>
+              <p className="text-gray-700"><strong>Address:</strong> S0-2, Geniefolks Building (2nd Floor), Block A, Plot No. A-28, Sector 4, Noida, Uttar Pradesh - 201301</p>
             </div>
           </section>
 
