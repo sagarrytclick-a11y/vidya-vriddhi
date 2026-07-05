@@ -207,7 +207,7 @@ export function AdmissionModal() {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-linear-to-br from-orange-50 via-white to-orange-50 rounded-3xl shadow-2xl">
+      <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-linear-to-br from-orange-50 via-white to-orange-50 rounded-3xl shadow-2xl">
         {/* Close Button */}
         <button
           onClick={closeModal}
