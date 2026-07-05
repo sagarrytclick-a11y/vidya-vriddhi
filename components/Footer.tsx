@@ -129,6 +129,7 @@ const Footer = () => {
           <div className="border-t border-gray-800 mt-8 pt-8">
             <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8 text-xs sm:text-sm">
               <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</Link>
+              <Link href="/career" className="text-gray-300 hover:text-white transition-colors">Career</Link>
               <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link>
               <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</Link>
               <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link>

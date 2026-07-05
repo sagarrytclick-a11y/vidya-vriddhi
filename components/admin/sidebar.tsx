@@ -12,7 +12,8 @@ import {
   BookOpen, 
   MessageSquare,
   Library,
-  Newspaper
+  Newspaper,
+  Briefcase
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
@@ -28,6 +29,7 @@ const sidebarItems = [
   { href: '/admin/courses', label: 'Courses', icon: Library },
   { href: '/admin/news', label: 'News', icon: Newspaper },
   { href: '/admin/enquiries', label: 'Enquiries', icon: MessageSquare },
+  { href: '/admin/job-applications', label: 'Job Applications', icon: Briefcase },
 ]
 
 export function Sidebar() {
