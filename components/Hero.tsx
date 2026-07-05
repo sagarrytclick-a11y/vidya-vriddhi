@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, GraduationCap, FileText, MonitorPlay, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
+import { useAdmissionModal } from '@/contexts/admission-modal-context'
 
 const slides = [
     {
@@ -28,6 +29,7 @@ const slides = [
 const Hero = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [currentSlide, setCurrentSlide] = useState(0)
+    const { openModal } = useAdmissionModal()
     
     // --- Typing Effect States ---
     const [displayedTitle, setDisplayedTitle] = useState(slides[0].title)
@@ -159,6 +161,15 @@ const Hero = () => {
                     </div>
                     <button className="bg-[#F27121] text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-md font-medium hover:bg-[#E05A1B] transition-colors text-xs sm:text-sm">
                         Search
+                    </button>
+                </div>
+
+                <div className="mt-3 flex justify-center">
+                    <button
+                        onClick={() => openModal('Counselling')}
+                        className="rounded-full bg-[#F27121] px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-lg transition hover:bg-[#E05A1B]"
+                    >
+                        Need Counselling
                     </button>
                 </div>
             </div>

@@ -188,7 +188,7 @@ export default function NewsPage() {
                           <td className="py-3 px-4">
                             {newsItem.imageUrl ? (
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-slate-600 rounded overflow-hidden shrink-0">
+                                <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded bg-slate-600">
                                   <NextImage
                                     src={newsItem.imageUrl}
                                     alt={newsItem.title}
@@ -200,7 +200,7 @@ export default function NewsPage() {
                                       e.currentTarget.nextElementSibling?.classList.remove('hidden')
                                     }}
                                   />
-                                  <div className="hidden w-full h-full flex items-center justify-center">
+                                  <div className="hidden h-full w-full items-center justify-center">
                                     <ImageIcon className="h-4 w-4 text-slate-400" />
                                   </div>
                                 </div>
