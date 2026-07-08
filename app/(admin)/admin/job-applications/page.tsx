@@ -145,7 +145,7 @@ export default function JobApplicationsPage() {
               placeholder="Search by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-blue-500"
+              className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
             />
           </div>
           <Select value={positionFilter} onValueChange={setPositionFilter}>
@@ -168,7 +168,7 @@ export default function JobApplicationsPage() {
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full" />
               </div>
             ) : applications.length === 0 ? (
               <div className="text-center py-8 text-gray-400">No applications found</div>
@@ -218,7 +218,7 @@ export default function JobApplicationsPage() {
                             href={app.resumeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-sm"
+                            className="flex items-center gap-1 text-teal-400 hover:text-teal-300 text-sm"
                           >
                             <FileText className="h-4 w-4" />
                             View PDF
@@ -236,7 +236,7 @@ export default function JobApplicationsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
+                              className="text-teal-400 hover:text-teal-300 hover:bg-slate-700"
                               onClick={() => {
                                 setSelectedApp(app)
                                 setIsViewModalOpen(true)
@@ -325,7 +325,7 @@ export default function JobApplicationsPage() {
                       href={selectedApp.resumeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
                     >
                       <FileText className="h-4 w-4" />
                       View Resume PDF

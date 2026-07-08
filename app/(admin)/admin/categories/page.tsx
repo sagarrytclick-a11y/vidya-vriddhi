@@ -443,7 +443,7 @@ export default function CategoriesPage() {
       <div className="p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-white">Categories Management</h1>
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setIsAddOpen(true)}>
+          <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white" onClick={() => setIsAddOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add Category
           </Button>
@@ -509,7 +509,7 @@ export default function CategoriesPage() {
                           <td className="py-3 px-4 text-gray-400 text-sm">{formatDate(category.createdAt)}</td>
                           <td className="py-3 px-4">
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
+                              <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-slate-700"
                                 onClick={() => { setSelectedCategory(category); setIsViewOpen(true); }}>
                                 <Eye className="h-4 w-4" />
                               </Button>

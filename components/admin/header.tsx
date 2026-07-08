@@ -44,9 +44,9 @@ export function Header() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
+              <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-teal-500 transition-all">
                 <AvatarImage src="/admin-avatar.jpg" alt="Admin" />
-                <AvatarFallback className="bg-blue-600 text-white">AD</AvatarFallback>
+                <AvatarFallback className="bg-teal-600 text-white">AD</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="z-[60] bg-slate-800 border-slate-700 text-white">

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Globe, GraduationCap, FileText, BookOpen, Library, Newspaper, ChevronRight } from 'lucide-react'
 
 const quickActions = [
-  { label: 'Add Country', href: '/admin/countries', icon: Globe, color: 'text-blue-400' },
+  { label: 'Add Country', href: '/admin/countries', icon: Globe, color: 'text-teal-400' },
   { label: 'Add College', href: '/admin/colleges', icon: GraduationCap, color: 'text-green-400' },
   { label: 'Add Exam', href: '/admin/exams', icon: FileText, color: 'text-orange-400' },
   { label: 'Add Blog', href: '/admin/blogs', icon: BookOpen, color: 'text-purple-400' },

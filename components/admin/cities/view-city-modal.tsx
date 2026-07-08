@@ -67,7 +67,7 @@ export function ViewCityModal({ isOpen, onClose, city }: ViewCityModalProps) {
               <h3 className="text-sm font-medium text-gray-400 mb-2">Features</h3>
               <div className="flex flex-wrap gap-2">
                 {city.features.map((feature, index) => (
-                  <Badge key={index} variant="secondary" className="bg-blue-600">
+                  <Badge key={index} variant="secondary" className="bg-teal-600">
                     {feature}
                   </Badge>
                 ))}

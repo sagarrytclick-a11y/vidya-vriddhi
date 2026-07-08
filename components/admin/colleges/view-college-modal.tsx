@@ -199,13 +199,13 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
 
           {/* Related Data */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-blue-900 p-4 rounded-lg">
+            <div className="bg-teal-900 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-blue-300" />
-                <h4 className="font-semibold text-blue-100">Categories</h4>
+                <Users className="w-5 h-5 text-teal-300" />
+                <h4 className="font-semibold text-teal-100">Categories</h4>
               </div>
-              <p className="text-2xl font-bold text-blue-100">{college.categories?.length || college._count?.categories || 0}</p>
-              <p className="text-sm text-blue-300">Associated categories</p>
+              <p className="text-2xl font-bold text-teal-100">{college.categories?.length || college._count?.categories || 0}</p>
+              <p className="text-sm text-teal-300">Associated categories</p>
             </div>
             <div className="bg-green-900 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">

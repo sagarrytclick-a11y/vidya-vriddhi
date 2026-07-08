@@ -79,7 +79,7 @@ export default function ExamsPage() {
           <h1 className="text-2xl font-bold text-white">Exams Management</h1>
           <Button 
             size="lg" 
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white"
             onClick={openAddModal}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -92,7 +92,7 @@ export default function ExamsPage() {
           <Input
             type="text"
             placeholder="Search exams..."
-            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-blue-500"
+            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -130,7 +130,7 @@ export default function ExamsPage() {
                         <td className="py-3 px-4 text-white font-medium">{exam.name}</td>
                         <td className="py-3 px-4 text-gray-400 text-sm">{exam.shortName}</td>
                         <td className="py-3 px-4">
-                          <Badge variant="outline" className="border-blue-500 text-blue-400">
+                          <Badge variant="outline" className="border-teal-500 text-teal-400">
                             {exam.type}
                           </Badge>
                         </td>
@@ -158,7 +158,7 @@ export default function ExamsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
+                              className="text-teal-400 hover:text-teal-300 hover:bg-slate-700"
                               onClick={() => openEditModal(exam)}
                             >
                               <Edit className="h-4 w-4" />
@@ -204,7 +204,7 @@ export default function ExamsPage() {
                             onClick={() => setPage(pageNum)}
                             className={`w-8 h-8 p-0 ${
                               pageNum === page
-                                ? 'bg-blue-600 border-blue-600 text-white'
+                                ? 'bg-teal-600 border-teal-600 text-white'
                                 : 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600'
                             }`}
                           >
