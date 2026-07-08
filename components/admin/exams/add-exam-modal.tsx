@@ -680,7 +680,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
           {/* Overview */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
+              <div className="w-1 h-6 bg-teal-500 rounded-full"></div>
               <h3 className="text-lg font-semibold text-white">Overview</h3>
             </div>
             <div className="space-y-4">
@@ -705,7 +705,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     overview: { ...prev.overview, content: e.target.value }
                   }))}
-                  className="bg-slate-700 border-slate-600 focus:border-blue-500 transition-colors"
+                  className="bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors"
                   placeholder="Provide a comprehensive overview of the exam, including its purpose, significance, and what students can expect..."
                   rows={4}
                 />
@@ -720,7 +720,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       type="button" 
                       onClick={addKeyHighlight} 
                       size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Highlight
@@ -759,7 +759,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                             value={highlight}
                             onChange={(e) => updateKeyHighlight(index, e.target.value)}
                             onKeyPress={(e) => handleKeyPress(e, index)}
-                            className="key-highlight-input bg-slate-700 border-slate-600 focus:border-blue-500 transition-colors"
+                            className="key-highlight-input bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors"
                             placeholder={`Enter key highlight ${index + 1}...`}
                           />
                           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
@@ -835,7 +835,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       type="button" 
                       onClick={addBulletPoint} 
                       size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Bullet
@@ -870,14 +870,14 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     {formData.registration.bulletPoints.map((point, index) => (
                       <div key={index} className="flex gap-2 items-center group">
                         <div className="flex-1 relative">
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 text-sm">
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-teal-400 text-sm">
                             •
                           </div>
                           <Input
                             value={point}
                             onChange={(e) => updateBulletPoint(index, e.target.value)}
                             onKeyPress={(e) => handleBulletKeyPress(e, index)}
-                            className="bullet-point-input bg-slate-700 border-slate-600 focus:border-blue-500 transition-colors pl-8"
+                            className="bullet-point-input bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors pl-8"
                             placeholder={`Enter bullet point ${index + 1}...`}
                           />
                           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
@@ -977,7 +977,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Label className="text-white font-medium">Exam Pattern Sections</Label>
-                  <Button type="button" onClick={addExamPatternRow} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button type="button" onClick={addExamPatternRow} size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
                     <Plus className="h-4 w-4 mr-1" />
                     Add Section
                   </Button>

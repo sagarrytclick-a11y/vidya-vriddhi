@@ -83,7 +83,7 @@ export function CollegeList() {
         <div>
           <h1 className="text-2xl font-bold text-white">Colleges Management</h1>
         </div>
-        <Button onClick={openAddModal} className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button onClick={openAddModal} className="bg-teal-600 hover:bg-teal-700 text-white">
           <Plus className="w-4 h-4 mr-2" />
           Add College
         </Button>
@@ -95,7 +95,7 @@ export function CollegeList() {
           placeholder="Search colleges..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-blue-500"
+          className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
         />
       </div>
 
@@ -171,7 +171,7 @@ export function CollegeList() {
                           <Button variant="ghost" size="sm" className="text-green-400 hover:text-green-300 hover:bg-slate-700" onClick={() => openViewModal(college)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-slate-700" onClick={async () => await openEditModal(college)}>
+                          <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-slate-700" onClick={async () => await openEditModal(college)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => handleDeleteCollege(college)}>
@@ -210,7 +210,7 @@ export function CollegeList() {
                           onClick={() => setPage(pageNum)}
                           className={`w-8 h-8 p-0 ${
                             pageNum === page
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-teal-600 border-teal-600 text-white'
                               : 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600'
                           }`}
                         >

@@ -46,14 +46,14 @@ export default function DashboardPage() {
         <Card className="bg-slate-800 border-slate-700 text-white">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-400" />
+              <Calendar className="h-5 w-5 text-teal-400" />
               Upcoming Events
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
                 <div>
                   <p className="text-sm font-medium">JEE Main Exam</p>
                   <p className="text-xs text-gray-400">April 6, 2024</p>

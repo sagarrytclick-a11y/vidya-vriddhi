@@ -280,7 +280,7 @@ export function EditCityModal({ isOpen, onClose, city }: EditCityModalProps) {
                 {formData.features.map((feature, index) => (
                   <span
                     key={index}
-                    className="bg-blue-600 text-white px-2 py-1 rounded text-sm flex items-center gap-1"
+                    className="bg-teal-600 text-white px-2 py-1 rounded text-sm flex items-center gap-1"
                   >
                     {feature}
                     <button

@@ -51,7 +51,7 @@ export function StatsCards() {
       value: countries.length,
       description: 'Active destinations',
       icon: Globe,
-      color: 'text-blue-400',
+      color: 'text-teal-400',
       href: '/admin/countries'
     },
     {
@@ -115,7 +115,7 @@ export function StatsCards() {
       value: stats.total,
       description: 'Student inquiries',
       icon: MessageSquare,
-      color: 'text-blue-400',
+      color: 'text-teal-400',
       href: '/admin/enquiries'
     },
     {

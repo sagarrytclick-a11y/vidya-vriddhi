@@ -139,7 +139,7 @@ export default function EnquiriesPage() {
       case 'RESOLVED':
         return 'bg-green-500/20 text-green-400 border-green-500/30'
       case 'FOLLOW_UP':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+        return 'bg-teal-500/20 text-teal-400 border-teal-500/30'
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
     }
@@ -177,7 +177,7 @@ export default function EnquiriesPage() {
               placeholder="Search by name, email, city, or category..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-blue-500"
+              className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -200,7 +200,7 @@ export default function EnquiriesPage() {
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
               </div>
             ) : enquiries.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
@@ -224,7 +224,7 @@ export default function EnquiriesPage() {
                       <tr key={enquiry.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center">
                               <User className="h-4 w-4 text-white" />
                             </div>
                             <div>
@@ -351,7 +351,7 @@ export default function EnquiriesPage() {
               
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center">
                     <User className="h-6 w-6 text-white" />
                   </div>
                   <div>

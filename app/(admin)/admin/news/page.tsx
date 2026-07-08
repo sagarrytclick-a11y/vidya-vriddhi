@@ -110,7 +110,7 @@ export default function NewsPage() {
           <h1 className="text-3xl font-bold text-white">News</h1>
           <Button
             onClick={openAddModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add News
@@ -215,7 +215,7 @@ export default function NewsPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
+                                className="text-teal-400 hover:text-teal-300 hover:bg-slate-700"
                                 onClick={() => openViewModal(newsItem)}
                               >
                                 <Eye className="h-4 w-4" />
@@ -280,7 +280,7 @@ export default function NewsPage() {
                             size="sm"
                             onClick={() => handlePageChange(pageNum)}
                             className={currentPage === pageNum 
-                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                              ? "bg-teal-600 hover:bg-teal-700 text-white" 
                               : "border-slate-600 text-gray-300 hover:bg-slate-700"
                             }
                           >

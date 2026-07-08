@@ -200,7 +200,7 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full bg-slate-700 border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-700 border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                 required
               >
                 <option value="">Select a category</option>

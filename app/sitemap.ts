@@ -28,6 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${domain}/study-abroad`, priority: 0.8, changeFrequency: 'weekly' as const },
     { url: `${domain}/blogs`, priority: 0.8, changeFrequency: 'weekly' as const },
     { url: `${domain}/news`, priority: 0.7, changeFrequency: 'daily' as const },
+    { url: `${domain}/mbbs-in-kyrgyzstan`, priority: 0.9, changeFrequency: 'weekly' as const },
+    { url: `${domain}/mbbs-in-russia`, priority: 0.9, changeFrequency: 'weekly' as const },
+    { url: `${domain}/mbbs-in-georgia`, priority: 0.9, changeFrequency: 'weekly' as const },
   ]
 
   const collegePages = colleges.map((c) => ({

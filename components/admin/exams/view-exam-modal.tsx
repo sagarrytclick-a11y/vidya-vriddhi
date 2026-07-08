@@ -20,7 +20,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
       <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-400" />
+            <BookOpen className="h-5 w-5 text-teal-400" />
             {exam.name}
           </DialogTitle>
           <DialogDescription className="text-slate-400">
@@ -33,7 +33,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
           <Card className="bg-slate-700 border-slate-600">
             <CardHeader>
               <CardTitle className="text-lg text-white flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-400" />
+                <FileText className="h-5 w-5 text-teal-400" />
                 Basic Information
               </CardTitle>
             </CardHeader>
@@ -57,7 +57,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
                 </div>
                 <div>
                   <label className="text-sm text-slate-400">Type</label>
-                  <Badge variant="outline" className="border-blue-500 text-blue-400">
+                  <Badge variant="outline" className="border-teal-500 text-teal-400">
                     {exam.type}
                   </Badge>
                 </div>
@@ -92,7 +92,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
             <Card className="bg-slate-700 border-slate-600">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-blue-400" />
+                  <Globe className="h-5 w-5 text-teal-400" />
                   {exam.overview.title}
                 </CardTitle>
               </CardHeader>
@@ -122,7 +122,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
             <Card className="bg-slate-700 border-slate-600">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-400" />
+                  <Users className="h-5 w-5 text-teal-400" />
                   {exam.registration.title}
                 </CardTitle>
               </CardHeader>
@@ -136,7 +136,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
                     <ul className="mt-2 space-y-1">
                       {exam.registration.bulletPoints.map((point: string, index: number) => (
                         <li key={index} className="text-white flex items-start gap-2">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
+                          <div className="w-2 h-2 bg-teal-400 rounded-full mt-2 flex-shrink-0" />
                           {point}
                         </li>
                       ))}
@@ -152,7 +152,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
             <Card className="bg-slate-700 border-slate-600">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-blue-400" />
+                  <FileText className="h-5 w-5 text-teal-400" />
                   {exam.examPattern.title}
                 </CardTitle>
               </CardHeader>
@@ -210,7 +210,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
             <Card className="bg-slate-700 border-slate-600">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-400" />
+                  <Calendar className="h-5 w-5 text-teal-400" />
                   {exam.examDates.title}
                 </CardTitle>
               </CardHeader>
@@ -220,7 +220,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
                     {exam.examDates.importantDates.map((date: any, index: number) => (
                       <div key={index} className="flex items-center justify-between bg-slate-600 p-3 rounded">
                         <span className="text-white">{date.event}</span>
-                        <Badge variant="outline" className="border-blue-500 text-blue-400">
+                        <Badge variant="outline" className="border-teal-500 text-teal-400">
                           {date.date}
                         </Badge>
                       </div>
@@ -236,7 +236,7 @@ export function ViewExamModal({ isOpen, onClose, exam }: ViewExamModalProps) {
             <Card className="bg-slate-700 border-slate-600">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Award className="h-5 w-5 text-blue-400" />
+                  <Award className="h-5 w-5 text-teal-400" />
                   {exam.resultStatistics.title}
                 </CardTitle>
               </CardHeader>

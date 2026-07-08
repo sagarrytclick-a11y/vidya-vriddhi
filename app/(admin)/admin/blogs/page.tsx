@@ -90,7 +90,7 @@ export default function BlogsPage() {
           <h1 className="text-3xl font-bold text-white">Blogs</h1>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Blog
@@ -195,7 +195,7 @@ export default function BlogsPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="text-blue-400 hover:text-blue-300 hover:bg-slate-700"
+                                className="text-teal-400 hover:text-teal-300 hover:bg-slate-700"
                                 onClick={() => {
                                   setSelectedBlog(blog)
                                   setIsViewModalOpen(true)
@@ -266,7 +266,7 @@ export default function BlogsPage() {
                             size="sm"
                             onClick={() => handlePageChange(pageNum)}
                             className={currentPage === pageNum 
-                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                              ? "bg-teal-600 hover:bg-teal-700 text-white" 
                               : "border-slate-600 text-gray-300 hover:bg-slate-700"
                             }
                           >

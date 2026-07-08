@@ -150,7 +150,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
                 value={formData.name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="Enter country name"
-                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-blue-500 ${
+                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 ${
                   errors.name ? 'border-red-500 focus:ring-red-500' : ''
                 }`}
                 required
@@ -169,7 +169,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
                 value={formData.slug}
                 onChange={(e) => handleChange('slug', e.target.value)}
                 placeholder="Enter slug (e.g., united-states)"
-                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-blue-500 ${
+                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 ${
                   errors.slug ? 'border-red-500 focus:ring-red-500' : ''
                 }`}
                 required
@@ -190,7 +190,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
                 value={formData.flagEmoji}
                 onChange={(e) => handleChange('flagEmoji', e.target.value)}
                 placeholder="🇺🇸"
-                className="bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-blue-500 text-center"
+                className="bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 text-center"
               />
               <Button
                 type="button"
@@ -212,7 +212,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Enter country description"
               rows={4}
-              className="w-full bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-blue-500 rounded-md p-3"
+              className="w-full bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 rounded-md p-3"
             />
           </div>
 
@@ -222,7 +222,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
                 type="checkbox"
                 checked={formData.active}
                 onChange={(e) => handleChange('active', e.target.checked)}
-                className="mr-2 h-4 w-4 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="mr-2 h-4 w-4 bg-slate-700 border-slate-600 rounded focus:ring-teal-500"
               />
               Active
             </label>
@@ -232,7 +232,7 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
             <Button
               type="submit"
               disabled={isSubmitting || isUpdating}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              className="bg-teal-600 hover:bg-teal-700 text-white disabled:opacity-50"
             >
               {isSubmitting || isUpdating ? 'Updating...' : 'Update Country'}
             </Button>
