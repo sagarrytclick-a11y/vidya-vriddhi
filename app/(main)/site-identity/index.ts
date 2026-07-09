@@ -115,7 +115,7 @@ export const SITE_IDENTITY: SiteIdentity = {
     ogImage: "/logo.png",
   },
   business: {
-    established: 2020,
+    established: 2019,
     type: "Education Services",
     services: [
       "College Guidance",
