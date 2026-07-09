@@ -106,7 +106,7 @@ const AboutPage = () => {
                   <h3 className="text-xl font-bold text-gray-900">Our Headquarters</h3>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  Located in the heart of Bangalore, our modern office serves as the central hub 
+                  Located in the heart of Noida, our modern office serves as the central hub 
                   where our expert counselors work tirelessly to guide students toward their academic dreams. 
                   The welcoming environment reflects our commitment to making every student feel supported 
                   throughout their educational journey.
@@ -159,7 +159,7 @@ const AboutPage = () => {
                 to bridge the gap between talented students and their dream institutions.
               </p>
               <p className="mb-4">
-                What started as a small counseling center in Bangalore has grown into a nationally 
+                What started as a small counseling center in Noida has grown into a nationally 
                 recognized educational consultancy. We have successfully guided over 50,000 students 
                 through the complex admission processes of India's top universities and international 
                 institutions. Our comprehensive services include career assessment, college selection, 
