@@ -129,7 +129,7 @@ const AboutPage = () => {
                         AT
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-slate-900">{SITE_IDENTITY.meta.author}</h3>
+                        <h3 className="text-xl font-bold text-slate-900">Abhishek Tiwari</h3>
                         <p className="text-orange-500 font-medium text-sm">Founder & Chief Executive Officer</p>
                       </div>
                     </div>
