@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         active: true
       },
       orderBy: { createdAt: 'desc' },
+      take: 50,
       select: {
         id: true,
         name: true,
@@ -54,11 +55,15 @@ export async function GET(request: NextRequest) {
           }
         },
         courses: {
+          where: {
+            name: { equals: courseName, mode: 'insensitive' }
+          },
           select: {
             id: true,
             name: true,
             slug: true
-          }
+          },
+          take: 3
         },
         _count: {
           select: {
@@ -70,7 +75,9 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(colleges)
+    return NextResponse.json(colleges, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+    })
   } catch (error) {
     console.error('Error fetching colleges by course:', error)
     return NextResponse.json(

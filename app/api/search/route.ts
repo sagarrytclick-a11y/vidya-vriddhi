@@ -11,9 +11,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [] })
     }
 
-    // Search all entities in parallel
+    // Search all entities in parallel — select only fields used in results
     const [colleges, exams, news, courses] = await Promise.all([
-      // Search colleges
       db.college.findMany({
         where: {
           OR: [
@@ -22,7 +21,12 @@ export async function GET(request: NextRequest) {
           ]
         },
         take: limit,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          logoURL: true,
+          imageURL: true,
           country: {
             select: {
               name: true,
@@ -32,7 +36,6 @@ export async function GET(request: NextRequest) {
         }
       }),
 
-      // Search exams
       db.exam.findMany({
         where: {
           OR: [
@@ -40,21 +43,32 @@ export async function GET(request: NextRequest) {
             { slug: { contains: query, mode: 'insensitive' as const } }
           ]
         },
-        take: limit
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          examImageurl: true,
+        }
       }),
 
-      // Search news/articles
       db.news.findMany({
         where: {
           OR: [
             { title: { contains: query, mode: 'insensitive' as const } },
-            { content: { contains: query, mode: 'insensitive' as const } }
+            { slug: { contains: query, mode: 'insensitive' as const } }
           ]
         },
-        take: limit
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          imageUrl: true,
+          createdAt: true,
+        }
       }),
 
-      // Search courses
       db.course.findMany({
         where: {
           OR: [
@@ -62,7 +76,12 @@ export async function GET(request: NextRequest) {
             { slug: { contains: query, mode: 'insensitive' as const } }
           ]
         },
-        take: limit
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        }
       })
     ])
 
@@ -83,7 +102,7 @@ export async function GET(request: NextRequest) {
         type: 'Exam',
         image: exam.examImageurl,
         slug: exam.slug,
-        additionalInfo: exam.examDates && typeof exam.examDates === 'string' ? new Date(exam.examDates).toLocaleDateString() : 'TBA'
+        additionalInfo: 'Exam'
       })),
       ...news.map(newsItem => ({
         id: newsItem.id,

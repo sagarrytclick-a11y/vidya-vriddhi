@@ -2,7 +2,8 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Calendar, Clock, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
+import { unstable_cache } from 'next/cache'
+import { Calendar, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -13,9 +14,59 @@ interface CityPageProps {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 3600
+
+async function getCityBySlug(slug: string) {
+  return unstable_cache(
+    async () => {
+      return db.city.findUnique({
+        where: { slug, active: true },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          cityImageURL: true,
+          features: true,
+          createdAt: true,
+          _count: {
+            select: { colleges: { where: { active: true } } },
+          },
+          country: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              flagEmoji: true,
+            },
+          },
+          colleges: {
+            where: { active: true },
+            take: 6,
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              logoURL: true,
+              imageURL: true,
+              description: true,
+              Countryranking: true,
+              Internationalranking: true,
+              categories: { select: { name: true, slug: true }, take: 3 },
+              courses: { select: { name: true, slug: true }, take: 3 },
+            },
+          },
+        },
+      })
+    },
+    ['city-detail', slug],
+    { revalidate: 3600 }
+  )()
+}
+
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params
-  const city = await db.city.findUnique({ where: { slug, active: true }, select: { name: true, description: true, country: { select: { name: true } } } })
+  const city = await getCityBySlug(slug)
   if (!city) return { title: 'City Not Found' }
   return {
     title: `Study in ${city.name}, ${city.country.name} | Colleges & Universities`,
@@ -29,56 +80,13 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
 export default async function CityPage({ params }: CityPageProps) {
   const { slug } = await params
-  
-  const city = await db.city.findUnique({
-    where: {
-      slug,
-      active: true
-    },
-    include: {
-      country: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          flagEmoji: true,
-        }
-      },
-      colleges: {
-        where: {
-          active: true
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          logoURL: true,
-          imageURL: true,
-          description: true,
-          Countryranking: true,
-          Internationalranking: true,
-          categories: {
-            select: {
-              name: true,
-              slug: true,
-            }
-          },
-          courses: {
-            select: {
-              name: true,
-              slug: true,
-            },
-            take: 3
-          }
-        },
-        take: 6
-      }
-    }
-  })
+  const city = await getCityBySlug(slug)
 
   if (!city) {
     notFound()
   }
+
+  const collegeTotal = city._count.colleges
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white">
@@ -106,7 +114,7 @@ export default async function CityPage({ params }: CityPageProps) {
               </div>
               <div className="flex items-center gap-1 text-blue-100/90 text-sm">
                 <Building2 className="w-4 h-4" />
-                <span>{city.colleges.length} Colleges</span>
+                <span>{collegeTotal} Colleges</span>
               </div>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
@@ -277,7 +285,7 @@ export default async function CityPage({ params }: CityPageProps) {
                       <Building2 className="w-5 h-5 text-blue-600" />
                       <div>
                         <p className="text-sm text-slate-500">Total Colleges</p>
-                        <p className="font-medium text-slate-900">{city.colleges.length}</p>
+                        <p className="font-medium text-slate-900">{collegeTotal}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">

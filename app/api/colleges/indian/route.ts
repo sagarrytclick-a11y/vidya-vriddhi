@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { get, set } from '@/lib/cache'
+import { unstable_cache } from 'next/cache'
+
+const getIndiaCountryId = unstable_cache(
+  async () => {
+    const india = await db.country.findFirst({
+      where: { name: { equals: 'India', mode: 'insensitive' } },
+      select: { id: true },
+    })
+    return india?.id ?? null
+  },
+  ['india-country-id'],
+  { revalidate: 86400 }
+)
 
 // GET Indian colleges with pagination
 export async function GET(request: NextRequest) {
@@ -38,18 +51,10 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Find India country (case-insensitive)
-    const india = await db.country.findFirst({
-      where: {
-        name: {
-          equals: 'India',
-          mode: 'insensitive'
-        }
-      }
-    })
+    const indiaId = await getIndiaCountryId()
 
     // If India not found, return empty results
-    if (!india) {
+    if (!indiaId) {
       const emptyResponse = {
         colleges: [],
         pagination: {
@@ -73,7 +78,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause
     let whereClause: any = {
-      countryId: india.id,
+      countryId: indiaId,
       active: true
     }
 

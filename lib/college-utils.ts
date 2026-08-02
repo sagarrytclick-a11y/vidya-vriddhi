@@ -6,12 +6,44 @@ export const getCollegeBySlug = async (slug: string) => {
     async () => {
       return db.college.findUnique({
         where: { slug },
-        include: {
-          city: true,
-          country: true,
-          categories: true,
-          courses: true,
-          exams: true,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          establishment_year: true,
+          Countryranking: true,
+          Internationalranking: true,
+          active: true,
+          features: true,
+          logoURL: true,
+          imageURL: true,
+          keyHighlights: true,
+          whyChooseUs: true,
+          documentsRequired: true,
+          feesStructure: true,
+          admissionProcess: true,
+          campusHighlights: true,
+          countryId: true,
+          cityId: true,
+          createdAt: true,
+          updatedAt: true,
+          city: {
+            select: { id: true, name: true, slug: true },
+          },
+          country: {
+            select: { id: true, name: true, slug: true, flagEmoji: true },
+          },
+          categories: {
+            select: { id: true, name: true, slug: true },
+          },
+          courses: {
+            select: { id: true, name: true, slug: true },
+          },
+          // List badges only — never pull exam Json blobs on college pages
+          exams: {
+            select: { id: true, name: true, slug: true, shortName: true },
+          },
         },
       })
     },

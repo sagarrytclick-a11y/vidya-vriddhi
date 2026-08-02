@@ -30,14 +30,17 @@ export interface Course {
  * Course with related colleges
  */
 export interface CourseWithColleges extends Course {
-  colleges: CourseCollege[]
+  colleges?: CourseCollege[]
+  _count?: {
+    colleges: number
+  }
 }
 
 /**
  * Course with count aggregates
  */
 export interface CourseWithStats extends Course {
-  colleges: CourseCollege[]
+  colleges?: CourseCollege[]
   _count: {
     colleges: number
   }

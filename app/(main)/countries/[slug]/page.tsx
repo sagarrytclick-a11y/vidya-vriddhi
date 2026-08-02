@@ -2,7 +2,8 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Calendar, Clock, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
+import { unstable_cache } from 'next/cache'
+import { Calendar, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -13,9 +14,68 @@ interface CountryPageProps {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 3600
+
+async function getCountryBySlug(slug: string) {
+  return unstable_cache(
+    async () => {
+      return db.country.findUnique({
+        where: { slug, active: true },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          flagEmoji: true,
+          description: true,
+          createdAt: true,
+          _count: {
+            select: {
+              colleges: { where: { active: true } },
+              cities: { where: { active: true } },
+            },
+          },
+          // Cap preview list — full catalog lives on /colleges?country=
+          colleges: {
+            where: { active: true },
+            take: 12,
+            orderBy: { Internationalranking: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              logoURL: true,
+              imageURL: true,
+              description: true,
+              Countryranking: true,
+              Internationalranking: true,
+              city: { select: { name: true, slug: true } },
+              categories: { select: { name: true, slug: true }, take: 3 },
+              courses: { select: { name: true, slug: true }, take: 3 },
+            },
+          },
+          cities: {
+            where: { active: true },
+            take: 6,
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              cityImageURL: true,
+              _count: { select: { colleges: true } },
+            },
+          },
+        },
+      })
+    },
+    ['country-detail', slug],
+    { revalidate: 3600 }
+  )()
+}
+
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { slug } = await params
-  const country = await db.country.findUnique({ where: { slug, active: true }, select: { name: true, description: true } })
+  const country = await getCountryBySlug(slug)
   if (!country) return { title: 'Country Not Found' }
   return {
     title: `Study in ${country.name} | Colleges, Courses & Universities`,
@@ -29,74 +89,14 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 
 export default async function CountryPage({ params }: CountryPageProps) {
   const { slug } = await params
-  
-  const country = await db.country.findUnique({
-    where: {
-      slug,
-      active: true
-    },
-    include: {
-      colleges: {
-        where: {
-          active: true
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          logoURL: true,
-          imageURL: true,
-          description: true,
-          Countryranking: true,
-          Internationalranking: true,
-          city: {
-            select: {
-              name: true,
-              slug: true,
-            }
-          },
-          categories: {
-            select: {
-              name: true,
-              slug: true,
-            }
-          },
-          courses: {
-            select: {
-              name: true,
-              slug: true,
-            },
-            take: 3
-          }
-        },
-        orderBy: {
-          Internationalranking: 'asc'
-        }
-      },
-      cities: {
-        where: {
-          active: true
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          cityImageURL: true,
-          _count: {
-            select: {
-              colleges: true
-            }
-          }
-        },
-        take: 6
-      }
-    }
-  })
+  const country = await getCountryBySlug(slug)
 
   if (!country) {
     notFound()
   }
+
+  const collegeTotal = country._count.colleges
+  const cityTotal = country._count.cities
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/20 to-white">
@@ -125,11 +125,11 @@ export default async function CountryPage({ params }: CountryPageProps) {
                 <div className="flex items-center gap-4 mt-2 text-green-100/90">
                   <div className="flex items-center gap-1">
                     <Building2 className="w-4 h-4" />
-                    <span>{country.colleges.length} Colleges</span>
+                    <span>{collegeTotal} Colleges</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
-                    <span>{country.cities.length} Cities</span>
+                    <span>{cityTotal} Cities</span>
                   </div>
                 </div>
               </div>
@@ -336,14 +336,14 @@ export default async function CountryPage({ params }: CountryPageProps) {
                       <Building2 className="w-5 h-5 text-green-600" />
                       <div>
                         <p className="text-sm text-slate-500">Total Colleges</p>
-                        <p className="font-medium text-slate-900">{country.colleges.length}</p>
+                        <p className="font-medium text-slate-900">{collegeTotal}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <MapPin className="w-5 h-5 text-green-600" />
                       <div>
                         <p className="text-sm text-slate-500">Total Cities</p>
-                        <p className="font-medium text-slate-900">{country.cities.length}</p>
+                        <p className="font-medium text-slate-900">{cityTotal}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">

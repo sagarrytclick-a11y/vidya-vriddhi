@@ -177,7 +177,7 @@ export default function CoursesPage() {
                     <div className="flex items-center gap-4 mb-5">
                       <div className="flex items-center gap-1.5 text-sm text-slate-500">
                         <Building2 className="w-4 h-4 text-orange-500" />
-                        <span className="font-medium text-slate-700">{course.colleges?.length || 0}</span>
+                        <span className="font-medium text-slate-700">{course._count?.colleges ?? course.colleges?.length ?? 0}</span>
                         <span>Colleges</span>
                       </div>
                       <div className="w-1 h-1 bg-slate-300 rounded-full" />
