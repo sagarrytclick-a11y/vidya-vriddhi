@@ -56,19 +56,23 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
           </div>
 
           {/* Associated Colleges */}
-          {course.colleges && course.colleges.length > 0 && (
+          {(course._count?.colleges ?? course.colleges?.length ?? 0) > 0 && (
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">Associated Colleges</h3>
                 <div className="bg-slate-700 rounded-lg p-4">
-                  <div className="flex flex-wrap gap-2">
-                    {course.colleges.map((college) => (
-                      <Badge key={college.id} variant="outline" className="border-slate-600 text-gray-300">
-                        <Building className="h-3 w-3 mr-1" />
-                        {college.name}
-                      </Badge>
-                    ))}
-                  </div>
+                  {course.colleges && course.colleges.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {course.colleges.map((college) => (
+                        <Badge key={college.id} variant="outline" className="border-slate-600 text-gray-300">
+                          <Building className="h-3 w-3 mr-1" />
+                          {college.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-300">{course._count?.colleges} college(s) linked</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -102,10 +106,10 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
             </div>
           </div>
 
-          {course.colleges && course.colleges.length > 0 && (
+          {(course._count?.colleges ?? course.colleges?.length ?? 0) > 0 && (
             <div className="pt-4 border-t border-slate-700">
               <label className="text-sm font-medium text-gray-400">Associated Colleges Count</label>
-              <p className="text-white mt-1">{course.colleges.length} college(s)</p>
+              <p className="text-white mt-1">{course._count?.colleges ?? course.colleges?.length} college(s)</p>
             </div>
           )}
         </div>

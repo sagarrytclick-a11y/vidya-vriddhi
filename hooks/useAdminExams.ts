@@ -72,6 +72,7 @@ const fetchExamsWithPagination = async (
   if (search) params.append('search', search)
   if (page) params.append('page', page.toString())
   if (limit) params.append('limit', limit.toString())
+  params.append('detail', 'true')
 
   const url = `/api/exams?${params.toString()}`
   const response = await fetch(url)
@@ -125,7 +126,9 @@ const fetchExamsWithPagination = async (
 }
 
 const fetchExams = async (search?: string): Promise<Exam[]> => {
-  const url = search ? `/api/exams?search=${encodeURIComponent(search)}` : '/api/exams'
+  const params = new URLSearchParams({ detail: 'true' })
+  if (search) params.append('search', search)
+  const url = `/api/exams?${params.toString()}`
   const response = await fetch(url)
 
   if (!response.ok) {

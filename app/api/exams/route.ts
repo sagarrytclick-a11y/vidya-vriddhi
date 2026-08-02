@@ -57,8 +57,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
+    // Admin edit modals need full Json blobs; public list does not
+    const detail = searchParams.get('detail') === 'true'
 
-    // Build where clause for search
     const where = search
       ? {
           OR: [
@@ -68,38 +69,45 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
-    // Fetch exams with pagination
+    const lightSelect = {
+      id: true,
+      name: true,
+      slug: true,
+      shortName: true,
+      description: true,
+      conductingBody: true,
+      examMode: true,
+      examType: true,
+      frequency: true,
+      active: true,
+      examImageurl: true,
+      examDates: true,
+      createdAt: true,
+      updatedAt: true,
+    } as const
+
     const [exams, total] = await Promise.all([
       db.exam.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          shortName: true,
-          description: true,
-          conductingBody: true,
-          examMode: true,
-          examType: true,
-          frequency: true,
-          active: true,
-          examImageurl: true,
-          overview: true,
-          registration: true,
-          examPattern: true,
-          examDates: true,
-          resultStatistics: true,
-          createdAt: true,
-          updatedAt: true
-        }
+        select: detail
+          ? {
+              ...lightSelect,
+              overview: true,
+              registration: true,
+              examPattern: true,
+              resultStatistics: true,
+            }
+          : lightSelect,
       }),
       db.exam.count({ where })
     ])
 
-    return NextResponse.json(createPaginationResponse(exams, total, page, limit))
+    return NextResponse.json(createPaginationResponse(exams, total, page, limit), {
+      headers: { 'Cache-Control': detail ? 'private, no-store' : 'public, s-maxage=300, stale-while-revalidate=600' },
+    })
   } catch (error) {
     console.error('Error fetching exams:', error)
     return NextResponse.json(

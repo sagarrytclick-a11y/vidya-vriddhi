@@ -58,9 +58,35 @@ export async function GET(
     const { id } = await params
     const exam = await db.exam.findUnique({
       where: { id },
-      include: {
-        colleges: true
-      }
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        shortName: true,
+        description: true,
+        conductingBody: true,
+        examType: true,
+        examMode: true,
+        frequency: true,
+        active: true,
+        examImageurl: true,
+        overview: true,
+        registration: true,
+        examPattern: true,
+        examDates: true,
+        resultStatistics: true,
+        createdAt: true,
+        updatedAt: true,
+        colleges: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            logoURL: true,
+          },
+          take: 20,
+        },
+      },
     })
 
     if (!exam) {

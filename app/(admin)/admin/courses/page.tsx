@@ -171,7 +171,7 @@ function CoursesPageContent() {
                           <div className="flex items-center gap-2">
                             <Building className="h-4 w-4 text-gray-400" />
                             <span className="text-gray-300 text-sm">
-                              {course.colleges ? course.colleges.length : 0}
+                              {course._count?.colleges ?? course.colleges?.length ?? 0}
                             </span>
                           </div>
                         </td>

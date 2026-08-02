@@ -43,12 +43,6 @@ export async function GET(request: NextRequest) {
           active: true,
           createdAt: true,
           updatedAt: true,
-          colleges: {
-            select: {
-              id: true,
-              name: true,
-            }
-          },
           _count: {
             select: {
               colleges: true

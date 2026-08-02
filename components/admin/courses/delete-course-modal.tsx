@@ -30,7 +30,8 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
 
   if (!course) return null
 
-  const hasAssociatedColleges = course.colleges && course.colleges.length > 0
+  const collegeCount = course._count?.colleges ?? course.colleges?.length ?? 0
+  const hasAssociatedColleges = collegeCount > 0
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -77,7 +78,7 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
             </p>
             {hasAssociatedColleges && (
               <p className="text-gray-300 text-sm">
-                <strong>Associated Colleges:</strong> {course.colleges.length}
+                <strong>Associated Colleges:</strong> {collegeCount}
               </p>
             )}
           </div>

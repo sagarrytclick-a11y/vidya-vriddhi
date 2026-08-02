@@ -31,7 +31,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         <div className="space-y-3 mb-4">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Building className="w-4 h-4 text-gray-400" />
-            <span>{course.colleges?.length || 0} Colleges</span>
+            <span>{course._count?.colleges ?? course.colleges?.length ?? 0} Colleges</span>
           </div>
         </div>
         
