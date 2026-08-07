@@ -1,10 +1,18 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import NextImage from 'next/image'
 import { Calendar, MapPin, Globe, Award, ImageIcon, FileText, DollarSign, GraduationCap, Users, CheckCircle, XCircle } from 'lucide-react'
+import {
+  adminViewDialogClass,
+  adminViewHeaderClass,
+  adminViewBodyClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
 
 interface ViewCollegeModalProps {
   isOpen: boolean
@@ -27,9 +35,9 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
+      <DialogContent className={cn(adminViewDialogClass, "max-w-4xl")}>
+        <DialogHeader className={adminViewHeaderClass}>
+          <DialogTitle className="text-white flex items-center justify-between">
             <span>{college.name}</span>
             <div className="flex gap-2">
               {college.active ? (
@@ -38,7 +46,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                   Active
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-gray-800 text-gray-400">
+                <Badge variant="secondary" className="bg-gray-800 text-[#6b7280]">
                   <XCircle className="w-3 h-3 mr-1" />
                   Inactive
                 </Badge>
@@ -47,7 +55,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className={cn(adminViewBodyClass, "space-y-6")}>
           {/* Header Section */}
           <div className="flex gap-6">
             {college.logoURL && (
@@ -64,11 +72,11 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-white mb-2">{college.name}</h2>
               {college.description && (
-                <p className="text-gray-300 mb-4">{college.description}</p>
+                <p className="text-[#9ca3af] mb-4">{college.description}</p>
               )}
               <div className="flex flex-wrap gap-2 mb-4">
                 {college.features?.map((feature: string, index: number) => (
-                  <Badge key={index} variant="outline" className="text-xs bg-slate-700 border-slate-600 text-white">
+                  <Badge key={index} variant="outline" className="text-xs rounded-lg bg-[#0c0f14] border border-white/6 text-white">
                     {feature}
                   </Badge>
                 ))}
@@ -89,40 +97,40 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
 
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-300">
+            <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
               <span className="font-medium">Country:</span>
               <span>{college.country?.name || 'N/A'}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <MapPin className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
+              <MapPin className="w-4 h-4 text-[#6b7280]" />
               <span className="font-medium">City:</span>
               <span>{college.city?.name || 'N/A'}</span>
             </div>
             {college.establishment_year && (
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <Calendar className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
+                <Calendar className="w-4 h-4 text-[#6b7280]" />
                 <span className="font-medium">Established:</span>
                 <span>{college.establishment_year}</span>
               </div>
             )}
             {college.Countryranking && (
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <Award className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
+                <Award className="w-4 h-4 text-[#6b7280]" />
                 <span className="font-medium">Country Ranking:</span>
                 <span>#{college.Countryranking}</span>
               </div>
             )}
             {college.Internationalranking && (
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <Globe className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
+                <Globe className="w-4 h-4 text-[#6b7280]" />
                 <span className="font-medium">International Ranking:</span>
                 <span>#{college.Internationalranking}</span>
               </div>
             )}
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <FileText className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-sm text-[#9ca3af]">
+              <FileText className="w-4 h-4 text-[#6b7280]" />
               <span className="font-medium">Slug:</span>
-              <span className="text-gray-400">/{college.slug}</span>
+              <span className="text-[#6b7280]">/{college.slug}</span>
             </div>
           </div>
 
@@ -133,8 +141,8 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <FileText className="w-5 h-5" />
                 Documents Required
               </h3>
-              <div className="bg-slate-700 p-4 rounded-lg">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <pre className="text-sm text-[#9ca3af] whitespace-pre-wrap">
                   {JSON.stringify(college.documentsRequired, null, 2)}
                 </pre>
               </div>
@@ -147,8 +155,8 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <DollarSign className="w-5 h-5" />
                 Fees Structure
               </h3>
-              <div className="bg-slate-700 p-4 rounded-lg">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <pre className="text-sm text-[#9ca3af] whitespace-pre-wrap">
                   {JSON.stringify(college.feesStructure, null, 2)}
                 </pre>
               </div>
@@ -161,8 +169,8 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <GraduationCap className="w-5 h-5" />
                 Admission Process
               </h3>
-              <div className="bg-slate-700 p-4 rounded-lg">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <pre className="text-sm text-[#9ca3af] whitespace-pre-wrap">
                   {JSON.stringify(college.admissionProcess, null, 2)}
                 </pre>
               </div>
@@ -175,8 +183,8 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <CheckCircle className="w-5 h-5" />
                 Why Choose Us
               </h3>
-              <div className="bg-slate-700 p-4 rounded-lg">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <pre className="text-sm text-[#9ca3af] whitespace-pre-wrap">
                   {JSON.stringify(college.whyChooseUs, null, 2)}
                 </pre>
               </div>
@@ -189,8 +197,8 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
                 <ImageIcon className="w-5 h-5" />
                 Gallery Images
               </h3>
-              <div className="bg-slate-700 p-4 rounded-lg">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <pre className="text-sm text-[#9ca3af] whitespace-pre-wrap">
                   {JSON.stringify(college.galleryImages, null, 2)}
                 </pre>
               </div>
@@ -227,7 +235,7 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
 
           {/* Timestamps */}
           <div className="border-t pt-4">
-            <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
+            <div className="grid grid-cols-2 gap-4 text-sm text-[#6b7280]">
               <div>
                 <span className="font-medium">Created:</span> {formatDate(college.createdAt)}
               </div>
@@ -237,22 +245,22 @@ export function ViewCollegeModal({ isOpen, onClose, college, onEdit, onDelete }:
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            {onEdit && (
-              <Button variant="outline" onClick={() => onEdit(college)} className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
-                Edit College
-              </Button>
-            )}
-            {onDelete && (
-              <Button variant="destructive" onClick={() => onDelete(college)} className="bg-red-600 hover:bg-red-700 text-white">
-                Delete College
-              </Button>
-            )}
-            <Button variant="outline" onClick={onClose} className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
-              Close
+        </div>
+
+        <div className="flex shrink-0 justify-end gap-3 border-t border-white/4 bg-[#0c0f14]/50 px-6 py-4">
+          {onEdit && (
+            <Button variant="outline" onClick={() => onEdit(college)} className={adminCancelBtnClass}>
+              Edit College
             </Button>
-          </div>
+          )}
+          {onDelete && (
+            <Button variant="destructive" onClick={() => onDelete(college)} className={adminDangerBtnClass}>
+              Delete College
+            </Button>
+          )}
+          <Button variant="outline" onClick={onClose} className={adminCancelBtnClass}>
+            Close
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

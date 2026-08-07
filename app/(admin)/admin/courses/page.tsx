@@ -3,14 +3,23 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminPageSkeleton,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
 import { Badge } from '@/components/ui/badge'
-import { LoadingPage } from '@/components/ui/loading'
 import { CourseProvider, useCourseContext } from '@/contexts/course-context'
 import { CourseUIProvider, useCourseUIContext } from '@/contexts/course-ui-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
-import { Search, Plus, Trash2, Eye, Edit, Building, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, Building } from 'lucide-react'
+import { Pagination } from '@/components/ui/pagination'
 
 const AddCourseModal = dynamic(() => import('@/components/admin/courses/add-course-modal').then(m => ({ default: m.AddCourseModal })))
 const ViewCourseModal = dynamic(() => import('@/components/admin/courses/view-course-modal').then(m => ({ default: m.ViewCourseModal })))
@@ -32,7 +41,8 @@ function CoursesPageContent() {
     deleteCourse,
     isCreating,
     isUpdating,
-    setPage
+    setPage,
+    setLimit,
   } = useCourseContext()
 
   // UI state from CourseUIContext
@@ -52,14 +62,14 @@ function CoursesPageContent() {
     selectedCourse
   } = useCourseUIContext()
 
-  const handleCreateCourse = async (data: CourseFormData) => {
-    await createCourse(data)
+  const handleCreateCourse = (data: CourseFormData) => {
     closeAddModal()
+    void createCourse(data)
   }
 
-  const handleUpdateCourse = async (id: string, data: Partial<CourseFormData>) => {
-    await updateCourse(id, data)
+  const handleUpdateCourse = (id: string, data: Partial<CourseFormData>) => {
     closeEditModal()
+    void updateCourse(id, data)
   }
 
   const handleDeleteCourse = async (course: any) => {
@@ -72,16 +82,10 @@ function CoursesPageContent() {
     (course.description && course.description.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-  }
-
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="p-8">
-          <LoadingPage text="Loading courses..." />
-        </div>
+        <AdminPageSkeleton rows={6} columns={6} />
       </AdminLayout>
     )
   }
@@ -89,7 +93,7 @@ function CoursesPageContent() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-8">
+        <div className={adminPagePadClass}>
           <div className="flex items-center justify-center min-h-96">
             <div className="text-red-500">Error: {error}</div>
           </div>
@@ -100,33 +104,26 @@ function CoursesPageContent() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Courses</h1>
-          <Button
-            onClick={openAddModal}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Course
-          </Button>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="Course List"
+          action={
+            <Button onClick={openAddModal} className={adminPageActionClass}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Course
+            </Button>
+          }
+        />
 
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search courses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-slate-700 border-slate-600 text-white"
-            />
-          </div>
-        </div>
+        <AdminSearch
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search courses..."
+        />
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className="text-white">Course List</CardTitle>
+            <CardTitle className={adminCardTitleClass}>Course List</CardTitle>
           </CardHeader>
           <CardContent>
             {filteredCourses.length === 0 ? (
@@ -218,50 +215,21 @@ function CoursesPageContent() {
         </Card>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-400">
-              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} courses
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
-                className="border-slate-600 text-white hover:bg-slate-700"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={pageNum === pagination.page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handlePageChange(pageNum)}
-                    className={
-                      pageNum === pagination.page
-                        ? "bg-teal-600 hover:bg-teal-700 text-white"
-                        : "border-slate-600 text-white hover:bg-slate-700"
-                    }
-                  >
-                    {pageNum}
-                  </Button>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page === pagination.totalPages}
-                className="border-slate-600 text-white hover:bg-slate-700"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+        {pagination.total > 0 && (
+          <div className="mt-4 overflow-hidden rounded-2xl ring-1 ring-white/5">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              total={pagination.total}
+              limit={pagination.limit}
+              onPageChange={setPage}
+              onLimitChange={(newLimit) => {
+                setLimit(newLimit)
+                setPage(1)
+              }}
+              hasNext={pagination.page < pagination.totalPages}
+              hasPrev={pagination.page > 1}
+            />
           </div>
         )}
 

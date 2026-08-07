@@ -4,13 +4,22 @@ import NextImage from 'next/image'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminPageSkeleton,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
 import { Badge } from '@/components/ui/badge'
-import { LoadingPage, LoadingTable } from '@/components/ui/loading'
 import { useAdminBlogs } from '@/hooks/useAdminBlogs'
 import { Blog, BlogFormData } from '@/contexts/blog-context'
-import { Search, Plus, Trash2, Image as ImageIcon, Eye, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
+import { Pagination } from '@/components/ui/pagination'
 
 const AddBlogModal = dynamic(() => import('@/components/admin/blogs/add-blog-modal').then(m => ({ default: m.AddBlogModal })))
 const ViewBlogModal = dynamic(() => import('@/components/admin/blogs/view-blog-modal').then(m => ({ default: m.ViewBlogModal })))
@@ -19,11 +28,12 @@ const DeleteBlogModal = dynamic(() => import('@/components/admin/blogs/delete-bl
 
 export default function BlogsPage() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(0)
-  const itemsPerPage = 10
-  
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+
   // Use useAdminBlogs hook for pagination
-  const { blogs, total, loading, error, createBlog, updateBlog, deleteBlog, refetchBlogs, isCreating, isUpdating } = useAdminBlogs(itemsPerPage, currentPage * itemsPerPage)
+  const { blogs, total, loading, error, createBlog, updateBlog, deleteBlog, isCreating, isUpdating } =
+    useAdminBlogs(limit, (page - 1) * limit)
   
   // Modal state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -32,25 +42,19 @@ export default function BlogsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
 
-  const handleCreateBlog = async (data: BlogFormData) => {
-    await createBlog(data)
+  const handleCreateBlog = (data: BlogFormData) => {
     setIsAddModalOpen(false)
-    refetchBlogs()
+    void createBlog(data)
   }
 
-  const handleUpdateBlog = async (id: string, data: Partial<BlogFormData>) => {
-    await updateBlog(id, data)
+  const handleUpdateBlog = (id: string, data: Partial<BlogFormData>) => {
     setIsEditModalOpen(false)
-    refetchBlogs()
+    void updateBlog(id, data)
   }
 
   const handleDeleteBlog = async (blog: Blog) => {
     setSelectedBlog(blog)
     setIsDeleteModalOpen(true)
-  }
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
   }
 
   const filteredBlogs = blogs.filter(blog =>
@@ -59,14 +63,12 @@ export default function BlogsPage() {
     blog.content.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const totalPages = Math.ceil(total / itemsPerPage)
+  const totalPages = Math.max(1, Math.ceil(total / limit))
 
   if (loading) {
     return (
       <AdminLayout>
-        <div className="p-8">
-          <LoadingPage text="Loading blogs..." />
-        </div>
+        <AdminPageSkeleton rows={6} columns={6} />
       </AdminLayout>
     )
   }
@@ -74,7 +76,7 @@ export default function BlogsPage() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-8">
+        <div className={adminPagePadClass}>
           <div className="flex items-center justify-center min-h-96">
             <div className="text-red-500">Error: {error}</div>
           </div>
@@ -85,40 +87,27 @@ export default function BlogsPage() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Blogs</h1>
-          <Button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Blog
-          </Button>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="Blog List"
+          subtitle={total > 0 ? `${total} items` : undefined}
+          action={
+            <Button onClick={() => setIsAddModalOpen(true)} className={adminPageActionClass}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Blog
+            </Button>
+          }
+        />
 
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search blogs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-slate-700 border-slate-600 text-white"
-            />
-          </div>
-        </div>
+        <AdminSearch
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search blogs..."
+        />
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-white">Blog List</CardTitle>
-              {total > 0 && (
-                <div className="text-sm text-gray-400">
-                  Total: {total} items
-                </div>
-              )}
-            </div>
+            <CardTitle className={adminCardTitleClass}>Blog List</CardTitle>
           </CardHeader>
           <CardContent>
             {filteredBlogs.length === 0 ? (
@@ -231,62 +220,20 @@ export default function BlogsPage() {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
-                    <div className="text-sm text-gray-400">
-                      Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, total)} of {total}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 0}
-                        className="border-slate-600 text-gray-300 hover:bg-slate-700 disabled:opacity-50"
-                      >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Previous
-                      </Button>
-                      
-                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                        let pageNum
-                        if (totalPages <= 5) {
-                          pageNum = i
-                        } else if (currentPage < 3) {
-                          pageNum = i
-                        } else if (currentPage > totalPages - 3) {
-                          pageNum = totalPages - 5 + i
-                        } else {
-                          pageNum = currentPage - 2 + i
-                        }
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={currentPage === pageNum ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handlePageChange(pageNum)}
-                            className={currentPage === pageNum 
-                              ? "bg-teal-600 hover:bg-teal-700 text-white" 
-                              : "border-slate-600 text-gray-300 hover:bg-slate-700"
-                            }
-                          >
-                            {pageNum + 1}
-                          </Button>
-                        )
-                      })}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages - 1}
-                        className="border-slate-600 text-gray-300 hover:bg-slate-700 disabled:opacity-50"
-                      >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
+                {total > 0 && (
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    total={total}
+                    limit={limit}
+                    onPageChange={setPage}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit)
+                      setPage(1)
+                    }}
+                    hasNext={page < totalPages}
+                    hasPrev={page > 1}
+                  />
                 )}
               </>
             )}

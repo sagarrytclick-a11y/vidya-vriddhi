@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,11 +8,21 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import NextImage from 'next/image'
-import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
+import { X, Plus, Trash2 } from 'lucide-react'
 import { CollegeFormData } from '@/types/college'
 import { toast } from 'sonner'
+import { AdminImageDropzone } from '@/components/admin/image-dropzone'
+import {
+  adminCheckboxClass,
+  adminDialogClass,
+  adminFieldClass,
+  adminSelectContentClass,
+  adminCancelBtnClass,
+  adminPrimaryBtnClass,
+  adminLabelClass,
+} from '@/components/admin/modal-ui'
 
 interface AddCollegeModalProps {
   isOpen: boolean
@@ -139,9 +150,9 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
   const [newCourse, setNewCourse] = useState({ course_name: '', duration: '', annual_tuition_fee: '' })
   const [newWhyChooseUsFeature, setNewWhyChooseUsFeature] = useState({ title: '', description: '' })
   const [newAdmissionStep, setNewAdmissionStep] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const logoInputRef = useRef<HTMLInputElement>(null)
-  const campusImageInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingCampus, setUploadingCampus] = useState(false)
   
   // Dynamic data states
   const [exams, setExams] = useState<any[]>([])
@@ -458,6 +469,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
   }
 
   const handleImageUpload = async (file: File, type: 'imageURL' | 'logoURL') => {
+    if (type === 'imageURL') setUploadingImage(true)
+    else setUploadingLogo(true)
     try {
       const url = await uploadToImageKit(file)
       setFormData(prev => ({
@@ -468,6 +481,9 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
     } catch (error) {
       console.error('Image upload failed:', error)
       toast.error('Failed to upload image. Please try again.')
+    } finally {
+      if (type === 'imageURL') setUploadingImage(false)
+      else setUploadingLogo(false)
     }
   }
 
@@ -475,10 +491,10 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn(adminDialogClass, "max-w-4xl max-h-[90vh] overflow-y-auto")}>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit College' : 'Add New College'}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-white">{isEdit ? 'Edit College' : 'Add New College'}</DialogTitle>
+          <DialogDescription className="text-[#6b7280]">
             {isEdit ? 'Update the college information below.' : 'Fill in the college information below.'}
           </DialogDescription>
         </DialogHeader>
@@ -487,23 +503,23 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">College Name *</Label>
+              <Label htmlFor="name" className={adminLabelClass}>College Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter college name"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="slug">Slug *</Label>
+              <Label htmlFor="slug" className={adminLabelClass}>Slug *</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => handleInputChange('slug', e.target.value)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="college-slug"
                 required
               />
@@ -511,12 +527,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className={adminLabelClass}>Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className="bg-slate-700 border-slate-600"
+              className={adminFieldClass}
               placeholder="Enter college description"
               rows={3}
             />
@@ -524,12 +540,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="country">Country *</Label>
+              <Label htmlFor="country" className={adminLabelClass}>Country *</Label>
               <Select value={formData.countryId} onValueChange={(value) => handleInputChange('countryId', value)} disabled={loading}>
-                <SelectTrigger className="bg-slate-700 border-slate-600">
+                <SelectTrigger className={adminFieldClass}>
                   <SelectValue placeholder={loading ? "Loading countries..." : "Select country"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={adminSelectContentClass}>
                   {countries.map((country) => (
                     <SelectItem key={country.id} value={country.id}>
                       {country.name}
@@ -539,16 +555,16 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               </Select>
             </div>
             <div>
-              <Label htmlFor="city">City *</Label>
+              <Label htmlFor="city" className={adminLabelClass}>City *</Label>
               <Select 
                 value={formData.cityId || ''} 
                 onValueChange={(value) => handleInputChange('cityId', value || undefined)}
                 disabled={!formData.countryId || loading}
               >
-                <SelectTrigger className="bg-slate-700 border-slate-600">
+                <SelectTrigger className={adminFieldClass}>
                   <SelectValue placeholder={loading ? "Loading cities..." : "Select city"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={adminSelectContentClass}>
                   {filteredCities.map((city) => (
                     <SelectItem key={city.id} value={city.id}>
                       {city.name}
@@ -561,38 +577,38 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="establishment_year">Establishment Year</Label>
+              <Label htmlFor="establishment_year" className={adminLabelClass}>Establishment Year</Label>
               <Input
                 id="establishment_year"
                 type="number"
                 value={formData.establishment_year || ''}
                 onChange={(e) => handleInputChange('establishment_year', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="e.g., 1950"
                 min="1800"
                 max={new Date().getFullYear()}
               />
             </div>
             <div>
-              <Label htmlFor="Countryranking">Country Ranking</Label>
+              <Label htmlFor="Countryranking" className={adminLabelClass}>Country Ranking</Label>
               <Input
                 id="Countryranking"
                 type="number"
                 value={formData.Countryranking || ''}
                 onChange={(e) => handleInputChange('Countryranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="e.g., 1"
                 min="1"
               />
             </div>
             <div>
-              <Label htmlFor="Internationalranking">International Ranking</Label>
+              <Label htmlFor="Internationalranking" className={adminLabelClass}>International Ranking</Label>
               <Input
                 id="Internationalranking"
                 type="number"
                 value={formData.Internationalranking || ''}
                 onChange={(e) => handleInputChange('Internationalranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="e.g., 100"
                 min="1"
               />
@@ -601,7 +617,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="exams">Exams</Label>
+              <Label htmlFor="exams" className={adminLabelClass}>Exams</Label>
               <div className="space-y-2">
                 {exams.map((exam) => (
                   <div key={exam.id} className="flex items-center space-x-2">
@@ -615,7 +631,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                           handleInputChange('exams', formData.exams?.filter(id => id !== exam.id) || [])
                         }
                       }}
-                    />
+                  className={adminCheckboxClass}
+                />
                     <Label htmlFor={`exam-${exam.id}`} className="text-sm text-white">
                       {exam.name}
                     </Label>
@@ -624,12 +641,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               </div>
             </div>
             <div>
-              <Label htmlFor="categories">Categories</Label>
+              <Label htmlFor="categories" className={adminLabelClass}>Categories</Label>
               <div className="space-y-2">
                 {loading ? (
-                  <p className="text-sm text-gray-400">Loading categories...</p>
+                  <p className="text-sm text-[#6b7280]">Loading categories...</p>
                 ) : categories.length === 0 ? (
-                  <p className="text-sm text-gray-400">No categories found. Please add categories first.</p>
+                  <p className="text-sm text-[#6b7280]">No categories found. Please add categories first.</p>
                 ) : (
                   categories.map((category) => (
                     <div key={category.id} className="flex items-center space-x-2">
@@ -643,7 +660,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                             handleInputChange('categories', formData.categories?.filter(id => id !== category.id) || [])
                           }
                         }}
-                      />
+                  className={adminCheckboxClass}
+                />
                       <Label htmlFor={`category-${category.id}`} className="text-sm text-white">
                         {category.name}
                       </Label>
@@ -656,8 +674,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
           {/* Courses Section */}
           <div>
-            <Label htmlFor="courses">Courses</Label>
-            <div className="space-y-2 max-h-40 overflow-y-auto border border-slate-600 rounded p-3 bg-slate-700">
+            <Label htmlFor="courses" className={adminLabelClass}>Courses</Label>
+            <div className="space-y-2 max-h-40 overflow-y-auto rounded-xl border border-white/6 bg-[#0c0f14] p-3">
               {courses.map((course) => (
                 <div key={course.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -670,26 +688,27 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                         handleInputChange('courses', formData.courses?.filter(id => id !== course.id) || [])
                       }
                     }}
-                  />
+                  className={adminCheckboxClass}
+                />
                   <Label htmlFor={`course-${course.id}`} className="text-sm text-white">
                     {course.name}
                   </Label>
                 </div>
               ))}
               {courses.length === 0 && (
-                <p className="text-sm text-gray-400">No courses available</p>
+                <p className="text-sm text-[#6b7280]">No courses available</p>
               )}
             </div>
           </div>
 
           {/* Features */}
           <div>
-            <Label>Features</Label>
+            <Label className={adminLabelClass}>Features</Label>
             <div className="flex gap-2 mb-2">
               <Input
                 value={newFeature}
                 onChange={(e) => setNewFeature(e.target.value)}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Add a feature"
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
               />
@@ -699,7 +718,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+                <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
                   <span className="text-sm text-white">{feature}</span>
                   <Button
                     type="button"
@@ -717,95 +736,65 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
 
           {/* Images */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="imageURL">College Image</Label>
-              <div className="flex gap-2">
-                <Input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) handleImageUpload(file, 'imageURL')
-                  }}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Image
-                </Button>
-                {formData.imageURL && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleInputChange('imageURL', '')}
-                    className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label className={adminLabelClass}>College Image</Label>
+              <AdminImageDropzone
+                label="Upload college image"
+                uploading={uploadingImage}
+                onFiles={async (files) => {
+                  if (files[0]) await handleImageUpload(files[0], 'imageURL')
+                }}
+              />
               {formData.imageURL && (
-                <div className="mt-2">
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] p-3">
                   <NextImage
                     src={formData.imageURL}
                     alt="College image"
                     width={80}
                     height={80}
-                    className="object-cover rounded"
+                    className="rounded object-cover"
                   />
-                </div>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="logoURL">Logo</Label>
-              <div className="flex gap-2">
-                <Input
-                  ref={logoInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) handleImageUpload(file, 'logoURL')
-                  }}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => logoInputRef.current?.click()}
-                  className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Logo
-                </Button>
-                {formData.logoURL && (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleInputChange('logoURL', '')}
-                    className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
+                    onClick={() => handleInputChange('imageURL', '')}
+                    className={adminCancelBtnClass}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    Remove
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className={adminLabelClass}>Logo</Label>
+              <AdminImageDropzone
+                label="Upload logo"
+                uploading={uploadingLogo}
+                onFiles={async (files) => {
+                  if (files[0]) await handleImageUpload(files[0], 'logoURL')
+                }}
+              />
               {formData.logoURL && (
-                <div className="mt-2">
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] p-3">
                   <NextImage
                     src={formData.logoURL}
                     alt="College logo"
                     width={80}
                     height={80}
-                    className="object-cover rounded"
+                    className="rounded object-cover"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleInputChange('logoURL', '')}
+                    className={adminCancelBtnClass}
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    Remove
+                  </Button>
                 </div>
               )}
             </div>
@@ -816,17 +805,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <h3 className="text-lg font-semibold">Key Highlights Section</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="keyHighlights_title">Title</Label>
+                <Label htmlFor="keyHighlights_title" className={adminLabelClass}>Title</Label>
                 <Input
                   id="keyHighlights_title"
                   value="Key Highlights"
                   disabled
-                  className="bg-slate-700 border-slate-600 text-gray-400"
+                  className={cn(adminFieldClass, "text-[#6b7280]")}
                   readOnly
                 />
               </div>
               <div>
-                <Label htmlFor="keyHighlights_description">Description</Label>
+                <Label htmlFor="keyHighlights_description" className={adminLabelClass}>Description</Label>
                 <Textarea
                   id="keyHighlights_description"
                   value={formData.keyHighlights?.description || ''}
@@ -834,19 +823,19 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                     ...formData.keyHighlights!,
                     description: e.target.value
                   })}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter key highlights description"
                   rows={3}
                 />
               </div>
               <div>
-                <Label>Key Highlights Features</Label>
+                <Label className={adminLabelClass}>Key Highlights Features</Label>
                 <div className="space-y-2">
                   <div className="flex gap-2">
                     <Input
                       value={newKeyHighlightFeature}
                       onChange={(e) => setNewKeyHighlightFeature(e.target.value)}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Add a key highlight feature"
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyHighlightFeature())}
                     />
@@ -856,7 +845,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {(formData.keyHighlights?.features || []).map((feature, index) => (
-                      <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+                      <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
                         <span className="text-sm text-white">{feature}</span>
                         <Button
                           type="button"
@@ -880,17 +869,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <h3 className="text-lg font-semibold mb-4">Why Choose Us Section</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="whyChooseUs_title">Why Choose Us Title</Label>
+                <Label htmlFor="whyChooseUs_title" className={adminLabelClass}>Why Choose Us Title</Label>
                 <Input
                   id="whyChooseUs_title"
                   value="Why Choose Us"
                   disabled
-                  className="bg-slate-700 border-slate-600 text-gray-400"
+                  className={cn(adminFieldClass, "text-[#6b7280]")}
                   readOnly
                 />
               </div>
               <div>
-                <Label htmlFor="whyChooseUs_description">Why Choose Us Description</Label>
+                <Label htmlFor="whyChooseUs_description" className={adminLabelClass}>Why Choose Us Description</Label>
                 <Textarea
                   id="whyChooseUs_description"
                   value={formData.whyChooseUs?.description || ''}
@@ -898,25 +887,25 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                     ...formData.whyChooseUs!,
                     description: e.target.value
                   })}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter description for why choose us"
                   rows={3}
                 />
               </div>
               <div>
-                <Label>Why Choose Us Features</Label>
+                <Label className={adminLabelClass}>Why Choose Us Features</Label>
                 <div className="space-y-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <Input
                       value={newWhyChooseUsFeature?.title || ''}
                       onChange={(e) => setNewWhyChooseUsFeature({ ...newWhyChooseUsFeature!, title: e.target.value })}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Feature title"
                     />
                     <Input
                       value={newWhyChooseUsFeature?.description || ''}
                       onChange={(e) => setNewWhyChooseUsFeature({ ...newWhyChooseUsFeature!, description: e.target.value })}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Feature description"
                     />
                   </div>
@@ -926,11 +915,11 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   </Button>
                   <div className="space-y-2">
                     {formData.whyChooseUs?.features?.map((feature: any, index: number) => (
-                      <div key={index} className="bg-slate-700 p-3 rounded">
+                      <div key={index} className="rounded-xl bg-[#0c0f14] border border-white/6 p-3">
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="font-medium text-white">{feature.title}</h4>
-                            <p className="text-sm text-gray-300">{feature.description}</p>
+                            <p className="text-sm text-[#9ca3af]">{feature.description}</p>
                           </div>
                           <Button
                             type="button"
@@ -953,17 +942,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           {/* Documents Required Section */}
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <Label htmlFor="documentsRequired_title">Documents Required Title</Label>
+              <Label htmlFor="documentsRequired_title" className={adminLabelClass}>Documents Required Title</Label>
               <Input
                 id="documentsRequired_title"
                 value="Documents Required"
                 disabled
-                className="bg-slate-700 border-slate-600 text-gray-400"
+                className={cn(adminFieldClass, "text-[#6b7280]")}
                 readOnly
               />
             </div>
             <div>
-              <Label htmlFor="documentsRequired_description">Documents Required Description</Label>
+              <Label htmlFor="documentsRequired_description" className={adminLabelClass}>Documents Required Description</Label>
               <Textarea
                 id="documentsRequired_description"
                 value={formData.documentsRequired?.description || ''}
@@ -972,19 +961,19 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   title: formData.documentsRequired?.title || 'Documents Required',
                   description: e.target.value
                 })}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter description for documents required"
                 rows={3}
               />
             </div>
             <div>
-              <Label>Documents Required List</Label>
+              <Label className={adminLabelClass}>Documents Required List</Label>
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <Input
                     value={newDocument}
                     onChange={(e) => setNewDocument(e.target.value)}
-                    className="bg-slate-700 border-slate-600"
+                    className={adminFieldClass}
                     placeholder="Add a required document"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
                   />
@@ -994,7 +983,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {formData.documentsRequired?.documents?.map((document: string, index: number) => (
-                    <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+                    <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
                       <span className="text-sm text-white">{document}</span>
                       <Button
                         type="button"
@@ -1017,17 +1006,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <h3 className="text-lg font-semibold mb-4">Fees Structure Section</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="feesStructure_title">Fees Structure Title</Label>
+                <Label htmlFor="feesStructure_title" className={adminLabelClass}>Fees Structure Title</Label>
                 <Input
                   id="feesStructure_title"
                   value="Fees Structure"
                   disabled
-                  className="bg-slate-700 border-slate-600 text-gray-400"
+                  className={cn(adminFieldClass, "text-[#6b7280]")}
                   readOnly
                 />
               </div>
               <div>
-                <Label htmlFor="feesStructure_description">Fees Structure Description</Label>
+                <Label htmlFor="feesStructure_description" className={adminLabelClass}>Fees Structure Description</Label>
                 <Textarea
                   id="feesStructure_description"
                   value={formData.feesStructure?.description || ''}
@@ -1035,31 +1024,31 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                     ...formData.feesStructure!,
                     description: e.target.value
                   })}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter description for fees structure"
                   rows={3}
                 />
               </div>
               <div>
-                <Label>Fees Structure Courses</Label>
+                <Label className={adminLabelClass}>Fees Structure Courses</Label>
                 <div className="space-y-2">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <Input
                       value={newCourse?.course_name || ''}
                       onChange={(e) => setNewCourse({ ...newCourse!, course_name: e.target.value })}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Course name"
                     />
                     <Input
                       value={newCourse?.duration || ''}
                       onChange={(e) => setNewCourse({ ...newCourse!, duration: e.target.value })}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Duration (e.g., 4 years)"
                     />
                     <Input
                       value={newCourse?.annual_tuition_fee || ''}
                       onChange={(e) => setNewCourse({ ...newCourse!, annual_tuition_fee: e.target.value })}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Annual fee (e.g., $10,000)"
                     />
                   </div>
@@ -1069,12 +1058,12 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   </Button>
                   <div className="space-y-2">
                     {formData.feesStructure?.courses?.map((course: any, index: number) => (
-                      <div key={index} className="bg-slate-700 p-3 rounded">
+                      <div key={index} className="rounded-xl bg-[#0c0f14] border border-white/6 p-3">
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="font-medium text-white">{course.course_name}</h4>
-                            <p className="text-sm text-gray-300">Duration: {course.duration}</p>
-                            <p className="text-sm text-gray-300">Annual Tuition: {course.annual_tuition_fee}</p>
+                            <p className="text-sm text-[#9ca3af]">Duration: {course.duration}</p>
+                            <p className="text-sm text-[#9ca3af]">Annual Tuition: {course.annual_tuition_fee}</p>
                           </div>
                           <Button
                             type="button"
@@ -1099,17 +1088,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <h3 className="text-lg font-semibold mb-4">Admission Process Section</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="admissionProcess_title">Admission Process Title</Label>
+                <Label htmlFor="admissionProcess_title" className={adminLabelClass}>Admission Process Title</Label>
                 <Input
                   id="admissionProcess_title"
                   value="Admission Process"
                   disabled
-                  className="bg-slate-700 border-slate-600 text-gray-400"
+                  className={cn(adminFieldClass, "text-[#6b7280]")}
                   readOnly
                 />
               </div>
               <div>
-                <Label htmlFor="admissionProcess_description">Admission Process Description</Label>
+                <Label htmlFor="admissionProcess_description" className={adminLabelClass}>Admission Process Description</Label>
                 <Textarea
                   id="admissionProcess_description"
                   value={formData.admissionProcess?.description || ''}
@@ -1117,19 +1106,19 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                     ...formData.admissionProcess!,
                     description: e.target.value
                   })}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter description for admission process"
                   rows={3}
                 />
               </div>
               <div>
-                <Label>Admission Process Steps</Label>
+                <Label className={adminLabelClass}>Admission Process Steps</Label>
                 <div className="space-y-2">
                   <div className="flex gap-2">
                     <Input
                       value={newAdmissionStep}
                       onChange={(e) => setNewAdmissionStep(e.target.value)}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Add an admission step"
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAdmissionStep())}
                     />
@@ -1139,7 +1128,7 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                   </div>
                   <div className="space-y-2">
                     {formData.admissionProcess?.steps?.map((step: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2 bg-slate-700 p-2 rounded">
+                      <div key={index} className="flex items-center gap-2 rounded-lg bg-[#0c0f14] border border-white/6 p-2">
                         <span className="text-sm font-medium text-white">Step {index + 1}:</span>
                         <span className="text-sm text-white">{step}</span>
                         <Button
@@ -1164,17 +1153,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <h3 className="text-lg font-semibold mb-4">Campus Highlights Section</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="campusHighlights_title">Campus Highlights Title</Label>
+                <Label htmlFor="campusHighlights_title" className={adminLabelClass}>Campus Highlights Title</Label>
                 <Input
                   id="campusHighlights_title"
                   value="Campus Highlights"
                   disabled
-                  className="bg-slate-700 border-slate-600 text-gray-400"
+                  className={cn(adminFieldClass, "text-[#6b7280]")}
                   readOnly
                 />
               </div>
               <div>
-                <Label htmlFor="campusHighlights_description">Campus Highlights Description</Label>
+                <Label htmlFor="campusHighlights_description" className={adminLabelClass}>Campus Highlights Description</Label>
                 <Textarea
                   id="campusHighlights_description"
                   value={formData.campusHighlights?.description || ''}
@@ -1182,38 +1171,30 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
                     ...formData.campusHighlights!,
                     description: e.target.value
                   })}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter description for campus highlights"
                   rows={3}
                 />
               </div>
               <div>
-                <Label>Campus Highlights Images</Label>
+                <Label className={adminLabelClass}>Campus Highlights Images</Label>
                 <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      ref={campusImageInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => {
-                        const files = e.target.files
-                        if (files) {
-                          Array.from(files).forEach(file => handleCampusImageUpload(file))
+                  <AdminImageDropzone
+                    label="Upload campus images"
+                    multiple
+                    uploading={uploadingCampus}
+                    hint="Drop multiple images or click upload"
+                    onFiles={async (files) => {
+                      setUploadingCampus(true)
+                      try {
+                        for (const file of files) {
+                          await handleCampusImageUpload(file)
                         }
-                      }}
-                      className="hidden"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => campusImageInputRef.current?.click()}
-                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Campus Images
-                    </Button>
-                  </div>
+                      } finally {
+                        setUploadingCampus(false)
+                      }
+                    }}
+                  />
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {formData.campusHighlights?.highlights?.map((highlight: string, index: number) => (
                       <div key={index} className="relative group aspect-video">
@@ -1246,15 +1227,16 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               id="active"
               checked={formData.active}
               onCheckedChange={(checked) => handleInputChange('active', checked)}
-            />
-            <Label htmlFor="active">Active</Label>
+                  className={adminCheckboxClass}
+                />
+            <Label htmlFor="active" className={adminLabelClass}>Active</Label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
+            <Button type="button" variant="outline" onClick={onClose} className={adminCancelBtnClass}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className={adminPrimaryBtnClass}>
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
@@ -1302,7 +1284,7 @@ function KeyHighlightsFeatures({ formData, handleInputChange }: { formData: Coll
         <Input
           value={newFeature}
           onChange={(e) => setNewFeature(e.target.value)}
-          className="bg-slate-700 border-slate-600"
+          className={adminFieldClass}
           placeholder="Add a feature"
           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
         />
@@ -1312,7 +1294,7 @@ function KeyHighlightsFeatures({ formData, handleInputChange }: { formData: Coll
       </div>
       <div className="flex flex-wrap gap-2">
         {formData.keyHighlights?.features?.map((feature: string, index: number) => (
-          <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+          <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
             <span className="text-sm text-white">{feature}</span>
             <Button
               type="button"
@@ -1363,13 +1345,13 @@ function WhyChooseUsFeatures({ formData, handleInputChange }: { formData: Colleg
           <Input
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            className="bg-slate-700 border-slate-600"
+            className={adminFieldClass}
             placeholder="Feature title"
           />
           <Input
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
-            className="bg-slate-700 border-slate-600"
+            className={adminFieldClass}
             placeholder="Feature description"
           />
         </div>
@@ -1380,11 +1362,11 @@ function WhyChooseUsFeatures({ formData, handleInputChange }: { formData: Colleg
       </div>
       <div className="space-y-2">
         {formData.whyChooseUs?.features?.map((feature: any, index: number) => (
-          <div key={index} className="bg-slate-700 p-3 rounded">
+          <div key={index} className="rounded-xl bg-[#0c0f14] border border-white/6 p-3">
             <div className="flex justify-between items-start">
               <div>
                 <h4 className="font-medium text-white">{feature.title}</h4>
-                <p className="text-sm text-gray-300">{feature.description}</p>
+                <p className="text-sm text-[#9ca3af]">{feature.description}</p>
               </div>
               <Button
                 type="button"
@@ -1438,7 +1420,7 @@ function AdmissionSteps({ formData, handleInputChange }: { formData: CollegeForm
         <Input
           value={newStep}
           onChange={(e) => setNewStep(e.target.value)}
-          className="bg-slate-700 border-slate-600"
+          className={adminFieldClass}
           placeholder="Add a step"
           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addStep())}
         />
@@ -1448,7 +1430,7 @@ function AdmissionSteps({ formData, handleInputChange }: { formData: CollegeForm
       </div>
       <div className="space-y-2">
         {formData.admissionProcess?.steps?.map((step: string, index: number) => (
-          <div key={index} className="flex items-center gap-2 bg-slate-700 p-2 rounded">
+          <div key={index} className="flex items-center gap-2 rounded-lg bg-[#0c0f14] border border-white/6 p-2">
             <span className="text-sm font-medium text-white">Step {index + 1}:</span>
             <span className="text-sm text-white">{step}</span>
             <Button
@@ -1497,7 +1479,7 @@ function RequiredDocuments({ formData, handleInputChange }: { formData: CollegeF
         <Input
           value={newDocument}
           onChange={(e) => setNewDocument(e.target.value)}
-          className="bg-slate-700 border-slate-600"
+          className={adminFieldClass}
           placeholder="Add a document"
           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
         />
@@ -1507,7 +1489,7 @@ function RequiredDocuments({ formData, handleInputChange }: { formData: CollegeF
       </div>
       <div className="flex flex-wrap gap-2">
         {formData.documentsRequired?.documents?.map((document: string, index: number) => (
-          <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+          <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
             <span className="text-sm text-white">{document}</span>
             <Button
               type="button"
@@ -1556,19 +1538,19 @@ function FeesStructureCourses({ formData, handleInputChange }: { formData: Colle
           <Input
             value={newCourse.course_name}
             onChange={(e) => setNewCourse({ ...newCourse, course_name: e.target.value })}
-            className="bg-slate-700 border-slate-600"
+            className={adminFieldClass}
             placeholder="Course name"
           />
           <Input
             value={newCourse.duration}
             onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
-            className="bg-slate-700 border-slate-600"
+            className={adminFieldClass}
             placeholder="Duration (e.g., 4 years)"
           />
           <Input
             value={newCourse.annual_tuition_fee}
             onChange={(e) => setNewCourse({ ...newCourse, annual_tuition_fee: e.target.value })}
-            className="bg-slate-700 border-slate-600"
+            className={adminFieldClass}
             placeholder="Annual fee (e.g., $10,000)"
           />
         </div>
@@ -1579,12 +1561,12 @@ function FeesStructureCourses({ formData, handleInputChange }: { formData: Colle
       </div>
       <div className="space-y-2">
         {formData.feesStructure?.courses?.map((course: any, index: number) => (
-          <div key={index} className="bg-slate-700 p-3 rounded">
+          <div key={index} className="rounded-xl bg-[#0c0f14] border border-white/6 p-3">
             <div className="flex justify-between items-start">
               <div>
                 <h4 className="font-medium text-white">{course.course_name}</h4>
-                <p className="text-sm text-gray-300">Duration: {course.duration}</p>
-                <p className="text-sm text-gray-300">Annual Tuition: {course.annual_tuition_fee}</p>
+                <p className="text-sm text-[#9ca3af]">Duration: {course.duration}</p>
+                <p className="text-sm text-[#9ca3af]">Annual Tuition: {course.annual_tuition_fee}</p>
               </div>
               <Button
                 type="button"
@@ -1633,7 +1615,7 @@ function CampusHighlightsList({ formData, handleInputChange }: { formData: Colle
         <Input
           value={newHighlight}
           onChange={(e) => setNewHighlight(e.target.value)}
-          className="bg-slate-700 border-slate-600"
+          className={adminFieldClass}
           placeholder="Add a campus highlight"
           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHighlight())}
         />
@@ -1643,7 +1625,7 @@ function CampusHighlightsList({ formData, handleInputChange }: { formData: Colle
       </div>
       <div className="flex flex-wrap gap-2">
         {formData.campusHighlights?.highlights?.map((highlight: string, index: number) => (
-          <div key={index} className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded">
+          <div key={index} className="flex items-center gap-1 rounded-lg bg-[#0c0f14] border border-white/6 px-2 py-1">
             <span className="text-sm text-white">{highlight}</span>
             <Button
               type="button"

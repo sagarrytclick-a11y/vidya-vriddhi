@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,15 @@ import { useState, useRef } from 'react'
 import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  adminCheckboxClass,
+  adminDialogClass,
+  adminFieldClass,
+  adminCancelBtnClass,
+  adminPrimaryBtnClass,
+  adminLabelClass,
+} from '@/components/admin/modal-ui'
+import { AdminImageDropzone } from '@/components/admin/image-dropzone'
 
 interface AddCategoryModalProps {
   isOpen: boolean
@@ -140,83 +150,65 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+      <DialogContent className={cn(adminDialogClass, "max-w-2xl")}>
         <DialogHeader>
-          <DialogTitle>Add New Category</DialogTitle>
+          <DialogTitle className="text-white">Add New Category</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label htmlFor="name">Category Name</Label>
+              <Label htmlFor="name" className={adminLabelClass}>Category Name</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={handleNameChange}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter category name"
                 required
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="slug">Slug</Label>
+              <Label htmlFor="slug" className={adminLabelClass}>Slug</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="category-slug"
                 required
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className={adminLabelClass}>Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter category description"
                 rows={3}
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="categoryImage">Category Image</Label>
+              <Label htmlFor="categoryImage" className={adminLabelClass}>Category Image</Label>
               <div className="space-y-3">
-                <div className="border-2 border-dashed border-slate-600 rounded-lg p-4">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    id="categoryImage"
-                  />
-                  <label
-                    htmlFor="categoryImage"
-                    className="flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700/50 transition-colors"
-                  >
-                    {uploadingImage ? (
-                      <LoadingButton text="Uploading to ImageKit..." size="md" />
-                    ) : (
-                      <>
-                        <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                        <span className="text-sm text-slate-300">Click to upload image</span>
-                      </>
-                    )}
-                    <span className="text-xs text-slate-500 mt-1">
-                      PNG, JPG, GIF up to 5MB • Powered by ImageKit
-                    </span>
-                  </label>
-                </div>
+                <AdminImageDropzone
+                  label="Upload image"
+                  uploading={uploadingImage}
+                  hint="PNG, JPG, GIF up to 5MB · drag & drop or browse"
+                  onFiles={async (files) => {
+                    if (files[0]) await handleImageUpload(files[0])
+                  }}
+                />
                 
                 {(uploadedImage || formData.categoryImageUrl) && (
                   <div className="relative group">
-                    <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
-                      <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden flex-shrink-0">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0c0f14] border border-white/6">
+                      <div className="relative w-16 h-16 rounded overflow-hidden bg-[#080a0e] border border-white/6 flex-shrink-0">
                         <NextImage
                           src={uploadedImage || formData.categoryImageUrl || ''}
                           alt="Category preview"
@@ -241,7 +233,7 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
                       <button
                         type="button"
                         onClick={removeUploadedImage}
-                        className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+                        className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -250,16 +242,16 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
                 )}
                 
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-px bg-slate-600"></div>
+                  <div className="flex-1 h-px bg-white/10"></div>
                   <span className="text-xs text-slate-400">OR</span>
-                  <div className="flex-1 h-px bg-slate-600"></div>
+                  <div className="flex-1 h-px bg-white/10"></div>
                 </div>
                 
                 <Input
                   type="url"
                   value={formData.categoryImageUrl}
                   onChange={(e) => setFormData(prev => ({ ...prev, categoryImageUrl: e.target.value }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="https://example.com/category-image.jpg"
                 />
               </div>
@@ -271,17 +263,18 @@ export function AddCategoryModal({ isOpen, onClose, onSubmit, isSubmitting = fal
                   id="active"
                   checked={formData.active}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked as boolean }))}
+                  className={adminCheckboxClass}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active" className={adminLabelClass}>Active</Label>
               </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className={adminCancelBtnClass}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className={adminPrimaryBtnClass}>
               {isSubmitting ? 'Creating...' : 'Create Category'}
             </Button>
           </div>

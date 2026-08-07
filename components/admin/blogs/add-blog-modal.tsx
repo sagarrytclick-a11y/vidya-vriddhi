@@ -11,7 +11,16 @@ import { useState, useRef, useEffect } from 'react'
 import { useBlogContext, BlogFormData } from '@/contexts/blog-context'
 import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
-import { generateSlug } from '@/lib/utils'
+import { cn, generateSlug } from '@/lib/utils'
+import {
+  adminCheckboxClass,
+  adminDialogClass,
+  adminFieldClass,
+  adminCancelBtnClass,
+  adminPrimaryBtnClass,
+  adminLabelClass,
+} from '@/components/admin/modal-ui'
+import { AdminImageDropzone } from '@/components/admin/image-dropzone'
 
 interface AddBlogModalProps {
   isOpen: boolean
@@ -70,8 +79,7 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
     }
 
     try {
-      await createBlog(formData)
-      onClose()
+      const payload = { ...formData }
       setFormData({
         title: '',
         slug: '',
@@ -84,6 +92,8 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+      onClose()
+      await createBlog(payload)
     } catch (error) {
       console.error('Failed to create blog:', error)
     }
@@ -147,15 +157,15 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl">
+      <DialogContent className={cn(adminDialogClass, "max-w-3xl")}>
         <DialogHeader>
-          <DialogTitle>Add New Blog</DialogTitle>
+          <DialogTitle className="text-white">Add New Blog</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label htmlFor="title">Blog Title</Label>
+              <Label htmlFor="title" className={adminLabelClass}>Blog Title</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -164,43 +174,43 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                   title: e.target.value,
                   slug: generateSlug(e.target.value)
                 }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter blog title"
                 required
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="slug">Blog Slug</Label>
+              <Label htmlFor="slug" className={adminLabelClass}>Blog Slug</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Blog slug will auto-generate from title"
                 required
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content" className={adminLabelClass}>Content</Label>
               <Textarea
                 id="content"
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                className="bg-slate-700 border-slate-600 min-h-[150px]"
+                className={cn(adminFieldClass, "min-h-[150px]")}
                 placeholder="Enter blog content"
                 required
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category" className={adminLabelClass}>Category</Label>
               <select
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full bg-slate-700 border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className={cn(adminFieldClass, "w-full px-3 py-2 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500")}
                 required
               >
                 <option value="">Select a category</option>
@@ -213,37 +223,21 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="blogImage">Blog Image</Label>
+              <Label htmlFor="blogImage" className={adminLabelClass}>Blog Image</Label>
               <div className="space-y-3">
-                <div className="border-2 border-dashed border-slate-600 rounded-lg p-4">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    id="blogImage"
-                  />
-                  <label
-                    htmlFor="blogImage"
-                    className="flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700/50 transition-colors"
-                  >
-                    <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                    {uploadingImage ? (
-                      <LoadingButton text="Uploading to ImageKit..." size="md" />
-                    ) : (
-                      <span className="text-sm text-slate-300">Click to upload image</span>
-                    )}
-                    <span className="text-xs text-slate-500 mt-1">
-                      PNG, JPG, GIF up to 5MB • Powered by ImageKit
-                    </span>
-                  </label>
-                </div>
+                <AdminImageDropzone
+                  label="Upload image"
+                  uploading={uploadingImage}
+                  hint="PNG, JPG, GIF up to 5MB · drag & drop or browse"
+                  onFiles={async (files) => {
+                    if (files[0]) await handleImageUpload(files[0])
+                  }}
+                />
                 
                 {(uploadedImage || formData.imageUrl) && (
                   <div className="relative group">
-                    <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
-                      <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0c0f14] border border-white/6">
+                      <div className="relative w-16 h-16 rounded overflow-hidden bg-[#080a0e] border border-white/6 shrink-0">
                         <NextImage
                           src={uploadedImage || formData.imageUrl || ''}
                           alt="Blog preview"
@@ -268,7 +262,7 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                       <button
                         type="button"
                         onClick={removeUploadedImage}
-                        className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+                        className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -277,16 +271,16 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                 )}
                 
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-px bg-slate-600"></div>
+                  <div className="flex-1 h-px bg-white/10"></div>
                   <span className="text-xs text-slate-400">OR</span>
-                  <div className="flex-1 h-px bg-slate-600"></div>
+                  <div className="flex-1 h-px bg-white/10"></div>
                 </div>
                 
                 <Input
                   type="url"
                   value={formData.imageUrl}
                   onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="https://example.com/blog-image.jpg"
                 />
               </div>
@@ -298,17 +292,18 @@ export function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
                   id="active"
                   checked={formData.active}
                   onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, active: checked }))}
+                  className={adminCheckboxClass}
                 />
-                <Label htmlFor="active">Active</Label>
+                <Label htmlFor="active" className={adminLabelClass}>Active</Label>
               </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className={adminCancelBtnClass}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isCreating}>
+            <Button type="submit" disabled={isCreating} className={adminPrimaryBtnClass}>
               {isCreating ? 'Creating...' : 'Create Blog'}
             </Button>
           </div>

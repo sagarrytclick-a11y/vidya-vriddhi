@@ -1,11 +1,17 @@
 
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
 import { useAdminCourses } from '@/hooks/useAdminCourses'
 import { Course } from '@/hooks/useAdminCourses'
+import {
+  adminDialogClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
 
 interface DeleteCourseModalProps {
   isOpen: boolean
@@ -35,9 +41,9 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+      <DialogContent className={cn(adminDialogClass, "max-w-md")}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-400">
+          <DialogTitle className="text-white flex items-center gap-2 text-red-400">
             <AlertTriangle className="h-5 w-5" />
             Delete Course
           </DialogTitle>
@@ -45,39 +51,39 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
         
         <div className="space-y-4">
           {hasAssociatedColleges ? (
-            <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
+            <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
               <p className="text-red-300 text-sm">
                 Cannot delete course 
                 <span className="font-semibold text-white mx-1">"{course.name}"</span>
                 because it has associated colleges.
               </p>
-              <p className="text-red-400 text-xs mt-2">
+              <p className="text-rose-400 text-xs mt-2">
                 Please remove all associated colleges before deleting this course.
               </p>
             </div>
           ) : (
             <>
-              <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
+              <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
                 <p className="text-red-300 text-sm">
                   Are you sure you want to delete the course 
                   <span className="font-semibold text-white mx-1">"{course.name}"</span>?
                 </p>
-                <p className="text-red-400 text-xs mt-2">
+                <p className="text-rose-400 text-xs mt-2">
                   This action cannot be undone. The course will be permanently removed from the system.
                 </p>
               </div>
             </>
           )}
 
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-gray-300 text-sm">
+          <div className="rounded-xl bg-[#0c0f14]/80 border border-white/6 p-3">
+            <p className="text-[#9ca3af] text-sm">
               <strong>Course:</strong> {course.name}
             </p>
-            <p className="text-gray-300 text-sm">
+            <p className="text-[#9ca3af] text-sm">
               <strong>Slug:</strong> {course.slug}
             </p>
             {hasAssociatedColleges && (
-              <p className="text-gray-300 text-sm">
+              <p className="text-[#9ca3af] text-sm">
                 <strong>Associated Colleges:</strong> {collegeCount}
               </p>
             )}
@@ -89,7 +95,7 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
             variant="outline" 
             onClick={onClose}
             disabled={isDeleting}
-            className="border-slate-600 text-gray-300 hover:bg-slate-700"
+            className={adminCancelBtnClass}
           >
             Cancel
           </Button>
@@ -97,7 +103,7 @@ export function DeleteCourseModal({ isOpen, onClose, course }: DeleteCourseModal
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting || hasAssociatedColleges}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className={adminDangerBtnClass}
           >
             {isDeleting ? 'Deleting...' : 'Delete Course'}
           </Button>

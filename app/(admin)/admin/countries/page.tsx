@@ -3,10 +3,18 @@
 import dynamic from 'next/dynamic'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LoadingPage } from '@/components/ui/loading'
-import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminPageSkeleton,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
+import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useCountryContext } from '@/contexts/country-context'
 
 const AddCountryModal = dynamic(() => import('@/components/admin/countries/add-country-modal').then(m => ({ default: m.AddCountryModal })))
@@ -43,9 +51,7 @@ export default function CountriesPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="p-8">
-          <LoadingPage text="Loading countries..." />
-        </div>
+        <AdminPageSkeleton rows={6} columns={6} />
       </AdminLayout>
     )
   }
@@ -53,7 +59,7 @@ export default function CountriesPage() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-8">
+        <div className={adminPagePadClass}>
           <div className="flex items-center justify-center min-h-96">
             <div className="text-red-400">Error: {error.message}</div>
           </div>
@@ -86,29 +92,27 @@ export default function CountriesPage() {
         isDeleting={isDeleting}
       />
       
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Countries Management</h1>
-          </div>
-          <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white" onClick={openAddModal}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Country
-          </Button>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="All Countries"
+          subtitle={`${countries.length} countries`}
+          action={
+            <Button onClick={openAddModal} className={adminPageActionClass}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Country
+            </Button>
+          }
+        />
 
-        <div className="relative mb-6 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search countries..."
-            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
-          />
-        </div>
+        <AdminSearch
+          value=""
+          onChange={() => {}}
+          placeholder="Search countries..."
+        />
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className="text-white">All Countries ({countries.length})</CardTitle>
+            <CardTitle className={adminCardTitleClass}>All Countries ({countries.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">

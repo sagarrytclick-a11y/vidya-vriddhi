@@ -1,7 +1,13 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import {
+  adminViewDialogClass,
+  adminViewHeaderClass,
+  adminViewBodyClass,
+} from '@/components/admin/modal-ui'
 
 interface ViewCategoryModalProps {
   isOpen: boolean
@@ -14,28 +20,28 @@ export function ViewCategoryModal({ isOpen, onClose, category }: ViewCategoryMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Category Details</DialogTitle>
+      <DialogContent className={cn(adminViewDialogClass, "max-w-2xl")}>
+        <DialogHeader className={adminViewHeaderClass}>
+          <DialogTitle className="text-white">Category Details</DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
+
+        <div className={cn(adminViewBodyClass, "space-y-6")}>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Category Name</h3>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Category Name</h3>
               <p className="text-white">{category.name}</p>
             </div>
             
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Slug</h3>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Slug</h3>
               <p className="text-white">{category.slug}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Status</h3>
-              <Badge className={category.active ? 'bg-green-600' : 'bg-gray-600'}>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Status</h3>
+              <Badge className={category.active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 text-[#9ca3af] border border-white/10'}>
                 {category.active ? 'Active' : 'Inactive'}
               </Badge>
             </div>
@@ -43,21 +49,21 @@ export function ViewCategoryModal({ isOpen, onClose, category }: ViewCategoryMod
 
           {category.description && (
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Description</h3>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Description</h3>
               <p className="text-white">{category.description}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Created</h3>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Created</h3>
               <p className="text-white">
                 {new Date(category.createdAt).toLocaleDateString()}
               </p>
             </div>
             
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-1">Last Updated</h3>
+              <h3 className="text-sm font-medium text-[#6b7280] mb-1">Last Updated</h3>
               <p className="text-white">
                 {new Date(category.updatedAt).toLocaleDateString()}
               </p>

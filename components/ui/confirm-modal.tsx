@@ -1,9 +1,15 @@
 'use client'
 
 import React from 'react'
-import { X, Trash2, AlertTriangle } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AlertTriangle, Trash2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from './button'
+import {
+  adminDialogClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
+import { cn } from '@/lib/utils'
 
 interface ConfirmModalProps {
   isOpen: boolean
@@ -15,178 +21,106 @@ interface ConfirmModalProps {
   cancelText?: string
   type?: 'delete' | 'warning' | 'danger'
   isLoading?: boolean
+  /** Optional detail lines shown in the dark info box */
+  details?: Array<{ label: string; value: string }>
 }
 
-export function ConfirmModal({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  title, 
-  message, 
+export function ConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
   confirmText = 'Delete',
   cancelText = 'Cancel',
   type = 'delete',
-  isLoading = false
+  isLoading = false,
+  details,
 }: ConfirmModalProps) {
-  const getIconAndColors = () => {
-    switch (type) {
-      case 'delete':
-        return {
-          icon: Trash2,
-          bgColor: 'bg-red-50',
-          iconBg: 'bg-red-100',
-          iconColor: 'text-red-600',
-          borderColor: 'border-red-200',
-          confirmBg: 'bg-red-600 hover:bg-red-700',
-          confirmText: 'Delete'
-        }
-      case 'warning':
-        return {
-          icon: AlertTriangle,
-          bgColor: 'bg-yellow-50',
-          iconBg: 'bg-yellow-100',
-          iconColor: 'text-yellow-600',
-          borderColor: 'border-yellow-200',
-          confirmBg: 'bg-yellow-600 hover:bg-yellow-700',
-          confirmText: 'Proceed'
-        }
-      case 'danger':
-        return {
-          icon: AlertTriangle,
-          bgColor: 'bg-orange-50',
-          iconBg: 'bg-orange-100',
-          iconColor: 'text-orange-600',
-          borderColor: 'border-orange-200',
-          confirmBg: 'bg-orange-600 hover:bg-orange-700',
-          confirmText: 'Continue'
-        }
-      default:
-        return {
-          icon: Trash2,
-          bgColor: 'bg-red-50',
-          iconBg: 'bg-red-100',
-          iconColor: 'text-red-600',
-          borderColor: 'border-red-200',
-          confirmBg: 'bg-red-600 hover:bg-red-700',
-          confirmText: 'Delete'
-        }
-    }
-  }
-
-  const { icon: Icon, bgColor, iconBg, iconColor, borderColor, confirmBg } = getIconAndColors()
+  const isDelete = type === 'delete'
+  const titleColor =
+    type === 'warning' ? 'text-amber-400' : type === 'danger' ? 'text-orange-400' : 'text-rose-400'
+  const warnBox =
+    type === 'warning'
+      ? 'border-amber-500/20 bg-amber-500/10'
+      : type === 'danger'
+        ? 'border-orange-500/20 bg-orange-500/10'
+        : 'border-rose-500/20 bg-rose-500/10'
+  const warnText =
+    type === 'warning'
+      ? 'text-amber-300'
+      : type === 'danger'
+        ? 'text-orange-300'
+        : 'text-rose-300'
+  const confirmClass =
+    type === 'warning'
+      ? 'rounded-xl bg-amber-600 text-white hover:bg-amber-500 font-semibold'
+      : type === 'danger'
+        ? 'rounded-xl bg-orange-600 text-white hover:bg-orange-500 font-semibold'
+        : adminDangerBtnClass
 
   const handleConfirm = () => {
     onConfirm()
-    if (!isLoading) {
-      onClose()
-    }
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              mass: 0.8
-            }}
-            className={`relative w-full max-w-md ${bgColor} border-2 ${borderColor} rounded-2xl shadow-2xl overflow-hidden`}
-          >
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full transition-colors z-10"
-              disabled={isLoading}
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !isLoading && onClose()}>
+      <DialogContent className={cn(adminDialogClass, 'max-w-md')}>
+        <DialogHeader>
+          <DialogTitle className={cn('flex items-center gap-2', titleColor)}>
+            {isDelete ? <Trash2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+            {title}
+          </DialogTitle>
+        </DialogHeader>
 
-            <div className="p-6 sm:p-8">
-              {/* Icon with animation */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 20,
-                  delay: 0.1
-                }}
-                className={`w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}
-              >
-                <Icon className={`w-8 h-8 ${iconColor}`} />
-              </motion.div>
+        <div className="space-y-4">
+          <div className={cn('rounded-xl border p-4', warnBox)}>
+            <p className={cn('text-sm', warnText)}>{message}</p>
+            {isDelete && (
+              <p className="mt-2 text-xs text-rose-400/80">
+                This action cannot be undone. The record will be permanently removed.
+              </p>
+            )}
+          </div>
 
-              {/* Title */}
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl font-bold text-gray-800 text-center mb-2"
-              >
-                {title}
-              </motion.h3>
-
-              {/* Message */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-gray-600 text-center mb-6"
-              >
-                {message}
-              </motion.p>
-
-              {/* Action Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex gap-3"
-              >
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  disabled={isLoading}
-                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  {cancelText}
-                </Button>
-                <Button
-                  onClick={handleConfirm}
-                  disabled={isLoading}
-                  className={`flex-1 ${confirmBg} text-white transition-all transform hover:scale-105 active:scale-95`}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Deleting...
-                    </div>
-                  ) : (
-                    confirmText
-                  )}
-                </Button>
-              </motion.div>
+          {details && details.length > 0 && (
+            <div className="rounded-xl border border-white/6 bg-[#0c0f14] p-3 space-y-1">
+              {details.map((row) => (
+                <p key={row.label} className="text-sm text-[#9ca3af]">
+                  <strong className="text-white">{row.label}:</strong> {row.value}
+                </p>
+              ))}
             </div>
-          </motion.div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+              className={adminCancelBtnClass}
+            >
+              {cancelText}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirm}
+              disabled={isLoading}
+              className={confirmClass}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Deleting...
+                </span>
+              ) : (
+                confirmText
+              )}
+            </Button>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
+      </DialogContent>
+    </Dialog>
   )
 }

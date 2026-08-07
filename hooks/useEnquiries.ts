@@ -27,7 +27,6 @@ export function useEnquiryStats() {
     queryKey: ['enquiry-stats'],
     queryFn: fetchEnquiryStats,
     staleTime: 30 * 1000, // 30 seconds
-    refetchOnMount: 'always',
     retry: 3,
   })
 

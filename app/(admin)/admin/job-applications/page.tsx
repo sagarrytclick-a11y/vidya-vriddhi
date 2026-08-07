@@ -5,12 +5,22 @@ import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AdminPageHeader,
+  adminPagePadClass,
+  adminSearchClass,
+  adminFilterClass,
+  adminCardClass,
+  adminCardTitleClass,
+} from '@/components/admin/page-ui'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pagination } from '@/components/ui/pagination'
-import { Search, Trash2, Eye, Mail, Phone, User, Calendar, FileText, ExternalLink } from 'lucide-react'
+import { Search, Trash2, Eye, Mail, Phone, User, Calendar, FileText, ExternalLink, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
+import { adminCancelBtnClass } from '@/components/admin/modal-ui'
+import { cn } from '@/lib/utils'
 
 const POSITIONS = [
   'Full-Stack Developer',
@@ -125,31 +135,31 @@ export default function JobApplicationsPage() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Job Applications</h1>
-            <p className="text-gray-400 text-sm mt-1">Manage career applications and resumes</p>
-          </div>
-          <div className="text-white">
-            <span className="text-sm text-gray-400">Total:</span>
-            <span className="ml-2 text-lg font-semibold">{total}</span>
-          </div>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="Job Applications"
+          subtitle="Manage career applications and resumes"
+          action={
+            <div className="text-white">
+              <span className="text-sm text-gray-400">Total:</span>
+              <span className="ml-2 text-lg font-semibold">{total}</span>
+            </div>
+          }
+        />
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
             <Input
               type="text"
               placeholder="Search by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
+              className={adminSearchClass}
             />
           </div>
           <Select value={positionFilter} onValueChange={setPositionFilter}>
-            <SelectTrigger className="w-48 bg-slate-800 border-slate-700 text-white">
+            <SelectTrigger className={`w-48 ${adminFilterClass}`}>
               <SelectValue placeholder="Filter by position" />
             </SelectTrigger>
             <SelectContent>
@@ -161,14 +171,14 @@ export default function JobApplicationsPage() {
           </Select>
         </div>
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className="text-white">All Applications</CardTitle>
+            <CardTitle className={adminCardTitleClass}>All Applications</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full" />
+                <div className="animate-spin h-8 w-8 border-2 border-[#ea580c] border-t-transparent rounded-full" />
               </div>
             ) : applications.length === 0 ? (
               <div className="text-center py-8 text-gray-400">No applications found</div>
@@ -279,60 +289,71 @@ export default function JobApplicationsPage() {
         {isViewModalOpen && selectedApp && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#080a0e]/75 backdrop-blur-md"
               onClick={() => setIsViewModalOpen(false)}
             />
-            <div className="relative w-full max-w-lg bg-slate-800 rounded-2xl shadow-2xl p-6">
-              <button
-                onClick={() => setIsViewModalOpen(false)}
-                className="absolute top-4 right-4 p-2 hover:bg-slate-700 rounded-full transition-colors"
-              >
-                <Trash2 className="w-4 h-4 text-gray-400" />
-              </button>
-
-              <div className="space-y-4">
+            <div className="admin-modal relative flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/6 bg-[#12161e] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)]">
+              <div className="flex shrink-0 items-start justify-between border-b border-white/4 px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ea580c]">
                     <User className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white">{selectedApp.name}</h3>
-                    <p className="text-gray-400">Job Applicant</p>
+                    <h3 className="text-lg font-semibold text-white">{selectedApp.name}</h3>
+                    <p className="text-sm text-[#6b7280]">Job Applicant</p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsViewModalOpen(false)}
+                  className="rounded-full p-2 text-[#6b7280] transition-colors hover:bg-[#0c0f14] hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-300">{selectedApp.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-300">{selectedApp.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-gray-400" />
-                    <Badge variant="outline" className="text-orange-300 border-orange-500/30 bg-orange-500/10">
-                      {selectedApp.position}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-300">Applied: {formatDate(selectedApp.createdAt)}</span>
-                  </div>
-                  <div className="pt-2">
-                    <a
-                      href={selectedApp.resumeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
-                    >
-                      <FileText className="h-4 w-4" />
-                      View Resume PDF
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-6 py-5 scrollbar-thin">
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
+                  <Mail className="h-4 w-4 text-[#6b7280]" />
+                  <span className="text-sm text-[#d1d5db]">{selectedApp.email}</span>
                 </div>
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
+                  <Phone className="h-4 w-4 text-[#6b7280]" />
+                  <span className="text-sm text-[#d1d5db]">{selectedApp.phone}</span>
+                </div>
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
+                  <FileText className="h-4 w-4 text-[#6b7280]" />
+                  <Badge variant="outline" className="border-[#ea580c]/30 bg-[#ea580c]/10 text-[#fdba74]">
+                    {selectedApp.position}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
+                  <Calendar className="h-4 w-4 text-[#6b7280]" />
+                  <span className="text-sm text-[#d1d5db]">Applied: {formatDate(selectedApp.createdAt)}</span>
+                </div>
+                <div className="pt-1">
+                  <a
+                    href={selectedApp.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#ea580c] px-4 py-2 text-sm text-white transition-colors hover:bg-[#c2410c]"
+                  >
+                    <FileText className="h-4 w-4" />
+                    View Resume PDF
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+
+              <div className="shrink-0 border-t border-white/4 px-6 py-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsViewModalOpen(false)}
+                  className={cn(adminCancelBtnClass, 'w-full')}
+                >
+                  Close
+                </Button>
               </div>
             </div>
           </div>
@@ -343,11 +364,16 @@ export default function JobApplicationsPage() {
           onClose={() => setDeleteModal({ isOpen: false, appId: null, appName: null })}
           onConfirm={confirmDelete}
           title="Delete Application"
-          message={`Are you sure you want to delete the application from ${deleteModal.appName}? This action cannot be undone.`}
+          message={`Are you sure you want to delete the application from "${deleteModal.appName}"?`}
           confirmText="Delete Application"
           cancelText="Cancel"
           type="delete"
           isLoading={isDeleting}
+          details={
+            deleteModal.appName
+              ? [{ label: 'Applicant', value: deleteModal.appName }]
+              : undefined
+          }
         />
       </div>
     </AdminLayout>

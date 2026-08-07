@@ -148,3 +148,202 @@
     @apply font-sans;
   }
 }
+
+/* Admin panel polish — UI only */
+.admin-panel {
+  --admin-bg: #080a0e;
+  --admin-surface: #12161e;
+  --admin-surface-2: #0c0f14;
+  --admin-accent: #ea580c;
+  --admin-accent-2: #f97316;
+  color-scheme: dark;
+}
+
+.admin-panel ::selection {
+  background: rgba(234, 88, 12, 0.28);
+  color: #fff;
+}
+
+.admin-sidebar,
+.admin-main {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar,
+.admin-main::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb,
+.admin-main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.admin-panel .bg-teal-600 {
+  background-color: #ea580c !important;
+  color: #fff !important;
+}
+
+.admin-panel .bg-teal-600:hover,
+.admin-panel .hover\:bg-teal-700:hover {
+  background-color: #c2410c !important;
+  color: #fff !important;
+}
+
+.admin-panel .text-teal-400 {
+  color: #ea580c !important;
+}
+
+.admin-panel .hover\:text-teal-300:hover {
+  color: #fdba74 !important;
+}
+
+.admin-panel .focus\:ring-teal-500:focus,
+.admin-panel .focus-visible\:ring-teal-500:focus-visible {
+  --tw-ring-color: rgba(234, 88, 12, 0.35);
+}
+
+.admin-panel .bg-slate-800,
+.admin-panel .bg-slate-900 {
+  background-color: #12161e !important;
+}
+
+.admin-panel .bg-slate-700,
+.admin-panel .bg-slate-700\/50:hover {
+  background-color: #151a22 !important;
+}
+
+.admin-panel .border-slate-700,
+.admin-panel .border-slate-600 {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.admin-panel [class*="rounded-lg"].bg-slate-800,
+.admin-panel .rounded-lg.border {
+  border-radius: 1rem;
+}
+
+.admin-panel table th {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280 !important;
+}
+
+.admin-panel table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-panel table tbody tr:hover {
+  background-color: rgba(12, 15, 20, 0.85) !important;
+}
+
+/* Admin CRUD modal chrome */
+.admin-modal {
+  color-scheme: dark;
+}
+
+.admin-modal [data-slot="dialog-close"],
+.admin-modal > button.absolute {
+  border-radius: 9999px;
+  color: #6b7280;
+  opacity: 1;
+}
+
+.admin-modal > button.absolute:hover {
+  background: #0c0f14;
+  color: #fff;
+}
+
+.admin-modal label {
+  margin-bottom: 0.35rem;
+  display: inline-block;
+}
+
+.admin-modal .flex.items-center > label,
+.admin-modal .flex.items-center.gap-2 > label,
+.admin-modal .flex.items-center.space-x-2 > label {
+  margin-bottom: 0;
+}
+
+/* Force visible checkboxes in admin modals + panel (portaled dialogs included) */
+.admin-modal button[role="checkbox"],
+.admin-panel button[role="checkbox"],
+[data-radix-dialog-content].admin-modal button[role="checkbox"],
+[role="dialog"] button[role="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #6b7280 !important;
+  background-color: #0c0f14 !important;
+  border-radius: 5px !important;
+  color: #fff !important;
+  opacity: 1 !important;
+  flex-shrink: 0;
+  box-shadow: none !important;
+}
+
+.admin-modal button[role="checkbox"][data-state="checked"],
+.admin-panel button[role="checkbox"][data-state="checked"],
+[data-radix-dialog-content].admin-modal button[role="checkbox"][data-state="checked"],
+[role="dialog"] button[role="checkbox"][data-state="checked"] {
+  background-color: #ea580c !important;
+  border-color: #ea580c !important;
+  color: #fff !important;
+}
+
+.admin-modal button[role="checkbox"][data-state="unchecked"]:hover,
+.admin-panel button[role="checkbox"][data-state="unchecked"]:hover,
+[role="dialog"] button[role="checkbox"][data-state="unchecked"]:hover {
+  border-color: #9ca3af !important;
+}
+
+.admin-modal input[type="checkbox"],
+.admin-panel input[type="checkbox"],
+[role="dialog"] input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ea580c;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 2px solid #6b7280;
+  border-radius: 5px;
+  background-color: #0c0f14;
+  appearance: auto;
+}
+
+.admin-modal select option {
+  background: #12161e;
+  color: #fff;
+}
+
+/* Sonner toasts — match admin dark + orange accent */
+[data-sonner-toaster] [data-sonner-toast] {
+  --normal-bg: #151a22;
+  --normal-border: rgba(255, 255, 255, 0.06);
+  --normal-text: #fff;
+  font-family: inherit;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type='success'] {
+  --success-bg: #12161e;
+  --success-border: rgba(52, 211, 153, 0.25);
+  --success-text: #fff;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type='error'] {
+  --error-bg: #12161e;
+  --error-border: rgba(244, 63, 94, 0.3);
+  --error-text: #fff;
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-icon] svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type='loading'] [data-icon] {
+  color: #ea580c;
+}

@@ -180,16 +180,46 @@ export function useColleges(search?: string): UseCollegesReturn {
   // Create college mutation
   const createCollegeMutation = useMutation({
     mutationFn: createCollege,
-    onSuccess: (newCollege) => {
-      toast.success('College created successfully')
-      queryClient.setQueryData(collegeKeys.list({ search: search || '', page, limit }), (old: PaginatedCollegesResponse | undefined) => {
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: collegeKeys.lists() })
+      const keys = collegeKeys.list({ search: search || '', page, limit })
+      const previous = queryClient.getQueryData(keys)
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      queryClient.setQueryData(keys, (old: PaginatedCollegesResponse | undefined) => {
         if (!old) return old
-        return { ...old, data: [newCollege, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+        return {
+          ...old,
+          data: [optimistic as any, ...old.data],
+          pagination: { ...old.pagination, total: old.pagination.total + 1 },
+        }
       })
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
+      return { previous, tempId: optimistic.id, keys }
     },
-    onError: (error: Error) => {
+    onSuccess: (newCollege, _vars, context) => {
+      toast.success('College created successfully')
+      if (context?.keys) {
+        queryClient.setQueryData(context.keys, (old: PaginatedCollegesResponse | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            data: old.data.map((c) => (c.id === context.tempId ? newCollege : c)),
+          }
+        })
+      }
+    },
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous && context.keys) {
+        queryClient.setQueryData(context.keys, context.previous)
+      }
       toast.error(error.message || 'Failed to create college')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: collegeKeys.lists(), refetchType: 'active' })
     },
   })
 
@@ -214,7 +244,7 @@ export function useColleges(search?: string): UseCollegesReturn {
       toast.error(error.message || 'Failed to update college')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'active' })
     },
   })
 
@@ -239,7 +269,7 @@ export function useColleges(search?: string): UseCollegesReturn {
       toast.error(error.message || 'Failed to delete college')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: collegeKeys.all, refetchType: 'active' })
     },
   })
 

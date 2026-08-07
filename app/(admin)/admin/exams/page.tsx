@@ -4,13 +4,22 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminPageSkeleton,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
 import { Badge } from '@/components/ui/badge'
-import { LoadingTable } from '@/components/ui/loading'
-import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useExamContext } from '@/contexts/exam-context'
 import { ExamFormData } from '@/hooks/useAdminExams'
+import { Pagination } from '@/components/ui/pagination'
 
 const AddExamModal = dynamic(() => import('@/components/admin/exams/add-exam-modal').then(m => ({ default: m.AddExamModal })))
 const ViewExamModal = dynamic(() => import('@/components/admin/exams/view-exam-modal').then(m => ({ default: m.ViewExamModal })))
@@ -45,17 +54,20 @@ export default function ExamsPage() {
     pagination,
     page,
     setPage,
+    limit,
+    setLimit,
   } = useExamContext()
 
-  const handleCreateExam = async (data: ExamFormData) => {
-    await createExam(data)
+  const handleCreateExam = (data: ExamFormData) => {
     closeAddModal()
+    void createExam(data)
   }
 
-  const handleEditExam = async (data: ExamFormData) => {
+  const handleEditExam = (data: ExamFormData) => {
     if (selectedExam) {
-      await updateExam(selectedExam.id, data)
+      const id = selectedExam.id
       closeEditModal()
+      void updateExam(id, data)
     }
   }
 
@@ -74,37 +86,33 @@ export default function ExamsPage() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Exams Management</h1>
-          <Button 
-            size="lg" 
-            className="bg-teal-600 hover:bg-teal-700 text-white"
-            onClick={openAddModal}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Exam
-          </Button>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="All Exams"
+          subtitle={`${pagination?.total || exams.length} exams`}
+          action={
+            <Button onClick={openAddModal} className={adminPageActionClass}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Exam
+            </Button>
+          }
+        />
 
-        <div className="relative mb-6 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search exams..."
-            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <AdminSearch
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search exams..."
+        />
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className="text-white">All Exams ({pagination?.total || exams.length})</CardTitle>
+            <CardTitle className={adminCardTitleClass}>
+              All Exams ({pagination?.total || exams.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <LoadingTable text="Loading exams..." />
+              <AdminTableSkeleton rows={6} columns={6} />
             ) : exams.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 {searchTerm ? 'No exams found matching your search.' : 'No exams found. Create your first exam!'}
@@ -179,51 +187,20 @@ export default function ExamsPage() {
                 </table>
 
                 {/* Pagination */}
-                {pagination && pagination.totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-700">
-                    <div className="text-sm text-gray-400">
-                      Showing {((page - 1) * pagination.limit) + 1} - {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} exams
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(page - 1)}
-                        disabled={!pagination.hasPrev}
-                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Previous
-                      </Button>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                          <Button
-                            key={pageNum}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage(pageNum)}
-                            className={`w-8 h-8 p-0 ${
-                              pageNum === page
-                                ? 'bg-teal-600 border-teal-600 text-white'
-                                : 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600'
-                            }`}
-                          >
-                            {pageNum}
-                          </Button>
-                        ))}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(page + 1)}
-                        disabled={!pagination.hasNext}
-                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
+                {pagination && pagination.total > 0 && (
+                  <Pagination
+                    currentPage={page}
+                    totalPages={pagination.totalPages}
+                    total={pagination.total}
+                    limit={limit}
+                    onPageChange={setPage}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit)
+                      setPage(1)
+                    }}
+                    hasNext={pagination.hasNext}
+                    hasPrev={pagination.hasPrev}
+                  />
                 )}
               </div>
             )}

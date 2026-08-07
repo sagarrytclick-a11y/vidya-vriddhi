@@ -103,7 +103,7 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
         if (!old) return old
         return { ...old, data: [newCourse, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
       })
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'active' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create course')
@@ -130,8 +130,8 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
       toast.error(error.message || 'Failed to update course')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'active' })
     },
   })
 
@@ -155,8 +155,8 @@ export function useAdminCourses(page: number = 1, limit: number = 10) {
       toast.error(error.message || 'Failed to delete course')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: courseKeys.details(), refetchType: 'active' })
     },
   })
 

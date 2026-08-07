@@ -1,9 +1,15 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Course } from '@/hooks/useAdminCourses'
 import { Calendar, Eye, Building } from 'lucide-react'
+import {
+  adminViewDialogClass,
+  adminViewHeaderClass,
+  adminViewBodyClass,
+} from '@/components/admin/modal-ui'
 
 interface ViewCourseModalProps {
   isOpen: boolean
@@ -16,21 +22,21 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className={cn(adminViewDialogClass, "max-w-4xl")}>
+        <DialogHeader className={adminViewHeaderClass}>
+          <DialogTitle className="text-white flex items-center gap-2">
             <Eye className="h-5 w-5" />
             Course Details
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
+
+        <div className={cn(adminViewBodyClass, "space-y-6")}>
           {/* Header */}
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white mb-2">{course.name}</h2>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-[#6b7280]">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     {new Date(course.createdAt).toLocaleDateString()}
@@ -47,8 +53,8 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
-              <div className="bg-slate-700 rounded-lg p-4">
-                <p className="text-gray-300 whitespace-pre-wrap">
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <p className="text-[#9ca3af] whitespace-pre-wrap">
                   {course.description || 'No description available'}
                 </p>
               </div>
@@ -60,11 +66,11 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">Associated Colleges</h3>
-                <div className="bg-slate-700 rounded-lg p-4">
+                <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
                   {course.colleges && course.colleges.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {course.colleges.map((college) => (
-                        <Badge key={college.id} variant="outline" className="border-slate-600 text-gray-300">
+                        <Badge key={college.id} variant="outline" className="border-white/10 text-[#9ca3af]">
                           <Building className="h-3 w-3 mr-1" />
                           {college.name}
                         </Badge>
@@ -79,27 +85,27 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
           )}
 
           {/* Metadata */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/6">
             <div>
-              <label className="text-sm font-medium text-gray-400">Slug</label>
+              <label className="text-sm font-medium text-[#6b7280]">Slug</label>
               <p className="text-white mt-1">{course.slug}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Status</label>
-              <p className="text-white mt-1">
+              <label className="text-sm font-medium text-[#6b7280]">Status</label>
+              <div className="mt-1">
                 <Badge variant={course.active ? "default" : "secondary"}>
                   {course.active ? "Active" : "Inactive"}
                 </Badge>
-              </p>
+              </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Created</label>
+              <label className="text-sm font-medium text-[#6b7280]">Created</label>
               <p className="text-white mt-1">
                 {new Date(course.createdAt).toLocaleString()}
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Last Updated</label>
+              <label className="text-sm font-medium text-[#6b7280]">Last Updated</label>
               <p className="text-white mt-1">
                 {new Date(course.updatedAt).toLocaleString()}
               </p>
@@ -107,8 +113,8 @@ export function ViewCourseModal({ isOpen, onClose, course }: ViewCourseModalProp
           </div>
 
           {(course._count?.colleges ?? course.colleges?.length ?? 0) > 0 && (
-            <div className="pt-4 border-t border-slate-700">
-              <label className="text-sm font-medium text-gray-400">Associated Colleges Count</label>
+            <div className="pt-4 border-t border-white/6">
+              <label className="text-sm font-medium text-[#6b7280]">Associated Colleges Count</label>
               <p className="text-white mt-1">{course._count?.colleges ?? course.colleges?.length} college(s)</p>
             </div>
           )}

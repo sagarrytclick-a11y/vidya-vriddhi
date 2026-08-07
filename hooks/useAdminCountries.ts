@@ -123,15 +123,33 @@ export function useAdminCountries() {
   // Create country mutation
   const createCountryMutation = useMutation({
     mutationFn: createCountry,
-    onSuccess: (newCountry) => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: countryKeys.lists() })
+      const previous = queryClient.getQueryData(countryKeys.lists())
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        ...newData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
       queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) => [
-        newCountry,
+        optimistic as Country,
         ...oldCountries,
       ])
-      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
+      return { previous, tempId: optimistic.id }
+    },
+    onSuccess: (newCountry, _vars, context) => {
+      queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) =>
+        oldCountries.map((country) =>
+          country.id === context?.tempId ? newCountry : country
+        )
+      )
       toast.success('Country created successfully!')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(countryKeys.lists(), context.previous)
+      }
       toast.error(error.message || 'Failed to create country')
     },
   })
@@ -139,16 +157,28 @@ export function useAdminCountries() {
   // Update country mutation
   const updateCountryMutation = useMutation({
     mutationFn: updateCountry,
+    onMutate: async (updated) => {
+      await queryClient.cancelQueries({ queryKey: countryKeys.lists() })
+      const previous = queryClient.getQueryData(countryKeys.lists())
+      queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) =>
+        oldCountries.map((country) =>
+          country.id === updated.id ? { ...country, ...updated } : country
+        )
+      )
+      return { previous }
+    },
     onSuccess: (updatedCountry) => {
       queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) =>
         oldCountries.map((country) =>
           country.id === updatedCountry.id ? updatedCountry : country
         )
       )
-      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
       toast.success('Country updated successfully!')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(countryKeys.lists(), context.previous)
+      }
       toast.error(error.message || 'Failed to update country')
     },
   })
@@ -156,14 +186,21 @@ export function useAdminCountries() {
   // Delete country mutation
   const deleteCountryMutation = useMutation({
     mutationFn: deleteCountry,
-    onSuccess: (_, deletedId) => {
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: countryKeys.lists() })
+      const previous = queryClient.getQueryData(countryKeys.lists())
       queryClient.setQueryData(countryKeys.lists(), (oldCountries: Country[] = []) =>
         oldCountries.filter((country) => country.id !== deletedId)
       )
-      queryClient.invalidateQueries({ queryKey: countryKeys.lists(), refetchType: 'all' })
+      return { previous }
+    },
+    onSuccess: () => {
       toast.success('Country deleted successfully!')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(countryKeys.lists(), context.previous)
+      }
       toast.error(error.message || 'Failed to delete country')
     },
   })

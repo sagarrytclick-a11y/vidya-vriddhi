@@ -1,17 +1,19 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { StatsSkeleton } from '@/components/ui/skeletons'
-import { 
-  Globe, 
-  GraduationCap, 
-  FileText, 
-  BookOpen, 
-  Building, 
-  Folder, 
+import { AdminStatsSkeleton } from '@/components/admin/page-ui'
+import {
+  Globe,
+  GraduationCap,
+  FileText,
+  BookOpen,
+  Building,
+  Folder,
   MessageSquare,
   Library,
-  Newspaper
+  Newspaper,
+  TrendingDown,
+  TrendingUp,
+  Minus,
 } from 'lucide-react'
 import { useColleges } from '@/hooks/useColleges'
 import { useCountryContext } from '@/contexts/country-context'
@@ -28,9 +30,19 @@ interface StatCard {
   title: string
   value: number
   description: string
-  icon: any
-  color: string
+  icon: React.ComponentType<{ className?: string }>
+  accent: string
   href: string
+  trend?: 'up' | 'down' | 'flat'
+}
+
+const accentMap: Record<string, { icon: string; glow: string; bar: string }> = {
+  orange: { icon: 'text-[#ea580c]', glow: 'from-[#ea580c]/10', bar: 'bg-[#ea580c]' },
+  amber: { icon: 'text-[#f59e0b]', glow: 'from-[#f59e0b]/10', bar: 'bg-[#f59e0b]' },
+  coral: { icon: 'text-[#fb923c]', glow: 'from-[#fb923c]/10', bar: 'bg-[#fb923c]' },
+  rose: { icon: 'text-[#e11d48]', glow: 'from-[#e11d48]/10', bar: 'bg-[#e11d48]' },
+  stone: { icon: 'text-[#a8a29e]', glow: 'from-[#a8a29e]/10', bar: 'bg-[#a8a29e]' },
+  emerald: { icon: 'text-[#059669]', glow: 'from-[#059669]/10', bar: 'bg-[#059669]' },
 }
 
 export function StatsCards() {
@@ -41,141 +53,180 @@ export function StatsCards() {
   const { count: categoryCount, isLoading: categoriesLoading } = useCategoryCount()
   const { courses, pagination, isLoading: coursesLoading } = useAdminCourses()
   const { exams, isLoading: examsLoading } = useAdminExams()
-  const { blogs, total: blogTotal, loading: blogsLoading } = useBlogContext()
-  const { news, total: newsTotal, isLoading: newsLoading } = useAdminNews()
+  const { total: blogTotal, loading: blogsLoading } = useBlogContext()
+  const { total: newsTotal, isLoading: newsLoading } = useAdminNews()
   const { stats, isLoading: enquiriesLoading } = useEnquiryStats()
 
   const statsData: StatCard[] = [
     {
-      title: 'Total Countries',
+      title: 'Countries',
       value: countries.length,
       description: 'Active destinations',
       icon: Globe,
-      color: 'text-teal-400',
-      href: '/admin/countries'
+      accent: 'coral',
+      href: '/admin/countries',
+      trend: 'up',
     },
     {
-      title: 'Total Colleges',
+      title: 'Colleges',
       value: collegePagination?.total || colleges.length,
-      description: 'Educational institutions',
+      description: 'Institutions',
       icon: GraduationCap,
-      color: 'text-green-400',
-      href: '/admin/colleges'
+      accent: 'orange',
+      href: '/admin/colleges',
+      trend: 'up',
     },
     {
-      title: 'Total Exams',
+      title: 'Exams',
       value: exams.length,
       description: 'Standardized tests',
       icon: FileText,
-      color: 'text-purple-400',
-      href: '/admin/exams'
+      accent: 'amber',
+      href: '/admin/exams',
+      trend: 'flat',
     },
     {
       title: 'Blog Posts',
       value: blogTotal,
       description: 'Published content',
       icon: BookOpen,
-      color: 'text-yellow-400',
-      href: '/admin/blogs'
+      accent: 'amber',
+      href: '/admin/blogs',
+      trend: 'up',
     },
     {
-      title: 'Total Cities',
+      title: 'Cities',
       value: cityPagination?.total || cities.length,
       description: 'Study locations',
       icon: Building,
-      color: 'text-orange-400',
-      href: '/admin/cities'
+      accent: 'orange',
+      href: '/admin/cities',
+      trend: 'up',
     },
     {
       title: 'Categories',
       value: categoryCount,
-      description: 'Content categories',
+      description: 'Content groups',
       icon: Folder,
-      color: 'text-pink-400',
-      href: '/admin/categories'
+      accent: 'amber',
+      href: '/admin/categories',
+      trend: 'flat',
     },
     {
       title: 'Courses',
       value: pagination?.total || courses.length,
-      description: 'Available courses',
+      description: 'Programs',
       icon: Library,
-      color: 'text-cyan-400',
-      href: '/admin/courses'
+      accent: 'stone',
+      href: '/admin/courses',
+      trend: 'up',
     },
     {
       title: 'News',
       value: newsTotal,
       description: 'Latest updates',
       icon: Newspaper,
-      color: 'text-lime-400',
-      href: '/admin/news'
+      accent: 'orange',
+      href: '/admin/news',
+      trend: 'up',
     },
     {
-      title: 'Total Enquiries',
+      title: 'Enquiries',
       value: stats.total,
-      description: 'Student inquiries',
+      description: 'All inquiries',
       icon: MessageSquare,
-      color: 'text-teal-400',
-      href: '/admin/enquiries'
+      accent: 'coral',
+      href: '/admin/enquiries',
+      trend: 'up',
     },
     {
-      title: 'Pending Enquiries',
+      title: 'Pending',
       value: stats.pending,
       description: 'Awaiting response',
       icon: MessageSquare,
-      color: 'text-red-400',
-      href: '/admin/enquiries?status=PENDING'
+      accent: 'rose',
+      href: '/admin/enquiries?status=PENDING',
+      trend: 'down',
     },
     {
-      title: 'Resolved Enquiries',
+      title: 'Resolved',
       value: stats.resolved,
       description: 'Completed',
       icon: MessageSquare,
-      color: 'text-green-400',
-      href: '/admin/enquiries?status=RESOLVED'
+      accent: 'emerald',
+      href: '/admin/enquiries?status=RESOLVED',
+      trend: 'up',
     },
     {
-      title: 'Follow Up Required',
+      title: 'Follow Up',
       value: stats.followUp,
       description: 'Need attention',
       icon: MessageSquare,
-      color: 'text-yellow-400',
-      href: '/admin/enquiries?status=FOLLOW_UP'
-    }
+      accent: 'amber',
+      href: '/admin/enquiries?status=FOLLOW_UP',
+      trend: 'flat',
+    },
   ]
 
-  const isLoading = collegesLoading || countriesLoading || citiesLoading || 
-                   categoriesLoading || coursesLoading || examsLoading || 
-                   blogsLoading || newsLoading || enquiriesLoading
+  const isLoading =
+    collegesLoading ||
+    countriesLoading ||
+    citiesLoading ||
+    categoriesLoading ||
+    coursesLoading ||
+    examsLoading ||
+    blogsLoading ||
+    newsLoading ||
+    enquiriesLoading
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-8">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {isLoading ? (
         <div className="col-span-full">
-          <StatsSkeleton count={8} />
+          <AdminStatsSkeleton count={8} />
         </div>
       ) : (
-        statsData.map((stat, index) => {
+        statsData.map((stat) => {
           const Icon = stat.icon
+          const colors = accentMap[stat.accent]
+          const TrendIcon =
+            stat.trend === 'up' ? TrendingUp : stat.trend === 'down' ? TrendingDown : Minus
+          const trendColor =
+            stat.trend === 'up'
+              ? 'text-[#34d399]'
+              : stat.trend === 'down'
+                ? 'text-[#fb7185]'
+                : 'text-[#6b7280]'
+
           return (
-            <Card 
-              key={index} 
-              className="bg-slate-800 border-slate-700 text-white cursor-pointer hover:bg-slate-700 hover:border-slate-600 transition-all duration-200 hover:scale-105"
+            <button
+              key={stat.title}
+              type="button"
               onClick={() => router.push(stat.href)}
+              className={`group relative overflow-hidden rounded-2xl bg-[#12161e] p-4 text-left ring-1 ring-white/[0.05] transition-all duration-300 hover:-translate-y-0.5 hover:ring-white/[0.1] hover:shadow-[0_12px_40px_-16px_rgba(0,0,0,0.8)]`}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-slate-300 text-sm font-medium">
+              <div
+                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${colors.glow} via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+              />
+              <div className="relative flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#6b7280]">
                     {stat.title}
-                  </CardTitle>
-                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight text-white tabular-nums">
+                    {stat.value}
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-xs text-slate-400">{stat.description}</div>
-              </CardContent>
-            </Card>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0c0f14] ring-1 ring-white/[0.05]">
+                  <Icon className={`h-5 w-5 ${colors.icon}`} />
+                </div>
+              </div>
+              <div className="relative mt-4 flex items-center justify-between">
+                <p className="text-xs text-[#6b7280]">{stat.description}</p>
+                <TrendIcon className={`h-3.5 w-3.5 ${trendColor}`} />
+              </div>
+              <div className={`absolute bottom-0 left-0 h-[2px] w-full opacity-40 ${colors.bar}`} />
+            </button>
           )
         })
       )}

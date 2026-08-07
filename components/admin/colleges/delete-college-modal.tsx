@@ -1,9 +1,15 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  adminDialogClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
 
 interface DeleteCollegeModalProps {
   isOpen: boolean
@@ -31,21 +37,21 @@ export function DeleteCollegeModal({ isOpen, onClose, college, onDelete, isDelet
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+      <DialogContent className={cn(adminDialogClass, "max-w-md")}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-400">
+          <DialogTitle className="text-white flex items-center gap-2 text-red-400">
             <AlertTriangle className="h-5 w-5" />
             Delete College
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
-            <p className="text-red-300 font-medium">Warning: This action cannot be undone!</p>
-            <p className="text-gray-300 text-sm mt-2">
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
+            <p className="text-rose-300 font-medium">Warning: This action cannot be undone!</p>
+            <p className="text-[#9ca3af] text-sm mt-2">
               Deleting this college will permanently remove all associated data including:
             </p>
-            <ul className="text-gray-400 text-sm mt-2 list-disc list-inside space-y-1">
+            <ul className="text-[#6b7280] text-sm mt-2 list-disc list-inside space-y-1">
               <li>College information and details</li>
               <li>Associated categories and exams</li>
               <li>Course connections</li>
@@ -53,13 +59,13 @@ export function DeleteCollegeModal({ isOpen, onClose, college, onDelete, isDelet
             </ul>
           </div>
           
-          <div className="bg-slate-700 rounded-lg p-3">
+          <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-3">
             <p className="text-white font-medium">{college.name}</p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-[#6b7280] text-sm">
               {college.city?.name}, {college.country?.name}
             </p>
             {college.description && (
-              <p className="text-gray-400 text-sm mt-1 truncate">
+              <p className="text-[#6b7280] text-sm mt-1 truncate">
                 {college.description.substring(0, 100)}...
               </p>
             )}
@@ -70,7 +76,7 @@ export function DeleteCollegeModal({ isOpen, onClose, college, onDelete, isDelet
               variant="outline" 
               onClick={onClose}
               disabled={isDeleting}
-              className="border-slate-600 text-gray-300 hover:bg-slate-700"
+              className={adminCancelBtnClass}
             >
               Cancel
             </Button>
@@ -78,7 +84,7 @@ export function DeleteCollegeModal({ isOpen, onClose, college, onDelete, isDelet
               variant="destructive" 
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className={adminDangerBtnClass}
             >
               {isDeleting ? 'Deleting...' : 'Delete College'}
             </Button>

@@ -3,11 +3,20 @@
 import dynamic from 'next/dynamic'
 import { AdminLayout } from '@/components/admin/layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LoadingPage } from '@/components/ui/loading'
-import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminPageSkeleton,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
+import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useCityContext } from '@/contexts/city-context'
+import { Pagination } from '@/components/ui/pagination'
 
 const AddCityModal = dynamic(() => import('@/components/admin/cities/add-city-modal').then(m => ({ default: m.AddCityModal })))
 const ViewCityModal = dynamic(() => import('@/components/admin/cities/view-city-modal').then(m => ({ default: m.ViewCityModal })))
@@ -34,18 +43,13 @@ export default function CitiesPage() {
     openAddModal,
     closeAddModal,
     setPage,
+    setLimit,
   } = useCityContext()
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-  }
 
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="p-8">
-          <LoadingPage text="Loading cities..." />
-        </div>
+        <AdminPageSkeleton rows={6} columns={6} />
       </AdminLayout>
     )
   }
@@ -53,7 +57,7 @@ export default function CitiesPage() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-8">
+        <div className={adminPagePadClass}>
           <div className="flex items-center justify-center min-h-96">
             <div className="text-red-400">Error: {error}</div>
           </div>
@@ -80,29 +84,29 @@ export default function CitiesPage() {
         city={selectedCity}
       />
 
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Cities Management</h1>
-          </div>
-          <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white" onClick={openAddModal}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add City
-          </Button>
-        </div>
+      <div className={adminPagePadClass}>
+        <AdminPageHeader
+          title="All Cities"
+          subtitle={`${pagination?.total || cities.length} cities`}
+          action={
+            <Button onClick={openAddModal} className={adminPageActionClass}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add City
+            </Button>
+          }
+        />
 
-        <div className="relative mb-6 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search cities..."
-            className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
-          />
-        </div>
+        <AdminSearch
+          value=""
+          onChange={() => {}}
+          placeholder="Search cities..."
+        />
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className="text-white">All Cities ({pagination?.total || cities.length})</CardTitle>
+            <CardTitle className={adminCardTitleClass}>
+              All Cities ({pagination?.total || cities.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -160,50 +164,21 @@ export default function CitiesPage() {
         </Card>
 
         {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-400">
-              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} cities
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
-                className="border-slate-600 text-white hover:bg-slate-700"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={pageNum === pagination.page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handlePageChange(pageNum)}
-                    className={
-                      pageNum === pagination.page
-                        ? "bg-teal-600 hover:bg-teal-700 text-white"
-                        : "border-slate-600 text-white hover:bg-slate-700"
-                    }
-                  >
-                    {pageNum}
-                  </Button>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page === pagination.totalPages}
-                className="border-slate-600 text-white hover:bg-slate-700"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+        {pagination && pagination.total > 0 && (
+          <div className="mt-4 overflow-hidden rounded-2xl ring-1 ring-white/5">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              total={pagination.total}
+              limit={pagination.limit}
+              onPageChange={setPage}
+              onLimitChange={(newLimit) => {
+                setLimit(newLimit)
+                setPage(1)
+              }}
+              hasNext={pagination.page < pagination.totalPages}
+              hasPrev={pagination.page > 1}
+            />
           </div>
         )}
       </div>

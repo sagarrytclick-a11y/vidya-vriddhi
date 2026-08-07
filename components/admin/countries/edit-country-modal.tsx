@@ -3,8 +3,15 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { X, Globe } from 'lucide-react'
+import { Globe } from 'lucide-react'
+import {
+  AdminModalShell,
+  adminFieldClass,
+  adminCancelBtnClass,
+  adminPrimaryBtnClass,
+  adminLabelClass,
+} from '@/components/admin/modal-ui'
+import { cn } from '@/lib/utils'
 
 interface Country {
   id: string
@@ -79,20 +86,16 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
     setErrors({})
 
     try {
-      await updateCountry({
+      const payload = {
         id: country.id,
         name: formData.name,
         slug: formData.slug,
         flagEmoji: formData.flagEmoji || undefined,
         description: formData.description || undefined,
         active: formData.active
-      })
-
-      setSuccess(true)
-      setTimeout(() => {
-        onClose()
-        setSuccess(false)
-      }, 1500)
+      }
+      onClose()
+      await updateCountry(payload)
     } catch (error) {
       if (error instanceof Error) {
         // Parse error message for field errors
@@ -110,143 +113,132 @@ export function EditCountryModal({ isOpen, onClose, country, updateCountry, isUp
     }
   }
 
-  if (!isOpen || !country) return null
+  if (!country) return null
 
   return (
-    <div className="fixed inset-0 bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-2xl mx-4 border border-slate-700">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white">Edit Country</h2>
+    <AdminModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit Country"
+      maxWidth="lg"
+      footer={
+        <>
           <Button
-            variant="ghost"
-            size="sm"
+            type="button"
+            variant="outline"
             onClick={onClose}
-            className="text-gray-400 hover:text-white hover:bg-slate-700"
+            className={adminCancelBtnClass}
           >
-            <X className="h-4 w-4" />
+            Cancel
           </Button>
+          <Button
+            type="submit"
+            form="edit-country-form"
+            disabled={isSubmitting || isUpdating}
+            className={cn(adminPrimaryBtnClass, 'disabled:opacity-50')}
+          >
+            {isSubmitting || isUpdating ? 'Updating...' : 'Update Country'}
+          </Button>
+        </>
+      }
+    >
+      {success && (
+        <div className="mb-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-300">
+          Country updated successfully!
+        </div>
+      )}
+
+      {errors.general && (
+        <div className="mb-4 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-rose-300">
+          {errors.general}
+        </div>
+      )}
+
+      <form id="edit-country-form" onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={cn(adminLabelClass, 'block mb-2')}>
+              Country Name *
+            </label>
+            <Input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="Enter country name"
+              className={cn(adminFieldClass, errors.name && 'border-rose-500 focus-visible:ring-rose-500/30')}
+              required
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-rose-400">{errors.name}</p>
+            )}
+          </div>
+
+          <div>
+            <label className={cn(adminLabelClass, 'block mb-2')}>
+              Slug *
+            </label>
+            <Input
+              type="text"
+              value={formData.slug}
+              onChange={(e) => handleChange('slug', e.target.value)}
+              placeholder="Enter slug (e.g., united-states)"
+              className={cn(adminFieldClass, errors.slug && 'border-rose-500 focus-visible:ring-rose-500/30')}
+              required
+            />
+            {errors.slug && (
+              <p className="mt-1 text-sm text-rose-400">{errors.slug}</p>
+            )}
+          </div>
         </div>
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-900 border border-green-700 rounded-lg text-green-300">
-            Country updated successfully!
-          </div>
-        )}
-
-        {errors.general && (
-          <div className="mb-4 p-3 bg-red-900 border border-red-700 rounded-lg text-red-300">
-            {errors.general}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Country Name *
-              </label>
-              <Input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Enter country name"
-                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 ${
-                  errors.name ? 'border-red-500 focus:ring-red-500' : ''
-                }`}
-                required
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-400">{errors.name}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Slug *
-              </label>
-              <Input
-                type="text"
-                value={formData.slug}
-                onChange={(e) => handleChange('slug', e.target.value)}
-                placeholder="Enter slug (e.g., united-states)"
-                className={`bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 ${
-                  errors.slug ? 'border-red-500 focus:ring-red-500' : ''
-                }`}
-                required
-              />
-              {errors.slug && (
-                <p className="mt-1 text-sm text-red-400">{errors.slug}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Flag Emoji
-            </label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={formData.flagEmoji}
-                onChange={(e) => handleChange('flagEmoji', e.target.value)}
-                placeholder="🇺🇸"
-                className="bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 text-center"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="text-slate-400 hover:text-white hover:bg-slate-700"
-              >
-                <Globe className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              placeholder="Enter country description"
-              rows={4}
-              className="w-full bg-slate-700 border-slate-600 text-white placeholder-gray-400 focus:ring-teal-500 rounded-md p-3"
+        <div>
+          <label className={cn(adminLabelClass, 'block mb-2')}>
+            Flag Emoji
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              value={formData.flagEmoji}
+              onChange={(e) => handleChange('flagEmoji', e.target.value)}
+              placeholder="🇺🇸"
+              className={cn(adminFieldClass, 'text-center')}
             />
-          </div>
-
-          <div className="flex items-center">
-            <label className="flex items-center text-sm font-medium text-gray-300">
-              <input
-                type="checkbox"
-                checked={formData.active}
-                onChange={(e) => handleChange('active', e.target.checked)}
-                className="mr-2 h-4 w-4 bg-slate-700 border-slate-600 rounded focus:ring-teal-500"
-              />
-              Active
-            </label>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting || isUpdating}
-              className="bg-teal-600 hover:bg-teal-700 text-white disabled:opacity-50"
-            >
-              {isSubmitting || isUpdating ? 'Updating...' : 'Update Country'}
-            </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
-              className="border-slate-600 text-gray-300 hover:bg-slate-700"
+              size="sm"
+              className={adminCancelBtnClass}
             >
-              Cancel
+              <Globe className="h-4 w-4" />
             </Button>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <div>
+          <label className={cn(adminLabelClass, 'block mb-2')}>
+            Description
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+            placeholder="Enter country description"
+            rows={4}
+            className={cn(adminFieldClass, 'w-full px-3 py-2')}
+          />
+        </div>
+
+        <div className="flex items-center">
+          <label className="flex items-center text-sm font-medium text-[#9ca3af]">
+            <input
+              type="checkbox"
+              checked={formData.active}
+              onChange={(e) => handleChange('active', e.target.checked)}
+              className="mr-2 h-[18px] w-[18px] shrink-0 cursor-pointer rounded-[5px] border-2 border-[#6b7280] bg-[#0c0f14] accent-[#ea580c]"
+            />
+            Active
+          </label>
+        </div>
+      </form>
+    </AdminModalShell>
   )
 }

@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import {
+  AdminPageHeader,
+  adminPagePadClass,
+  adminCardClass,
+} from '@/components/admin/page-ui'
 
 interface TableData {
   countries: any[]
@@ -69,13 +74,15 @@ export default function DatabaseTables() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Database Tables</h1>
-        <Button onClick={fetchTables} variant="outline">
-          Refresh
-        </Button>
-      </div>
+    <div className={`${adminPagePadClass} space-y-6`}>
+      <AdminPageHeader
+        title="Database Tables"
+        action={
+          <Button onClick={fetchTables} variant="outline">
+            Refresh
+          </Button>
+        }
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">

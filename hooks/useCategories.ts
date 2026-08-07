@@ -40,7 +40,11 @@ export const categoryKeys = {
 
 // API functions
 const fetchCategories = async ({ queryKey }: { queryKey: readonly unknown[] }): Promise<CategoriesResponse> => {
-  const [, filters] = queryKey as [string, { page: number; limit: number; search: string }]
+  const filters = (queryKey[queryKey.length - 1] || {}) as {
+    page?: number
+    limit?: number
+    search?: string
+  }
   const { page = 1, limit = 10, search = '' } = filters
   
   const params = new URLSearchParams({
@@ -139,7 +143,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
     queryKey: categoryKeys.list({ page, limit, search }),
     queryFn: fetchCategories,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnMount: 'always',
+    placeholderData: (previousData) => previousData,
     retry: 3,
   })
 
@@ -169,6 +173,7 @@ export function useCategories(page: number = 1, limit: number = 10, search: stri
         }
       })
       toast.success('Category created successfully!')
+      queryClient.invalidateQueries({ queryKey: categoryKeys.count(), refetchType: 'active' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create category')
@@ -246,7 +251,6 @@ export function useCategoryCount() {
     queryKey: categoryKeys.count(),
     queryFn: fetchCategoryCount,
     staleTime: 5 * 60 * 1000, // 5  minutes
-    refetchOnMount: 'always',
     retry: 3,
   })
 

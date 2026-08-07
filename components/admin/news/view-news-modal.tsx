@@ -1,10 +1,16 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { News } from '@/hooks/useAdminNews'
 import NextImage from 'next/image'
 import { Calendar, Eye, ImageIcon } from 'lucide-react'
+import {
+  adminViewDialogClass,
+  adminViewHeaderClass,
+  adminViewBodyClass,
+} from '@/components/admin/modal-ui'
 
 interface ViewNewsModalProps {
   isOpen: boolean
@@ -17,21 +23,21 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className={cn(adminViewDialogClass, "max-w-4xl")}>
+        <DialogHeader className={adminViewHeaderClass}>
+          <DialogTitle className="text-white flex items-center gap-2">
             <Eye className="h-5 w-5" />
             News Details
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
+
+        <div className={cn(adminViewBodyClass, "space-y-6")}>
           {/* Header */}
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white mb-2">{news.title}</h2>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-[#6b7280]">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     {new Date(news.createdAt).toLocaleDateString()}
@@ -44,7 +50,7 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
             </div>
 
             {news.imageUrl && (
-              <div className="relative w-full h-64 bg-slate-700 rounded-lg overflow-hidden">
+              <div className="relative w-full h-64 rounded-xl bg-[#0c0f14] border border-white/6 overflow-hidden">
                 <NextImage
                   src={news.imageUrl}
                   alt={news.title}
@@ -67,20 +73,20 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold text-white mb-2">Content</h3>
-              <div className="bg-slate-700 rounded-lg p-4">
-                <p className="text-gray-300 whitespace-pre-wrap">{news.content}</p>
+              <div className="rounded-xl bg-[#0c0f14] border border-white/6 p-4">
+                <p className="text-[#9ca3af] whitespace-pre-wrap">{news.content}</p>
               </div>
             </div>
           </div>
 
           {/* Metadata */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/6">
             <div>
-              <label className="text-sm font-medium text-gray-400">Slug</label>
+              <label className="text-sm font-medium text-[#6b7280]">Slug</label>
               <p className="text-white mt-1">{news.slug}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Status</label>
+              <label className="text-sm font-medium text-[#6b7280]">Status</label>
               <div className="text-white mt-1">
                 <Badge variant={news.active ? "default" : "secondary"}>
                   {news.active ? "Active" : "Inactive"}
@@ -88,13 +94,13 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Created</label>
+              <label className="text-sm font-medium text-[#6b7280]">Created</label>
               <p className="text-white mt-1">
                 {new Date(news.createdAt).toLocaleString()}
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-400">Last Updated</label>
+              <label className="text-sm font-medium text-[#6b7280]">Last Updated</label>
               <p className="text-white mt-1">
                 {new Date(news.updatedAt).toLocaleString()}
               </p>
@@ -102,8 +108,8 @@ export function ViewNewsModal({ isOpen, onClose, news }: ViewNewsModalProps) {
           </div>
 
           {news.imageUrl && (
-            <div className="pt-4 border-t border-slate-700">
-              <label className="text-sm font-medium text-gray-400">Image URL</label>
+            <div className="pt-4 border-t border-white/6">
+              <label className="text-sm font-medium text-[#6b7280]">Image URL</label>
               <p className="text-white mt-1 text-sm break-all">{news.imageUrl}</p>
             </div>
           )}

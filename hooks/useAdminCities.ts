@@ -78,6 +78,7 @@ async function deleteCity(id: string): Promise<void> {
 
 export function useAdminCities(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
+  const listKey = [...cityKeys.lists(), page, limit] as const
 
   const {
     data: response = { data: [], pagination: { page, limit, total: 0, totalPages: 0 } },
@@ -85,7 +86,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     error,
     refetch,
   } = useQuery({
-    queryKey: [...cityKeys.lists(), page, limit],
+    queryKey: listKey,
     queryFn: fetchCities,
     placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -94,48 +95,106 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
   // Create city mutation
   const createCityMutation = useMutation({
     mutationFn: createCity,
-    onSuccess: (newCity) => {
-      toast.success('City created successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) => [
-        newCity,
-        ...oldCities,
-      ])
-      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: cityKeys.lists() })
+      const previous = queryClient.getQueryData(listKey)
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: [optimistic as CityWithCountry, ...old.data],
+          pagination: { ...old.pagination, total: (old.pagination?.total || 0) + 1 },
+        }
+      })
+      return { previous, tempId: optimistic.id }
     },
-    onError: (error: Error) => {
+    onSuccess: (newCity, _vars, context) => {
+      toast.success('City created successfully')
+      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: old.data.map((city) => (city.id === context?.tempId ? newCity : city)),
+        }
+      })
+    },
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(listKey, context.previous)
       toast.error(error.message || 'Failed to create city')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'active' })
     },
   })
 
   // Update city mutation
   const updateCityMutation = useMutation({
     mutationFn: updateCity,
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: cityKeys.lists() })
+      const previous = queryClient.getQueryData(listKey)
+      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: old.data.map((city) => (city.id === id ? { ...city, ...data } : city)),
+        }
+      })
+      return { previous }
+    },
     onSuccess: (updatedCity) => {
       toast.success('City updated successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) =>
-        oldCities.map((city) =>
-          city.id === updatedCity.id ? updatedCity : city
-        )
-      )
-      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
+      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: old.data.map((city) => (city.id === updatedCity.id ? updatedCity : city)),
+        }
+      })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(listKey, context.previous)
       toast.error(error.message || 'Failed to update city')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'active' })
     },
   })
 
   // Delete city mutation
   const deleteCityMutation = useMutation({
     mutationFn: deleteCity,
-    onSuccess: (_, deletedId) => {
-      toast.success('City deleted successfully')
-      queryClient.setQueryData(cityKeys.lists(), (oldCities: CityWithCountry[] = []) =>
-        oldCities.filter((city) => city.id !== deletedId)
-      )
-      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'all' })
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: cityKeys.lists() })
+      const previous = queryClient.getQueryData(listKey)
+      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: old.data.filter((city) => city.id !== id),
+          pagination: {
+            ...old.pagination,
+            total: Math.max(0, (old.pagination?.total || 1) - 1),
+          },
+        }
+      })
+      return { previous }
     },
-    onError: (error: Error) => {
+    onSuccess: () => {
+      toast.success('City deleted successfully')
+    },
+    onError: (error: Error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(listKey, context.previous)
       toast.error(error.message || 'Failed to delete city')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: cityKeys.lists(), refetchType: 'active' })
     },
   })
 

@@ -271,7 +271,7 @@ export function useAdminExams(search?: string): UseAdminExamsReturn {
         if (!old) return old
         return { ...old, data: [newExam, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
       })
-      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'active' })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create exam')
@@ -299,7 +299,7 @@ export function useAdminExams(search?: string): UseAdminExamsReturn {
       toast.error(error.message || 'Failed to update exam')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'active' })
     },
   })
 
@@ -324,7 +324,7 @@ export function useAdminExams(search?: string): UseAdminExamsReturn {
       toast.error(error.message || 'Failed to delete exam')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: examKeys.all, refetchType: 'active' })
     },
   })
 

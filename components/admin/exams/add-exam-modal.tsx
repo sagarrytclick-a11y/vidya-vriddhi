@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,16 @@ import { LoadingButton } from '@/components/ui/loading'
 import { useState, useRef, useEffect } from 'react'
 import NextImage from 'next/image'
 import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
+import {
+  adminCheckboxClass,
+  adminDialogClass,
+  adminFieldClass,
+  adminSelectContentClass,
+  adminCancelBtnClass,
+  adminPrimaryBtnClass,
+  adminLabelClass,
+} from '@/components/admin/modal-ui'
+import { AdminImageDropzone } from '@/components/admin/image-dropzone'
 
 interface AddExamModalProps {
   isOpen: boolean
@@ -471,10 +482,10 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn(adminDialogClass, "max-w-4xl max-h-[90vh] overflow-y-auto")}>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Exam' : 'Add New Exam'}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-white">{isEdit ? 'Edit Exam' : 'Add New Exam'}</DialogTitle>
+          <DialogDescription className="text-[#6b7280]">
             {isEdit ? 'Edit the details of the existing exam.' : 'Fill in the details to create a new exam.'}
           </DialogDescription>
         </DialogHeader>
@@ -485,60 +496,60 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             <h3 className="text-lg font-semibold text-white">Basic Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Exam Name</Label>
+                <Label htmlFor="name" className={adminLabelClass}>Exam Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={handleNameChange}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter exam name"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="shortName">Short Name</Label>
+                <Label htmlFor="shortName" className={adminLabelClass}>Short Name</Label>
                 <Input
                   id="shortName"
                   value={formData.shortName}
                   onChange={(e) => setFormData(prev => ({ ...prev, shortName: e.target.value }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="e.g., JEE, NEET"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug" className={adminLabelClass}>Slug</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="exam-slug"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="conductingBody">Conducting Body</Label>
+                <Label htmlFor="conductingBody" className={adminLabelClass}>Conducting Body</Label>
                 <Input
                   id="conductingBody"
                   value={formData.conductingBody}
                   onChange={(e) => setFormData(prev => ({ ...prev, conductingBody: e.target.value }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter conducting body"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="examType">Exam Type</Label>
+                <Label htmlFor="examType" className={adminLabelClass}>Exam Type</Label>
                 <Select value={formData.examType} onValueChange={(value: any) => setFormData(prev => ({ ...prev, examType: value }))}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className={adminFieldClass}>
                     <SelectValue placeholder="Select exam type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className={adminSelectContentClass}>
                     <SelectItem value="NATIONAL">National</SelectItem>
                     <SelectItem value="STATE">State</SelectItem>
                     <SelectItem value="UNIVERSITY">University</SelectItem>
@@ -548,12 +559,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               </div>
 
               <div>
-                <Label htmlFor="examMode">Exam Mode</Label>
+                <Label htmlFor="examMode" className={adminLabelClass}>Exam Mode</Label>
                 <Select value={formData.examMode} onValueChange={(value: any) => setFormData(prev => ({ ...prev, examMode: value }))}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className={adminFieldClass}>
                     <SelectValue placeholder="Select exam mode" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className={adminSelectContentClass}>
                     <SelectItem value="ONLINE">Online</SelectItem>
                     <SelectItem value="OFFLINE">Offline</SelectItem>
                     <SelectItem value="HYBRID">Hybrid</SelectItem>
@@ -562,12 +573,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               </div>
 
               <div>
-                <Label htmlFor="frequency">Frequency</Label>
+                <Label htmlFor="frequency" className={adminLabelClass}>Frequency</Label>
                 <Select value={formData.frequency} onValueChange={(value: any) => setFormData(prev => ({ ...prev, frequency: value }))}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className={adminFieldClass}>
                     <SelectValue placeholder="Select frequency" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className={adminSelectContentClass}>
                     <SelectItem value="ONCE_A_YEAR">Once a year</SelectItem>
                     <SelectItem value="TWICE_A_YEAR">Twice a year</SelectItem>
                     <SelectItem value="QUARTERLY">Quarterly</SelectItem>
@@ -578,12 +589,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className={adminLabelClass}>Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter exam description"
                 rows={3}
                 required
@@ -598,37 +609,19 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               <h3 className="text-lg font-semibold text-white">Exam Image</h3>
             </div>
             <div className="space-y-3">
-              <div className="border-2 border-dashed border-slate-600 rounded-lg p-4">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="examImage"
+              <AdminImageDropzone
+                  label="Upload image"
+                  uploading={uploadingImage}
+                  hint="PNG, JPG, GIF up to 5MB · drag & drop or browse"
+                  onFiles={async (files) => {
+                    if (files[0]) await handleImageUpload(files[0])
+                  }}
                 />
-                <label
-                  htmlFor="examImage"
-                  className="flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700/50 transition-colors"
-                >
-                  {uploadingImage ? (
-                    <LoadingButton text="Uploading to ImageKit..." size="md" />
-                  ) : (
-                    <>
-                      <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                      <span className="text-sm text-slate-300">Click to upload exam image</span>
-                    </>
-                  )}
-                  <span className="text-xs text-slate-500 mt-1">
-                    PNG, JPG, GIF up to 5MB • Powered by ImageKit
-                  </span>
-                </label>
-              </div>
               
               {(uploadedImage || formData.examImageurl) && (
                 <div className="relative group">
-                  <div className="flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
-                    <div className="relative w-16 h-16 bg-slate-600 rounded overflow-hidden shrink-0">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0c0f14] border border-white/6">
+                    <div className="relative w-16 h-16 rounded overflow-hidden bg-[#080a0e] border border-white/6 shrink-0">
                       <NextImage
                         src={uploadedImage || formData.examImageurl || ''}
                         alt="Exam preview"
@@ -653,7 +646,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     <button
                       type="button"
                       onClick={removeUploadedImage}
-                      className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+                      className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -662,16 +655,16 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               )}
               
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-px bg-slate-600"></div>
+                <div className="flex-1 h-px bg-white/10"></div>
                 <span className="text-xs text-slate-400">OR</span>
-                <div className="flex-1 h-px bg-slate-600"></div>
+                <div className="flex-1 h-px bg-white/10"></div>
               </div>
               
               <Input
                 type="url"
                 value={formData.examImageurl}
                 onChange={(e) => setFormData(prev => ({ ...prev, examImageurl: e.target.value }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="https://example.com/exam-image.jpg"
               />
             </div>
@@ -685,19 +678,19 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             </div>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="overviewTitle" className="text-sm font-medium text-gray-300">Section Title</Label>
+                <Label htmlFor="overviewTitle" className="text-sm font-medium text-[#9ca3af]">Section Title</Label>
                 <Input
                   id="overviewTitle"
                   value={formData.overview.title}
                   readOnly
-                  className="bg-slate-700 border-slate-600 text-gray-400 cursor-not-allowed"
+                  className={cn(adminFieldClass, "text-[#6b7280] cursor-not-allowed")}
                   placeholder="Overview"
                 />
                 <p className="text-xs text-slate-500 mt-1">Overview section title is fixed</p>
               </div>
 
               <div>
-                <Label htmlFor="overviewContent" className="text-sm font-medium text-gray-300">Overview Content</Label>
+                <Label htmlFor="overviewContent" className="text-sm font-medium text-[#9ca3af]">Overview Content</Label>
                 <Textarea
                   id="overviewContent"
                   value={formData.overview.content}
@@ -705,7 +698,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     overview: { ...prev.overview, content: e.target.value }
                   }))}
-                  className="bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors"
+                  className={cn(adminFieldClass, "focus:border-teal-500 transition-colors")}
                   placeholder="Provide a comprehensive overview of the exam, including its purpose, significance, and what students can expect..."
                   rows={4}
                 />
@@ -720,7 +713,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       type="button" 
                       onClick={addKeyHighlight} 
                       size="sm"
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                      className={cn(adminPrimaryBtnClass, "")}
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Highlight
@@ -737,7 +730,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                         }))}
                         variant="outline"
                         size="sm"
-                        className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                        className="border-rose-500/50 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300"
                       >
                         Clear All
                       </Button>
@@ -746,7 +739,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                 </div>
                 
                 {formData.overview.keyHighlights.length === 0 ? (
-                  <div className="text-center py-8 border-2 border-dashed border-slate-600 rounded-lg">
+                  <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl bg-[#0c0f14]/50">
                     <p className="text-slate-400 text-sm mb-2">No key highlights added yet</p>
                     <p className="text-slate-500 text-xs">Click "Add Highlight" to add key features of this exam</p>
                   </div>
@@ -759,7 +752,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                             value={highlight}
                             onChange={(e) => updateKeyHighlight(index, e.target.value)}
                             onKeyPress={(e) => handleKeyPress(e, index)}
-                            className="key-highlight-input bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors"
+                            className={cn(adminFieldClass, "key-highlight-input transition-colors")}
                             placeholder={`Enter key highlight ${index + 1}...`}
                           />
                           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
@@ -771,7 +764,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                           onClick={() => removeKeyHighlight(index)}
                           variant="outline"
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity border-rose-500/50 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -800,12 +793,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <Label htmlFor="registrationTitle" className="text-sm font-medium text-gray-300">Section Title</Label>
+                  <Label htmlFor="registrationTitle" className="text-sm font-medium text-[#9ca3af]">Section Title</Label>
                   <Input
                     id="registrationTitle"
                     value={formData.registration.title}
                     readOnly
-                    className="bg-slate-700 border-slate-600 text-gray-400 cursor-not-allowed"
+                    className={cn(adminFieldClass, "text-[#6b7280] cursor-not-allowed")}
                     placeholder="Registration"
                   />
                   <p className="text-xs text-slate-500 mt-1">Registration section title is fixed</p>
@@ -813,7 +806,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               </div>
 
               <div>
-                <Label htmlFor="registrationDescription">Registration Description</Label>
+                <Label htmlFor="registrationDescription" className={adminLabelClass}>Registration Description</Label>
                 <Textarea
                   id="registrationDescription"
                   value={formData.registration.description}
@@ -821,7 +814,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     registration: { ...prev.registration, description: e.target.value }
                   }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter registration description"
                   rows={3}
                 />
@@ -835,7 +828,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       type="button" 
                       onClick={addBulletPoint} 
                       size="sm"
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                      className={cn(adminPrimaryBtnClass, "")}
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Bullet
@@ -852,7 +845,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                         }))}
                         variant="outline"
                         size="sm"
-                        className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                        className="border-rose-500/50 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300"
                       >
                         Clear All
                       </Button>
@@ -861,7 +854,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                 </div>
                 
                 {formData.registration.bulletPoints.length === 0 ? (
-                  <div className="text-center py-8 border-2 border-dashed border-slate-600 rounded-lg">
+                  <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl bg-[#0c0f14]/50">
                     <p className="text-slate-400 text-sm mb-2">No bullet points added yet</p>
                     <p className="text-slate-500 text-xs">Add key registration information and requirements</p>
                   </div>
@@ -877,7 +870,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                             value={point}
                             onChange={(e) => updateBulletPoint(index, e.target.value)}
                             onKeyPress={(e) => handleBulletKeyPress(e, index)}
-                            className="bullet-point-input bg-slate-700 border-slate-600 focus:border-teal-500 transition-colors pl-8"
+                            className={cn(adminFieldClass, "bullet-point-input pl-8 transition-colors")}
                             placeholder={`Enter bullet point ${index + 1}...`}
                           />
                           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
@@ -889,7 +882,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                           onClick={() => removeBulletPoint(index)}
                           variant="outline"
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity border-rose-500/50 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -918,19 +911,19 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="patternTitle" className="text-sm font-medium text-gray-300">Section Title</Label>
+                  <Label htmlFor="patternTitle" className="text-sm font-medium text-[#9ca3af]">Section Title</Label>
                   <Input
                     id="patternTitle"
                     value={formData.examPattern.title}
                     readOnly
-                    className="bg-slate-700 border-slate-600 text-gray-400 cursor-not-allowed"
+                    className={cn(adminFieldClass, "text-[#6b7280] cursor-not-allowed")}
                     placeholder="Exam Pattern"
                   />
                   <p className="text-xs text-slate-500 mt-1">Exam Pattern section title is fixed</p>
                 </div>
 
                 <div>
-                  <Label htmlFor="scoreRange">Score Range</Label>
+                  <Label htmlFor="scoreRange" className={adminLabelClass}>Score Range</Label>
                   <Input
                     id="scoreRange"
                     value={formData.examPattern.scoreRange}
@@ -938,13 +931,13 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       ...prev, 
                       examPattern: { ...prev.examPattern, scoreRange: e.target.value }
                     }))}
-                    className="bg-slate-700 border-slate-600"
+                    className={adminFieldClass}
                     placeholder="e.g., 0-300"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="totalDuration">Total Duration (minutes)</Label>
+                  <Label htmlFor="totalDuration" className={adminLabelClass}>Total Duration (minutes)</Label>
                   <Input
                     id="totalDuration"
                     type="number"
@@ -953,14 +946,14 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                       ...prev, 
                       examPattern: { ...prev.examPattern, totalDurationMins: parseInt(e.target.value) || 0 }
                     }))}
-                    className="bg-slate-700 border-slate-600"
+                    className={adminFieldClass}
                     placeholder="180"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="patternDescription">Pattern Description</Label>
+                <Label htmlFor="patternDescription" className={adminLabelClass}>Pattern Description</Label>
                 <Textarea
                   id="patternDescription"
                   value={formData.examPattern.description}
@@ -968,7 +961,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     examPattern: { ...prev.examPattern, description: e.target.value }
                   }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="Enter exam pattern description"
                   rows={3}
                 />
@@ -977,43 +970,43 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Label className="text-white font-medium">Exam Pattern Sections</Label>
-                  <Button type="button" onClick={addExamPatternRow} size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                  <Button type="button" onClick={addExamPatternRow} size="sm" className={cn(adminPrimaryBtnClass, "")}>
                     <Plus className="h-4 w-4 mr-1" />
                     Add Section
                   </Button>
                 </div>
                 {formData.examPattern.tableData.map((row, index) => (
-                  <div key={index} className="bg-slate-700/50 p-3 rounded-lg mb-3">
+                  <div key={index} className="rounded-xl bg-[#0c0f14]/80 border border-white/6 p-3 mb-3">
                     <div className="grid grid-cols-4 gap-3">
                       <div>
-                        <Label htmlFor={`section-${index}`} className="text-xs text-gray-300 block mb-1">Section Name</Label>
+                        <Label htmlFor={`section-${index}`} className="text-xs text-[#9ca3af] block mb-1">Section Name</Label>
                         <Input
                           id={`section-${index}`}
                           value={row.section}
                           onChange={(e) => updateExamPatternRow(index, 'section', e.target.value)}
-                          className="bg-slate-600 border-slate-500 text-white"
+                          className={adminFieldClass}
                           placeholder="e.g., Mathematics, Physics, Chemistry"
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`questions-${index}`} className="text-xs text-gray-300 block mb-1">Questions</Label>
+                        <Label htmlFor={`questions-${index}`} className="text-xs text-[#9ca3af] block mb-1">Questions</Label>
                         <Input
                           id={`questions-${index}`}
                           type="number"
                           value={row.questions}
                           onChange={(e) => updateExamPatternRow(index, 'questions', parseInt(e.target.value) || 0)}
-                          className="bg-slate-600 border-slate-500 text-white"
+                          className={adminFieldClass}
                           placeholder="50"
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`duration-${index}`} className="text-xs text-gray-300 block mb-1">Duration (min)</Label>
+                        <Label htmlFor={`duration-${index}`} className="text-xs text-[#9ca3af] block mb-1">Duration (min)</Label>
                         <Input
                           id={`duration-${index}`}
                           type="number"
                           value={row.durationMins}
                           onChange={(e) => updateExamPatternRow(index, 'durationMins', parseInt(e.target.value) || 0)}
-                          className="bg-slate-600 border-slate-500 text-white"
+                          className={adminFieldClass}
                           placeholder="60"
                         />
                       </div>
@@ -1023,7 +1016,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                           onClick={() => removeExamPatternRow(index)}
                           variant="outline"
                           size="sm"
-                          className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                          className="border-rose-500/50 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -1043,12 +1036,12 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             </div>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="datesTitle" className="text-sm font-medium text-gray-300">Section Title</Label>
+                <Label htmlFor="datesTitle" className="text-sm font-medium text-[#9ca3af]">Section Title</Label>
                 <Input
                   id="datesTitle"
                   value={formData.examDates.title}
                   readOnly
-                  className="bg-slate-700 border-slate-600 text-gray-400 cursor-not-allowed"
+                  className={cn(adminFieldClass, "text-[#6b7280] cursor-not-allowed")}
                   placeholder="Important Dates"
                 />
                 <p className="text-xs text-slate-500 mt-1">Important Dates section title is fixed</p>
@@ -1056,7 +1049,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label>Important Dates</Label>
+                  <Label className={adminLabelClass}>Important Dates</Label>
                   <Button type="button" onClick={addImportantDate} size="sm">
                     <Plus className="h-4 w-4 mr-1" />
                     Add Date
@@ -1067,14 +1060,14 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     <Input
                       value={date.event}
                       onChange={(e) => updateImportantDate(index, 'event', e.target.value)}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                       placeholder="Event name"
                     />
                     <Input
                       type="date"
                       value={date.date}
                       onChange={(e) => updateImportantDate(index, 'date', e.target.value)}
-                      className="bg-slate-700 border-slate-600"
+                      className={adminFieldClass}
                     />
                     <Button
                       type="button"
@@ -1098,19 +1091,19 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="statsTitle" className="text-sm font-medium text-gray-300">Section Title</Label>
+                <Label htmlFor="statsTitle" className="text-sm font-medium text-[#9ca3af]">Section Title</Label>
                 <Input
                   id="statsTitle"
                   value={formData.resultStatistics.title}
                   readOnly
-                  className="bg-slate-700 border-slate-600 text-gray-400 cursor-not-allowed"
+                  className={cn(adminFieldClass, "text-[#6b7280] cursor-not-allowed")}
                   placeholder="Result Statistics"
                 />
                 <p className="text-xs text-slate-500 mt-1">Result Statistics section title is fixed</p>
               </div>
 
               <div>
-                <Label htmlFor="passingCriteria">Passing Criteria</Label>
+                <Label htmlFor="passingCriteria" className={adminLabelClass}>Passing Criteria</Label>
                 <Input
                   id="passingCriteria"
                   value={formData.resultStatistics.passingCriteria}
@@ -1118,13 +1111,13 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     resultStatistics: { ...prev.resultStatistics, passingCriteria: e.target.value }
                   }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="e.g., 40% or above"
                 />
               </div>
 
               <div>
-                <Label htmlFor="totalMarks">Total Marks</Label>
+                <Label htmlFor="totalMarks" className={adminLabelClass}>Total Marks</Label>
                 <Input
                   id="totalMarks"
                   type="number"
@@ -1133,14 +1126,14 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                     ...prev, 
                     resultStatistics: { ...prev.resultStatistics, totalMarks: parseInt(e.target.value) || 0 }
                   }))}
-                  className="bg-slate-700 border-slate-600"
+                  className={adminFieldClass}
                   placeholder="400"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="statsDescription">Statistics Description</Label>
+              <Label htmlFor="statsDescription" className={adminLabelClass}>Statistics Description</Label>
               <Textarea
                 id="statsDescription"
                 value={formData.resultStatistics.description}
@@ -1148,7 +1141,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                   ...prev, 
                   resultStatistics: { ...prev.resultStatistics, description: e.target.value }
                 }))}
-                className="bg-slate-700 border-slate-600"
+                className={adminFieldClass}
                 placeholder="Enter result statistics description"
                 rows={3}
               />
@@ -1156,14 +1149,15 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
           </div>
 
           {/* Exam Status */}
-          <div className="border-t border-slate-600 pt-6">
-            <div className="flex items-center space-x-3 bg-slate-700/50 p-4 rounded-lg">
+          <div className="border-t border-white/6 pt-6">
+            <div className="flex items-center space-x-3 rounded-xl bg-[#0c0f14]/80 border border-white/6 p-4">
               <Checkbox
                 id="active"
                 checked={formData.active}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked as boolean }))}
                 className="w-5 h-5"
-              />
+                  className={adminCheckboxClass}
+                />
               <Label htmlFor="active" className="text-white font-medium cursor-pointer">
                 Active Exam
               </Label>
@@ -1174,10 +1168,10 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className={adminCancelBtnClass}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className={adminPrimaryBtnClass}>
               {isSubmitting ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Exam' : 'Create Exam')}
             </Button>
           </div>

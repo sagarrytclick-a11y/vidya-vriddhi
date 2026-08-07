@@ -1,10 +1,16 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
 import { useAdminNews } from '@/hooks/useAdminNews'
 import { News } from '@/hooks/useAdminNews'
+import {
+  adminDialogClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
 
 interface DeleteNewsModalProps {
   isOpen: boolean
@@ -31,30 +37,30 @@ export function DeleteNewsModal({ isOpen, onClose, news }: DeleteNewsModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+      <DialogContent className={cn(adminDialogClass, "max-w-md")}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-400">
+          <DialogTitle className="text-white flex items-center gap-2 text-red-400">
             <AlertTriangle className="h-5 w-5" />
             Delete News
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
             <p className="text-red-300 text-sm">
               Are you sure you want to delete the news 
               <span className="font-semibold text-white mx-1">"{news.title}"</span>?
             </p>
-            <p className="text-red-400 text-xs mt-2">
+            <p className="text-rose-400 text-xs mt-2">
               This action cannot be undone. The news will be permanently removed from the system.
             </p>
           </div>
 
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-gray-300 text-sm">
+          <div className="rounded-xl bg-[#0c0f14]/80 border border-white/6 p-3">
+            <p className="text-[#9ca3af] text-sm">
               <strong>News:</strong> {news.title}
             </p>
-            <p className="text-gray-300 text-sm">
+            <p className="text-[#9ca3af] text-sm">
               <strong>Slug:</strong> {news.slug}
             </p>
           </div>
@@ -65,7 +71,7 @@ export function DeleteNewsModal({ isOpen, onClose, news }: DeleteNewsModalProps)
             variant="outline" 
             onClick={onClose}
             disabled={isDeleting}
-            className="border-slate-600 text-gray-300 hover:bg-slate-700"
+            className={adminCancelBtnClass}
           >
             Cancel
           </Button>
@@ -73,7 +79,7 @@ export function DeleteNewsModal({ isOpen, onClose, news }: DeleteNewsModalProps)
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className={adminDangerBtnClass}
           >
             {isDeleting ? 'Deleting...' : 'Delete News'}
           </Button>

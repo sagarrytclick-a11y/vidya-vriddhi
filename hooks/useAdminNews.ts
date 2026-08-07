@@ -124,16 +124,42 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
   // Create news mutation
   const createNewsMutation = useMutation({
     mutationFn: createNews,
-    onSuccess: (newNews) => {
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: newsKeys.lists() })
+      const previous = queryClient.getQueryData(newsKeys.list({ limit, skip }))
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        ...data,
+        imageUrl: data.imageUrl || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      queryClient.setQueryData(newsKeys.list({ limit, skip }), (old: NewsResponse | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: [optimistic as any, ...old.data],
+          pagination: { ...old.pagination, total: old.pagination.total + 1 },
+        }
+      })
+      return { previous, tempId: optimistic.id }
+    },
+    onSuccess: (newNews, _vars, context) => {
       toast.success('News created successfully')
       queryClient.setQueryData(newsKeys.list({ limit, skip }), (old: NewsResponse | undefined) => {
         if (!old) return old
-        return { ...old, data: [newNews, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+        return {
+          ...old,
+          data: old.data.map((n) => (n.id === context?.tempId ? newNews : n)),
+        }
       })
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(newsKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to create news')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'active' })
     },
   })
 
@@ -157,8 +183,8 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
       toast.error(error.message || 'Failed to update news')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'active' })
     },
   })
 
@@ -182,8 +208,8 @@ export function useAdminNews(limit: number = 10, skip: number = 0) {
       toast.error(error.message || 'Failed to delete news')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: newsKeys.details(), refetchType: 'active' })
     },
   })
 

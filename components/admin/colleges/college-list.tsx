@@ -1,8 +1,7 @@
 'use client'
 
-import { Plus, Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Eye, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AddCollegeModal } from './add-college-modal'
 import { ViewCollegeModal } from './view-college-modal'
@@ -10,8 +9,18 @@ import { DeleteCollegeModal } from './delete-college-modal'
 import { useCollegeContext } from '@/contexts/college-context'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
-import { TableSkeleton } from '@/components/ui/skeletons'
+import { Pagination } from '@/components/ui/pagination'
+
 import { College, CollegeFormData } from '@/types/college'
+import {
+  AdminPageHeader,
+  AdminSearch,
+  adminPagePadClass,
+  adminPageActionClass,
+  adminCardClass,
+  adminCardTitleClass,
+  AdminTableSkeleton,
+} from '@/components/admin/page-ui'
 
 export function CollegeList() {
   const {
@@ -40,6 +49,8 @@ export function CollegeList() {
     pagination,
     page,
     setPage,
+    limit,
+    setLimit,
     search,
     setSearch,
   } = useCollegeContext()
@@ -47,20 +58,19 @@ export function CollegeList() {
   const { countries } = useCountryContext()
   const { cities } = useCityContext()
 
-  const handleAddCollege = async (data: CollegeFormData) => {
-    try {
-      await createCollege(data)
-      closeAddModal()
-    } catch (error) {
+  const handleAddCollege = (data: CollegeFormData) => {
+    closeAddModal()
+    void createCollege(data).catch((error) => {
       console.error('Failed to create college:', error)
-    }
+    })
   }
 
-  const handleEditCollege = async (data: CollegeFormData) => {
+  const handleEditCollege = (data: CollegeFormData) => {
     if (!selectedCollege) return
-    await updateCollege(selectedCollege.id, data)
+    const id = selectedCollege.id
     closeEditModal()
     closeViewModal()
+    void updateCollege(id, data)
   }
 
   const handleDeleteCollege = async (college: College) => {
@@ -69,47 +79,44 @@ export function CollegeList() {
 
   if (isLoading && colleges.length === 0) {
     return (
-      <div className="p-8">
-        <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-          <TableSkeleton rows={6} columns={6} />
+      <div className={adminPagePadClass}>
+        <div className="rounded-2xl border border-white/5 bg-[#12161e] p-4 ring-1 ring-white/5">
+          <AdminTableSkeleton rows={6} columns={6} />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Colleges Management</h1>
-        </div>
-        <Button onClick={openAddModal} className="bg-teal-600 hover:bg-teal-700 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Add College
-        </Button>
-      </div>
+    <div className={adminPagePadClass}>
+      <AdminPageHeader
+        title="All Colleges"
+        subtitle={`${pagination?.total || colleges.length} institutions in catalog`}
+        action={
+          <Button onClick={openAddModal} className={adminPageActionClass}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add College
+          </Button>
+        }
+      />
 
-      <div className="relative mb-6 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search colleges..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:ring-teal-500"
-        />
-      </div>
+      <AdminSearch
+        value={search}
+        onChange={setSearch}
+        placeholder="Search colleges..."
+      />
 
       {error && (
-        <Card className="border-red-900 bg-red-900/20 mb-6">
+        <Card className="border-rose-500/20 bg-rose-500/10 mb-6">
           <CardContent className="pt-6">
-            <p className="text-red-400">Error: {error}</p>
+            <p className="text-rose-300">Error: {error}</p>
           </CardContent>
         </Card>
       )}
 
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">All Colleges ({pagination?.total || colleges.length})</CardTitle>
+      <Card className={adminCardClass}>
+        <CardHeader className="border-b border-white/4">
+          <CardTitle className={adminCardTitleClass}>College List ({pagination?.total || colleges.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {colleges.length === 0 ? (
@@ -185,51 +192,20 @@ export function CollegeList() {
               </table>
 
               {/* Pagination */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-700">
-                  <div className="text-sm text-gray-400">
-                    Showing {((page - 1) * pagination.limit) + 1} - {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} colleges
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(page - 1)}
-                      disabled={!pagination.hasPrev}
-                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
-                      Previous
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                        <Button
-                          key={pageNum}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPage(pageNum)}
-                          className={`w-8 h-8 p-0 ${
-                            pageNum === page
-                              ? 'bg-teal-600 border-teal-600 text-white'
-                              : 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600'
-                          }`}
-                        >
-                          {pageNum}
-                        </Button>
-                      ))}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(page + 1)}
-                      disabled={!pagination.hasNext}
-                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </div>
-                </div>
+              {pagination && pagination.total > 0 && (
+                <Pagination
+                  currentPage={page}
+                  totalPages={pagination.totalPages}
+                  total={pagination.total}
+                  limit={limit}
+                  onPageChange={setPage}
+                  onLimitChange={(newLimit) => {
+                    setLimit(newLimit)
+                    setPage(1)
+                  }}
+                  hasNext={pagination.hasNext}
+                  hasPrev={pagination.hasPrev}
+                />
               )}
             </div>
           )}

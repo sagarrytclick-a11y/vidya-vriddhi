@@ -2,19 +2,18 @@
 
 import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react'
+import { Lock, Eye, EyeOff, Shield, User } from 'lucide-react'
 import Image from 'next/image'
 
 function AdminLoginContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/admin'
@@ -40,7 +39,7 @@ function AdminLoginContent() {
       } else {
         setError(data.error || 'Login failed')
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.')
     } finally {
       setIsLoading(false)
@@ -49,39 +48,40 @@ function AdminLoginContent() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center py-12 px-4">
-      <div className="max-w-md rounded-2xl  bg-white shadow-xl w-full">
-        {/* Logo Section */}
-        <div className="text-center flex flex-col items-center justify-center my-8">
-            
-              <Image src={'/logo.png'} alt='logo' height={150} width={150}  />
-           
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080a0e] px-4 py-12">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(234,88,12,0.08),_transparent_50%),radial-gradient(ellipse_at_bottom_right,_rgba(249,115,22,0.06),_transparent_45%)]" />
+
+      <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-[#12161e] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/[0.06]">
+        <div className="flex flex-col items-center px-8 pt-10">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white p-2">
+            <Image src="/logo.png" alt="logo" height={56} width={56} className="object-contain" />
+          </div>
+          <p className="text-lg font-semibold tracking-tight text-[#ea580c]">Vidya Vriddhi</p>
+          <p className="mt-1 text-sm text-[#6b7280]">Admin Console Sign In</p>
         </div>
 
-        {/* Login Form */}
-        <div className=" rounded-2xl p-8">
+        <div className="p-8 pt-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
+            <div className="mb-6 rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
+              <p className="text-sm text-rose-300">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="username" className="mb-2 block text-sm font-medium text-[#9ca3af]">
                 Username
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <User className="h-4 w-4 text-[#6b7280]" />
                 </div>
                 <input
                   id="username"
@@ -91,69 +91,58 @@ function AdminLoginContent() {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-gray-50/50 focus:bg-white"
+                  className="block w-full rounded-xl border border-white/[0.06] bg-[#0c0f14] py-3 pl-10 pr-3 text-white placeholder-[#4b5563] transition focus:border-[#ea580c]/40 focus:outline-none focus:ring-2 focus:ring-[#ea580c]/20 disabled:opacity-50"
                   placeholder="Enter your username"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-[#9ca3af]">
                 Password
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Lock className="h-4 w-4 text-[#6b7280]" />
                 </div>
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
                   required
                   disabled={isLoading}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-gray-50/50 focus:bg-white"
+                  className="block w-full rounded-xl border border-white/[0.06] bg-[#0c0f14] py-3 pl-10 pr-10 text-white placeholder-[#4b5563] transition focus:border-[#ea580c]/40 focus:outline-none focus:ring-2 focus:ring-[#ea580c]/20 disabled:opacity-50"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   disabled={isLoading}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#6b7280] transition hover:text-[#ea580c]"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Sign In Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="group w-full flex justify-center items-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-300 shadow-md hover:shadow-orange-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex w-full items-center justify-center rounded-xl bg-[#ea580c] py-3.5 px-4 text-sm font-bold text-white transition hover:bg-[#c2410c] focus:outline-none focus:ring-2 focus:ring-[#ea580c]/40 focus:ring-offset-2 focus:ring-offset-[#12161e] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Shield className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+              <Shield className="mr-2 h-4 w-4" />
               {isLoading ? 'Signing In...' : 'Sign In to Admin Panel'}
             </button>
           </form>
 
-          {/* Security Info */}
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <p className="text-center text-sm text-gray-600 mb-4">
+          <div className="mt-8 border-t border-white/[0.04] pt-6">
+            <p className="text-center text-sm text-[#6b7280]">
               Secure admin access for Vidya Vriddhi
             </p>
-           
           </div>
         </div>
-
-        {/* Back to Home */}
-       
       </div>
     </div>
   )
@@ -161,14 +150,16 @@ function AdminLoginContent() {
 
 export default function AdminLogin() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center py-12 px-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#080a0e] px-4 py-12">
+          <div className="text-center">
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#ea580c] border-t-transparent" />
+            <p className="mt-4 text-[#6b7280]">Loading...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <AdminLoginContent />
     </Suspense>
   )

@@ -18,6 +18,9 @@ interface CityContextType {
 
   // Pagination actions
   setPage: (page: number) => void
+  setLimit: (limit: number) => void
+  limit: number
+  page: number
 
   // Mutations
   createCity: (data: CreateCityData) => Promise<City>
@@ -60,7 +63,7 @@ interface CityProviderProps {
 
 export function CityProvider({ children }: CityProviderProps) {
   const [page, setPage] = useState(1)
-  const limit = 10
+  const [limit, setLimit] = useState(10)
 
   const {
     cities,
@@ -130,6 +133,9 @@ export function CityProvider({ children }: CityProviderProps) {
 
     // Pagination actions
     setPage,
+    setLimit,
+    limit,
+    page,
 
     // Mutations
     createCity,

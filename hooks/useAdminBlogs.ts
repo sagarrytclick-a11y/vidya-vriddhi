@@ -125,16 +125,42 @@ export function useAdminBlogs(limit: number = 10, skip: number = 0) {
   // Create blog mutation
   const createBlogMutation = useMutation({
     mutationFn: createBlog,
-    onSuccess: (newBlog) => {
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: blogKeys.lists() })
+      const previous = queryClient.getQueryData(blogKeys.list({ limit, skip }))
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        ...data,
+        imageUrl: data.imageUrl || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      queryClient.setQueryData(blogKeys.list({ limit, skip }), (old: BlogsResponse | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: [optimistic as any, ...old.data],
+          pagination: { ...old.pagination, total: old.pagination.total + 1 },
+        }
+      })
+      return { previous, tempId: optimistic.id }
+    },
+    onSuccess: (newBlog, _vars, context) => {
       toast.success('Blog created successfully')
       queryClient.setQueryData(blogKeys.list({ limit, skip }), (old: BlogsResponse | undefined) => {
         if (!old) return old
-        return { ...old, data: [newBlog, ...old.data], pagination: { ...old.pagination, total: old.pagination.total + 1 } }
+        return {
+          ...old,
+          data: old.data.map((b) => (b.id === context?.tempId ? newBlog : b)),
+        }
       })
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(blogKeys.list({ limit, skip }), context.previous)
       toast.error(error.message || 'Failed to create blog')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'active' })
     },
   })
 
@@ -158,8 +184,8 @@ export function useAdminBlogs(limit: number = 10, skip: number = 0) {
       toast.error(error.message || 'Failed to update blog')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'active' })
     },
   })
 
@@ -183,8 +209,8 @@ export function useAdminBlogs(limit: number = 10, skip: number = 0) {
       toast.error(error.message || 'Failed to delete blog')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.lists(), refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: blogKeys.details(), refetchType: 'active' })
     },
   })
 

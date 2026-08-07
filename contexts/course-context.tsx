@@ -23,6 +23,9 @@ interface CourseContextType {
 
   // Pagination actions
   setPage: (page: number) => void
+  setLimit: (limit: number) => void
+  limit: number
+  page: number
 
   // Mutations
   createCourse: (data: CourseFormData) => Promise<void>
@@ -46,7 +49,7 @@ interface CourseProviderProps {
 
 export function CourseProvider({ children }: CourseProviderProps) {
   const [page, setPage] = useState(1)
-  const limit = 10
+  const [limit, setLimit] = useState(10)
 
   const {
     courses,
@@ -71,6 +74,9 @@ export function CourseProvider({ children }: CourseProviderProps) {
 
     // Pagination actions
     setPage,
+    setLimit,
+    limit,
+    page,
 
     // Mutations
     createCourse,

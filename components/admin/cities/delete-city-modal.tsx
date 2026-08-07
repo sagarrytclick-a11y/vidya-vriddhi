@@ -4,6 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { useCityContext } from '@/contexts/city-context'
 import { City } from '@/hooks/useAdminCities'
+import {
+  adminDialogClass,
+  adminCancelBtnClass,
+  adminDangerBtnClass,
+} from '@/components/admin/modal-ui'
 
 interface DeleteCityModalProps {
   isOpen: boolean
@@ -30,9 +35,9 @@ export function DeleteCityModal({ isOpen, onClose, city }: DeleteCityModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white">
+      <DialogContent className={adminDialogClass}>
         <DialogHeader>
-          <DialogTitle>Delete City</DialogTitle>
+          <DialogTitle className="text-white">Delete City</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
@@ -41,20 +46,20 @@ export function DeleteCityModal({ isOpen, onClose, city }: DeleteCityModalProps)
           </p>
           
           {city.country && (
-            <p className="text-gray-400 text-sm">
+            <p className="text-[#6b7280] text-sm">
               This city is associated with {city.country.name}. This action cannot be undone.
             </p>
           )}
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className={adminCancelBtnClass}>
               Cancel
             </Button>
             <Button 
               variant="destructive" 
               onClick={handleDelete} 
               disabled={isDeleting}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className={adminDangerBtnClass}
             >
               {isDeleting ? 'Deleting...' : 'Delete City'}
             </Button>
