@@ -28,7 +28,7 @@ export type { NewsFormData }
 interface AddNewsModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit?: (data: NewsFormData) => Promise<void>
+  onSubmit?: (data: NewsFormData) => void | Promise<void>
 }
 
 export function AddNewsModal({ isOpen, onClose, onSubmit }: AddNewsModalProps) {

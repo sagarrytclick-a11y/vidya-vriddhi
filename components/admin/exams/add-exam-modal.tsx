@@ -26,7 +26,7 @@ import { AdminImageDropzone } from '@/components/admin/image-dropzone'
 interface AddExamModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: ExamFormData) => Promise<void>
+  onSubmit: (data: ExamFormData) => void | Promise<void>
   isSubmitting?: boolean
   initialData?: any
   isEdit?: boolean
@@ -1155,8 +1155,7 @@ export function AddExamModal({ isOpen, onClose, onSubmit, isSubmitting = false, 
                 id="active"
                 checked={formData.active}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked as boolean }))}
-                className="w-5 h-5"
-                  className={adminCheckboxClass}
+                className={cn('w-5 h-5', adminCheckboxClass)}
                 />
               <Label htmlFor="active" className="text-white font-medium cursor-pointer">
                 Active Exam

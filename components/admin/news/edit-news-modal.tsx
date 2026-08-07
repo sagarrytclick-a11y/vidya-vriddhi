@@ -26,7 +26,7 @@ interface EditNewsModalProps {
   isOpen: boolean
   onClose: () => void
   news: News | null
-  onUpdate: (id: string, data: Partial<NewsFormData>) => Promise<void>
+  onUpdate: (id: string, data: Partial<NewsFormData>) => void | Promise<void>
   isUpdating?: boolean
 }
 

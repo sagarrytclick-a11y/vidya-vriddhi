@@ -22,7 +22,7 @@ import {
 interface AddCourseModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: CourseFormData) => Promise<void>
+  onSubmit: (data: CourseFormData) => void | Promise<void>
 }
 
 export function AddCourseModal({ isOpen, onClose, onSubmit }: AddCourseModalProps) {

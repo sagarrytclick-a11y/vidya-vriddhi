@@ -23,7 +23,7 @@ interface EditCourseModalProps {
   isOpen: boolean
   onClose: () => void
   course: Course | null
-  onUpdate: (id: string, data: Partial<CourseFormData>) => Promise<void>
+  onUpdate: (id: string, data: Partial<CourseFormData>) => void | Promise<void>
   isUpdating?: boolean
 }
 

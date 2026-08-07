@@ -27,7 +27,7 @@ import {
 interface AddCollegeModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: CollegeFormData) => Promise<void>
+  onSubmit: (data: CollegeFormData) => void | Promise<void>
   isSubmitting?: boolean
   initialData?: any
   isEdit?: boolean
