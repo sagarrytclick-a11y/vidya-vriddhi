@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine, Bot, Sparkles, Target } from 'lucide-react'
+import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine, Bot, Sparkles } from 'lucide-react'
 import SearchOverlay from './SearchOverlay'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import { useVVSaarthi } from '@/contexts/vv-saarthi-context'
@@ -147,21 +147,7 @@ const Navbar = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              <div className="hidden lg:flex items-center space-x-3 ml-6">
-                <Link
-                  href="/neet-rank-predictor"
-                  className="text-white hover:text-orange-300 px-2.5 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-                >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500/20 text-orange-400">
-                    <Target className="w-3.5 h-3.5" />
-                  </span>
-                  <div className="leading-tight">
-                    <p className="text-sm">NEET Predictor</p>
-                    <p className="bg-orange-500 text-[9px] leading-none inline-flex items-center justify-center px-1.5 py-0.5 rounded mt-0.5">
-                      Free Tool
-                    </p>
-                  </div>
-                </Link>
+              <div className="hidden lg:flex items-center space-x-4 ml-8">
                 <Link href="/compare-colleges" className="text-white hover:text-orange-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
                   <PencilLine className="w-4 h-4" />
                   <div>
@@ -316,24 +302,6 @@ const Navbar = () => {
               >
                 <span className="font-semibold text-gray-800">Compare Colleges</span>
                 <ArrowRight size={16} className="text-gray-500" />
-              </Link>
-            </div>
-
-            {/* NEET Predictor - Mobile */}
-            <div className="border-b border-gray-100">
-              <Link
-                href="/neet-rank-predictor"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
-              >
-                <span className="font-semibold text-orange-600 flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-100 text-orange-600">
-                    <Target className="w-3.5 h-3.5" />
-                  </span>
-                  NEET Predictor
-                  <span className="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded">Free</span>
-                </span>
-                <ArrowRight size={16} className="text-orange-500" />
               </Link>
             </div>
 
