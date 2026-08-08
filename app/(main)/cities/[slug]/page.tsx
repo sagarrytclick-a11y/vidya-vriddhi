@@ -3,7 +3,16 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import { Calendar, ArrowLeft, MapPin, Globe, Building2, GraduationCap, Star } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  MapPin,
+  Globe,
+  Building2,
+  GraduationCap,
+  Star,
+  CheckCircle2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +28,7 @@ export const revalidate = 3600
 async function getCityBySlug(slug: string) {
   return unstable_cache(
     async () => {
-      return db.city.findUnique({
+      return db.city.findFirst({
         where: { slug, active: true },
         select: {
           id: true,
@@ -43,6 +52,7 @@ async function getCityBySlug(slug: string) {
           colleges: {
             where: { active: true },
             take: 6,
+            orderBy: { Internationalranking: 'asc' },
             select: {
               id: true,
               name: true,
@@ -70,10 +80,13 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   if (!city) return { title: 'City Not Found' }
   return {
     title: `Study in ${city.name}, ${city.country.name} | Colleges & Universities`,
-    description: city.description?.slice(0, 160) || `Explore colleges and educational opportunities in ${city.name}, ${city.country.name}.`,
+    description:
+      city.description?.slice(0, 160) ||
+      `Explore colleges and educational opportunities in ${city.name}, ${city.country.name}.`,
     openGraph: {
       title: `Study in ${city.name} - VidyaVriddhi`,
       description: city.description?.slice(0, 160),
+      ...(city.cityImageURL ? { images: [{ url: city.cityImageURL }] } : {}),
     },
   }
 }
@@ -89,259 +102,323 @@ export default async function CityPage({ params }: CityPageProps) {
   const collegeTotal = city._count.colleges
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto relative z-10">
-          <Link href="/cities">
-            <Button variant="ghost" className="text-white hover:bg-blue-400/20 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/25 to-white">
+      {/* Hero */}
+      <section className="relative min-h-[420px] md:min-h-[480px] overflow-hidden">
+        {city.cityImageURL ? (
+          <Image
+            src={city.cityImageURL}
+            alt={city.name}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/55 to-orange-900/35" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 flex flex-col justify-end min-h-[420px] md:min-h-[480px]">
+          <Link href="/cities" className="w-fit mb-4">
+            <Button
+              variant="ghost"
+              className="text-white/90 hover:text-white hover:bg-white/10 -ml-2"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Cities
             </Button>
           </Link>
-          <Breadcrumbs dark items={[
-            { label: 'Cities', href: '/cities' },
-            { label: city.name },
-          ]} />
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-                City
+
+          <Breadcrumbs
+            dark
+            items={[
+              { label: 'Cities', href: '/cities' },
+              { label: city.name },
+            ]}
+          />
+
+          <div className="mt-4 space-y-5 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-orange-500 text-white border-0 hover:bg-orange-500">
+                Study Destination
               </Badge>
-              <div className="flex items-center gap-1 text-blue-100/90 text-sm">
-                <Globe className="w-4 h-4" />
-                <span>{city.country.flagEmoji} {city.country.name}</span>
-              </div>
-              <div className="flex items-center gap-1 text-blue-100/90 text-sm">
-                <Building2 className="w-4 h-4" />
-                <span>{collegeTotal} Colleges</span>
-              </div>
+              <Link
+                href={`/countries/${city.country.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm px-3 py-1 text-sm text-white hover:bg-white/25 transition-colors"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                {city.country.flagEmoji} {city.country.name}
+              </Link>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm px-3 py-1 text-sm text-white">
+                <Building2 className="w-3.5 h-3.5" />
+                {collegeTotal} Colleges
+              </span>
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-              {city.name}
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+              Study in {city.name}
             </h1>
+
+            {city.description && (
+              <p className="text-lg text-white/85 leading-relaxed line-clamp-3 md:line-clamp-2">
+                {city.description}
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link href={`/colleges?city=${city.slug}`}>
+                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-lg shadow-orange-900/30">
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Browse Colleges
+                </Button>
+              </Link>
+              <Link href={`/countries/${city.country.slug}`}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/40 bg-white/10 text-white hover:bg-white hover:text-slate-900 backdrop-blur-sm"
+                >
+                  View {city.country.name}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* City Image */}
-      {city.cityImageURL && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-          <div className="rounded-2xl overflow-hidden shadow-2xl relative h-96">
-            <Image 
-              src={city.cityImageURL} 
-              alt={city.name}
-              fill
-              className="object-cover"
-              sizes="100vw"
-            />
-          </div>
-        </section>
-      )}
-
-      {/* City Content */}
+      {/* Content */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Description */}
-              <Card className="shadow-lg border-slate-200">
-                <CardContent className="p-8">
+              {/* About */}
+              <Card className="border-slate-200/80 shadow-sm overflow-hidden py-0 gap-0">
+                <div className="h-1 bg-gradient-to-r from-orange-500 to-amber-400" />
+                <CardContent className="p-6 md:p-8">
                   <h2 className="text-2xl font-bold text-slate-900 mb-4">About {city.name}</h2>
                   <div className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-                    {city.description || 'No description available for this city.'}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Colleges in City */}
-              {city.colleges.length > 0 && (
-                <Card className="shadow-lg border-slate-200">
-                  <CardContent className="p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-slate-900">Colleges in {city.name}</h2>
-                      <Link href={`/colleges?city=${city.slug}`}>
-                        <Button variant="outline" size="sm">
-                          View All
-                        </Button>
-                      </Link>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {city.colleges.map((college) => (
-                        <Link key={college.id} href={`/colleges/${college.slug}`}>
-                          <Card className="hover:shadow-xl transition-all cursor-pointer group">
-                            <CardContent className="p-6">
-                              {/* College Image */}
-                              {college.imageURL && (
-                              <div className="mb-4 rounded-lg overflow-hidden relative h-40">
-                                <Image 
-                                  src={college.imageURL} 
-                                  alt={college.name}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                  sizes="(max-width: 768px) 100vw, 50vw"
-                                />
-                              </div>
-                              )}
-
-                              {/* College Header */}
-                              <div className="flex items-start gap-4 mb-4">
-                                {college.logoURL && (
-                                  <div className="relative w-14 h-14 shrink-0">
-                                    <Image 
-                                      src={college.logoURL} 
-                                      alt={college.name}
-                                      fill
-                                      className="object-contain rounded-lg bg-white"
-                                      sizes="56px"
-                                    />
-                                  </div>
-                                )}
-                                <div className="flex-1">
-                                  <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-                                    {college.name}
-                                  </h3>
-                                  {(college.Countryranking || college.Internationalranking) && (
-                                    <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                                      {college.Countryranking && (
-                                        <Badge variant="secondary" className="flex items-center gap-1">
-                                          <Star className="w-3 h-3" />
-                                          #{college.Countryranking} National
-                                        </Badge>
-                                      )}
-                                      {college.Internationalranking && (
-                                        <Badge variant="secondary" className="flex items-center gap-1">
-                                          <Star className="w-3 h-3" />
-                                          #{college.Internationalranking} International
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* College Description */}
-                              {college.description && (
-                                <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-2">
-                                  {college.description}
-                                </p>
-                              )}
-
-                              {/* Categories */}
-                              {college.categories && college.categories.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                  {college.categories.slice(0, 3).map((category) => (
-                                    <Badge key={category.slug} variant="outline" className="text-xs">
-                                      {category.name}
-                                    </Badge>
-                                  ))}
-                                  {college.categories.length > 3 && (
-                                    <Badge variant="outline" className="text-xs">
-                                      +{college.categories.length - 3}
-                                    </Badge>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Courses */}
-                              {college.courses && college.courses.length > 0 && (
-                                <div className="border-t border-slate-100 pt-3">
-                                  <p className="text-xs text-slate-500 mb-2">Popular Courses:</p>
-                                  <div className="flex flex-wrap gap-1">
-                                    {college.courses.map((course) => (
-                                      <span key={course.slug} className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                                        {course.name}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Quick Info */}
-              <Card className="shadow-lg border-slate-200">
-                <CardContent className="p-6">
-                  <h3 className="font-bold text-slate-900 mb-4">Quick Info</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <p className="text-sm text-slate-500">Location</p>
-                        <p className="font-medium text-slate-900">{city.country.name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Building2 className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <p className="text-sm text-slate-500">Total Colleges</p>
-                        <p className="font-medium text-slate-900">{collegeTotal}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <p className="text-sm text-slate-500">Added</p>
-                        <p className="font-medium text-slate-900">
-                          {new Date(city.createdAt).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                          })}
-                        </p>
-                      </div>
-                    </div>
+                    {city.description ||
+                      `${city.name} is an educational destination in ${city.country.name}. Explore colleges and programs available in this city.`}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Features */}
               {city.features && city.features.length > 0 && (
-                <Card className="shadow-lg border-slate-200">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-slate-900 mb-4">Key Features</h3>
-                    <div className="flex flex-wrap gap-2">
+                <Card className="border-slate-200/80 shadow-sm py-0 gap-0">
+                  <CardContent className="p-6 md:p-8">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-5">Why study here</h2>
+                    <div className="grid sm:grid-cols-2 gap-3">
                       {city.features.map((feature, index) => (
-                        <Badge key={index} variant="secondary" className="text-sm">
-                          {feature}
-                        </Badge>
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50/50 px-4 py-3"
+                        >
+                          <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span className="text-slate-800 font-medium text-sm leading-snug">
+                            {feature}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
               )}
 
-              {/* Actions */}
-              <Card className="shadow-lg border-slate-200">
-                <CardContent className="p-6">
-                  <h3 className="font-bold text-slate-900 mb-4">Explore More</h3>
-                  <div className="space-y-3">
-                    <Link href={`/colleges?city=${city.slug}`} className="block">
-                      <Button variant="outline" className="w-full">
-                        <GraduationCap className="w-4 h-4 mr-2" />
-                        Browse Colleges
+              {/* Colleges */}
+              <div className="space-y-5">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">Colleges in {city.name}</h2>
+                    <p className="text-slate-500 text-sm mt-1">
+                      {collegeTotal > 0
+                        ? `Showing ${Math.min(6, collegeTotal)} of ${collegeTotal} colleges`
+                        : 'No colleges listed yet'}
+                    </p>
+                  </div>
+                  {collegeTotal > 0 && (
+                    <Link href={`/colleges?city=${city.slug}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300"
+                      >
+                        View all
+                        <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </Link>
-                    <Link href={`/countries/${city.country.slug}`} className="block">
-                      <Button variant="outline" className="w-full">
-                        <Globe className="w-4 h-4 mr-2" />
-                        View Country
-                      </Button>
-                    </Link>
+                  )}
+                </div>
+
+                {city.colleges.length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {city.colleges.map((college) => (
+                      <Link key={college.id} href={`/colleges/${college.slug}`} className="group block h-full">
+                        <Card className="h-full overflow-hidden border-slate-200/80 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 py-0 gap-0">
+                          <div className="relative h-40 bg-gradient-to-br from-orange-50 to-amber-50">
+                            {college.imageURL ? (
+                              <Image
+                                src={college.imageURL}
+                                alt={college.name}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Building2 className="w-10 h-10 text-orange-200" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                          </div>
+                          <CardContent className="p-5">
+                            <div className="flex items-start gap-3 mb-3">
+                              {college.logoURL && (
+                                <div className="relative w-12 h-12 shrink-0 rounded-lg bg-white border border-slate-100 overflow-hidden">
+                                  <Image
+                                    src={college.logoURL}
+                                    alt={college.name}
+                                    fill
+                                    className="object-contain p-1"
+                                    sizes="48px"
+                                  />
+                                </div>
+                              )}
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-2">
+                                  {college.name}
+                                </h3>
+                                {(college.Countryranking || college.Internationalranking) && (
+                                  <div className="flex flex-wrap gap-1.5 mt-2">
+                                    {college.Countryranking && (
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-xs bg-orange-50 text-orange-700 border border-orange-100"
+                                      >
+                                        <Star className="w-3 h-3 mr-1" />
+                                        #{college.Countryranking} National
+                                      </Badge>
+                                    )}
+                                    {college.Internationalranking && (
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-xs bg-slate-50 text-slate-700 border border-slate-100"
+                                      >
+                                        <Star className="w-3 h-3 mr-1" />
+                                        #{college.Internationalranking} World
+                                      </Badge>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {college.description && (
+                              <p className="text-slate-600 text-sm leading-relaxed mb-3 line-clamp-2">
+                                {college.description}
+                              </p>
+                            )}
+
+                            {college.categories?.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mb-3">
+                                {college.categories.slice(0, 3).map((category) => (
+                                  <Badge key={category.slug} variant="outline" className="text-xs border-slate-200">
+                                    {category.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+
+                            {college.courses?.length > 0 && (
+                              <div className="border-t border-slate-100 pt-3">
+                                <p className="text-xs text-slate-500 mb-2">Popular courses</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {college.courses.map((course) => (
+                                    <span
+                                      key={course.slug}
+                                      className="text-xs text-orange-700 bg-orange-50 px-2 py-1 rounded-md"
+                                    >
+                                      {course.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="border-dashed border-slate-200 bg-slate-50/50">
+                    <CardContent className="p-10 text-center">
+                      <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                      <p className="text-slate-600">Colleges for this city will appear here soon.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+              <Card className="border-orange-100 shadow-sm overflow-hidden py-0 gap-0">
+                <div className="bg-gradient-to-br from-orange-500 to-amber-500 px-6 py-5 text-white">
+                  <p className="text-orange-100 text-sm font-medium mb-1">Quick info</p>
+                  <h3 className="text-xl font-bold">{city.name}</h3>
+                </div>
+                <CardContent className="p-5 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Country</p>
+                      <p className="font-semibold text-slate-900">
+                        {city.country.flagEmoji} {city.country.name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Colleges</p>
+                      <p className="font-semibold text-slate-900">{collegeTotal}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            </div>
+
+              <Card className="border-slate-200/80 shadow-sm py-0 gap-0">
+                <CardContent className="p-5 space-y-3">
+                  <h3 className="font-bold text-slate-900">Explore more</h3>
+                  <Link href={`/colleges?city=${city.slug}`} className="block">
+                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                      <GraduationCap className="w-4 h-4 mr-2" />
+                      Browse Colleges
+                    </Button>
+                  </Link>
+                  <Link href={`/countries/${city.country.slug}`} className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full border-orange-200 text-orange-700 hover:bg-orange-50"
+                    >
+                      <Globe className="w-4 h-4 mr-2" />
+                      View Country
+                    </Button>
+                  </Link>
+                  <Link href="/cities" className="block">
+                    <Button variant="ghost" className="w-full text-slate-600 hover:text-orange-700 hover:bg-orange-50">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      All Cities
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </aside>
           </div>
         </div>
       </section>
