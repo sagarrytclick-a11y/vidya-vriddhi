@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Map as MapIcon, Building, ExternalLink } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MapPin, Building, ExternalLink, Map as MapIcon } from 'lucide-react'
 import { useCities } from '@/hooks/useCities'
 import { CityWithStats } from '@/types/domain'
 import { SkeletonPulse } from '@/components/ui/skeletons'
@@ -14,7 +14,10 @@ interface CityCardProps {
 
 const CityCard: React.FC<CityCardProps> = ({ city }) => {
   return (
-    <div className="shrink-0 w-44 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
+    <Link
+      href={`/cities/${city.slug}`}
+      className="shrink-0 w-44 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group block"
+    >
       {/* Image/Icon Banner */}
       <div className="h-32 bg-gradient-to-br from-orange-100 via-orange-50 to-blue-50 relative overflow-hidden">
         {city.cityImageURL ? (
@@ -47,14 +50,16 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
           <div className="mt-2 text-2xl">{city.country.flagEmoji}</div>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
 
 const TopStudyPlaces: React.FC = () => {
-  // Fetch cities using custom hook
-  const { data: response, isLoading, error } = useCities(100)
-  const cities = (response?.data || []).filter(city => city.country?.slug === 'india')
+  // Fetch a pool, keep only 10 India cities for the slider
+  const { data: response, isLoading, error } = useCities({ limit: 50, active: true })
+  const cities = (response?.data || [])
+    .filter((city) => city.country?.slug === 'india')
+    .slice(0, 10)
 
   const scrollLeft = () => {
     const element = document.getElementById('cities-scroll-container')

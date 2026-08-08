@@ -131,6 +131,7 @@ const Footer = () => {
               <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About {SITE_IDENTITY.name}</Link>
               <Link href="/career" className="text-gray-300 hover:text-white transition-colors">Career</Link>
               <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link>
+              <Link href="/site-map" className="text-gray-300 hover:text-orange-400 transition-colors font-medium">Sitemap</Link>
               <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms & Conditions</Link>
               <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link>
             </div>
@@ -144,46 +145,85 @@ const Footer = () => {
             </div>
 
             {/* App Download and Social Media */}
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                <div className="text-lg font-semibold">{SITE_IDENTITY.name}</div>
-                <span className="text-gray-400">© {new Date().getFullYear()} {SITE_IDENTITY.name}. All Rights Reserved</span>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-center sm:text-left">
+                <div className="text-lg font-semibold text-white">{SITE_IDENTITY.name}</div>
+                <span className="text-gray-400 text-sm">
+                  © {new Date().getFullYear()} {SITE_IDENTITY.name}. All Rights Reserved
+                </span>
               </div>
 
-          
-
               {/* Social Media Icons */}
-              <div className="flex items-center space-x-3 ml-0 md:ml-8">
-                {SITE_IDENTITY.contact.socials.whatsapp && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.whatsapp} className="text-gray-400 hover:text-white transition-colors">
-                    <MessageCircle className="w-5 h-5" />
-                  </Link>
-                )}
-                {SITE_IDENTITY.contact.socials.instagram && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.instagram} className="text-gray-400 hover:text-white transition-colors">
-                    <Instagram className="w-5 h-5" />
-                  </Link>
-                )}
-                {SITE_IDENTITY.contact.socials.linkedin && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.linkedin} className="text-gray-400 hover:text-white transition-colors">
-                    <Linkedin className="w-5 h-5" />
-                  </Link>
-                )}
-                {SITE_IDENTITY.contact.socials.youtube && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.youtube} className="text-gray-400 hover:text-white transition-colors">
-                    <Youtube className="w-5 h-5" />
-                  </Link>
-                )}
-                {SITE_IDENTITY.contact.socials.facebook && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.facebook} className="text-gray-400 hover:text-white transition-colors">
-                    <Facebook className="w-5 h-5" />
-                  </Link>
-                )}
-                {SITE_IDENTITY.contact.socials.twitter && (
-                  <Link target="_blank" href={SITE_IDENTITY.contact.socials.twitter} className="text-gray-400 hover:text-white transition-colors">
-                    <Twitter className="w-5 h-5" />
-                  </Link>
-                )}
+              <div className="flex flex-col items-center md:items-end gap-3">
+                <p className="text-sm font-medium text-orange-400">Follow us</p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  {SITE_IDENTITY.contact.socials.whatsapp && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.whatsapp}
+                      aria-label="WhatsApp"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-[#25D366] hover:ring-[#25D366] hover:scale-105 transition-all"
+                    >
+                      <MessageCircle className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                  {SITE_IDENTITY.contact.socials.instagram && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.instagram}
+                      aria-label="Instagram"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-gradient-to-br hover:from-[#f58529] hover:via-[#dd2a7b] hover:to-[#8134af] hover:ring-pink-400 hover:scale-105 transition-all"
+                    >
+                      <Instagram className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                  {SITE_IDENTITY.contact.socials.linkedin && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.linkedin}
+                      aria-label="LinkedIn"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-[#0A66C2] hover:ring-[#0A66C2] hover:scale-105 transition-all"
+                    >
+                      <Linkedin className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                  {SITE_IDENTITY.contact.socials.youtube && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.youtube}
+                      aria-label="YouTube"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-[#FF0000] hover:ring-[#FF0000] hover:scale-105 transition-all"
+                    >
+                      <Youtube className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                  {SITE_IDENTITY.contact.socials.facebook && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.facebook}
+                      aria-label="Facebook"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-[#1877F2] hover:ring-[#1877F2] hover:scale-105 transition-all"
+                    >
+                      <Facebook className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                  {SITE_IDENTITY.contact.socials.twitter && (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={SITE_IDENTITY.contact.socials.twitter}
+                      aria-label="Twitter"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 hover:bg-[#1D9BF0] hover:ring-[#1D9BF0] hover:scale-105 transition-all"
+                    >
+                      <Twitter className="w-5 h-5" strokeWidth={2.25} />
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </div>

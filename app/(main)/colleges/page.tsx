@@ -108,16 +108,18 @@ function CollegesPageContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex items-center text-sm text-gray-500">
-            <Link href="/" className="hover:text-blue-600">Home</Link>
-            <ChevronRight className="w-4 h-4 mx-2" />
-            <span className="text-gray-900 font-medium">Colleges</span>
+      <div className="bg-white border-b border-orange-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+          <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-y-1 text-[15px] font-medium">
+            <Link href="/" className="text-slate-700 hover:text-orange-600 transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="w-4 h-4 mx-2 text-orange-400 shrink-0" />
+            <span className="text-orange-600 font-semibold">Colleges</span>
             {searchParams.get('category') && (
               <>
-                <ChevronRight className="w-4 h-4 mx-2" />
-                <span className="text-blue-600 font-medium">
+                <ChevronRight className="w-4 h-4 mx-2 text-orange-400 shrink-0" />
+                <span className="text-slate-900 font-semibold">
                   {categories.find(c => c.slug === searchParams.get('category'))?.name}
                 </span>
               </>

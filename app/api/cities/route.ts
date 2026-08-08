@@ -18,16 +18,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
+    const activeOnly = searchParams.get('active') === 'true'
 
-    // Build where clause for search
-    const where = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { slug: { contains: search, mode: 'insensitive' as const } }
-          ]
-        }
-      : {}
+    // Build where clause for search / public active filter
+    const where = {
+      ...(activeOnly ? { active: true } : {}),
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' as const } },
+              { slug: { contains: search, mode: 'insensitive' as const } },
+              { description: { contains: search, mode: 'insensitive' as const } },
+              { country: { name: { contains: search, mode: 'insensitive' as const } } },
+            ],
+          }
+        : {}),
+    }
 
     // Fetch cities with pagination
     const [cities, total] = await Promise.all([

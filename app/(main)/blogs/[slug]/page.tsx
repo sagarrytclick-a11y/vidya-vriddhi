@@ -15,7 +15,7 @@ interface BlogPageProps {
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { slug } = await params
-  const blog = await db.blog.findUnique({ where: { slug, active: true } })
+  const blog = await db.blog.findFirst({ where: { slug, active: true } })
   if (!blog) return { title: 'Blog Not Found' }
   return {
     title: `${blog.title} | VidyaVriddhi Blogs`,
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 export default async function BlogPage({ params }: BlogPageProps) {
   const { slug } = await params
   
-  const blog = await db.blog.findUnique({
+  const blog = await db.blog.findFirst({
     where: {
       slug,
       active: true

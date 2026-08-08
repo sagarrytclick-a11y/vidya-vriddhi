@@ -15,15 +15,21 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const excludeIndia = searchParams.get('excludeIndia') === 'true'
+    const activeOnly = searchParams.get('active') === 'true'
     
-    const whereClause = excludeIndia ? {
-      NOT: {
-        name: {
-          equals: 'India',
-          mode: 'insensitive' as const
-        }
-      }
-    } : {}
+    const whereClause = {
+      ...(activeOnly ? { active: true } : {}),
+      ...(excludeIndia
+        ? {
+            NOT: {
+              name: {
+                equals: 'India',
+                mode: 'insensitive' as const,
+              },
+            },
+          }
+        : {}),
+    }
 
     const countries = await db.country.findMany({
       where: whereClause,
@@ -39,7 +45,8 @@ export async function GET(request: NextRequest) {
         active: true,
         _count: {
           select: {
-            colleges: true
+            colleges: true,
+            cities: true,
           }
         }
       }
