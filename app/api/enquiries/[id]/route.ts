@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/auth'
 
 // Validation schema for status update
 const statusUpdateSchema = z.object({
@@ -12,6 +13,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     const body = await request.json()
     
@@ -55,6 +59,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     
     // Delete the enquiry

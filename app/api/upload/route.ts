@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ImageKit from 'imagekit'
 import { randomUUID } from 'crypto'
+import { requireAdmin } from '@/lib/auth'
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
@@ -11,6 +12,9 @@ const imagekit = new ImageKit({
 export async function POST(request: NextRequest) {
   try {
     
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const formData = await request.formData()
     const file = formData.get('file') as File
 

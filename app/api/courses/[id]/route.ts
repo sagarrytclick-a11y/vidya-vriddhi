@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/auth'
 
 const updateCourseSchema = z.object({
   name: z.string().min(1, 'Course name is required').optional(),
@@ -51,6 +52,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     const body = await request.json()
     const validatedData = updateCourseSchema.parse(body)
@@ -109,6 +113,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
 
     // Check if course has associated colleges

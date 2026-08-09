@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 import { categoryCreateSchema, categoryUpdateSchema } from '@/lib/validations/schema'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,6 +59,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const body = await request.json()
 
     // Validate input using Zod schema

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
 
     const application = await db.careerApplication.findUnique({
@@ -28,6 +32,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
 
     await db.careerApplication.delete({

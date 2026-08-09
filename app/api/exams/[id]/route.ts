@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/auth'
 
 const examSchema = z.object({
   name: z.string().min(1, 'Exam name is required'),
@@ -112,6 +113,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
 
     const body = await request.json()
@@ -160,6 +164,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     
     // First check if exam exists

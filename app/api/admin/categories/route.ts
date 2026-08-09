@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 
 // GET /api/admin/categories?page=1&limit=10&search=
 export async function GET(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -54,6 +58,9 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/categories
 export async function POST(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const body = await request.json()
     const { name, slug, description, categoryImageUrl, active } = body
 

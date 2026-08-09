@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 
 // GET all tables with their data
 export async function GET(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     // Get paginated table data with limits
     const [countries, cities, colleges, categories, exams, courses] = await Promise.all([
       db.country.findMany({ take: 50, orderBy: { name: 'asc' }, select: { id: true, name: true, slug: true, flagEmoji: true, active: true, _count: { select: { cities: true } } } }),

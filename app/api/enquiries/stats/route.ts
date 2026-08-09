@@ -1,8 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const stats = await db.$queryRaw<{ status: string; count: bigint }[]>`
       SELECT status, COUNT(*)::int as count FROM "Enquiry" GROUP BY status
     `
