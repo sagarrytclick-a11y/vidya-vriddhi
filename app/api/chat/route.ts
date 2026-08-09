@@ -1,19 +1,49 @@
 export const runtime = 'nodejs'
 
-export async function POST(req: Request) {
+import { NextRequest } from 'next/server'
+import { z } from 'zod'
+import { enforceRateLimit } from '@/lib/rate-limit'
+
+const chatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.string().min(1).max(4000),
+})
+
+const chatBodySchema = z.object({
+  messages: z.array(chatMessageSchema).min(1).max(30),
+})
+
+export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const limited = enforceRateLimit(req, 'chat', 20, 60_000)
+    if (limited) return limited
+
+    const body = await req.json()
+    const parsed = chatBodySchema.safeParse(body)
+
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ error: 'Invalid chat payload' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Never forward client-supplied system prompts
+    const messages = parsed.data.messages.filter((m) => m.role !== 'system')
 
     const apiKey = process.env.OPENROUTER_API_KEY
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'OpenRouter API key not configured' }), { status: 500 })
+      return new Response(JSON.stringify({ error: 'Chat service unavailable' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
         'X-Title': 'Vidya Vriddhi - VV Saarthi',
       },
@@ -102,8 +132,7 @@ At the end of EVERY response add:
 📞 9839865347
 
 📧 [Abhishek@vidyavriddhi.com](mailto:Abhishek@vidyavriddhi.com)
-`
-
+`,
           },
           ...messages,
         ],
@@ -112,18 +141,24 @@ At the end of EVERY response add:
     })
 
     if (!response.ok) {
-      const error = await response.text()
-      return new Response(JSON.stringify({ error: `OpenRouter API error: ${error}` }), { status: response.status })
+      console.error('OpenRouter API error:', response.status)
+      return new Response(JSON.stringify({ error: 'Chat service temporarily unavailable' }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     return new Response(response.body, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
       },
     })
   } catch {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

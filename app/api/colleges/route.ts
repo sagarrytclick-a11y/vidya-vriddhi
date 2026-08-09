@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
+import { requireAdmin } from '@/lib/auth'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -138,6 +139,9 @@ export async function GET(request: NextRequest) {
 // POST create college
 export async function POST(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const body = await request.json()
     const validatedData = collegeSchema.parse(body)
 

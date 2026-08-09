@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ImageKit from 'imagekit'
 import { randomUUID } from 'crypto'
+import { z } from 'zod'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
+import { enforceRateLimit } from '@/lib/rate-limit'
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
@@ -9,18 +12,45 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
 })
 
+const careerApplicationSchema = z.object({
+  name: z.string().min(2).max(100).trim(),
+  email: z.string().email().max(200).trim().toLowerCase(),
+  phone: z
+    .string()
+    .min(7)
+    .max(20)
+    .regex(/^[0-9+\-\s()]+$/, 'Invalid phone number'),
+  position: z.string().min(2).max(150).trim(),
+})
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    const phone = formData.get('phone') as string
-    const position = formData.get('position') as string
-    const resume = formData.get('resume') as File | null
+    const limited = enforceRateLimit(request, 'career', 5, 60_000)
+    if (limited) return limited
 
-    if (!name || !email || !phone || !position) {
-      return NextResponse.json({ error: 'Name, email, phone, and position are required' }, { status: 400 })
+    const formData = await request.formData()
+    const parsed = careerApplicationSchema.safeParse({
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      position: formData.get('position'),
+    })
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: parsed.error.issues.map((i) => ({
+            field: i.path.join('.'),
+            message: i.message,
+          })),
+        },
+        { status: 400 }
+      )
     }
+
+    const { name, email, phone, position } = parsed.data
+    const resume = formData.get('resume') as File | null
 
     if (!resume || resume.size === 0) {
       return NextResponse.json({ error: 'Resume PDF is required' }, { status: 400 })
@@ -36,7 +66,8 @@ export async function POST(request: NextRequest) {
 
     const bytes = await resume.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    const uniqueFilename = `resume-${name.replace(/\s+/g, '-')}-${randomUUID()}.pdf`
+    const safeName = name.replace(/[^a-zA-Z0-9-_]/g, '-').slice(0, 40)
+    const uniqueFilename = `resume-${safeName}-${randomUUID()}.pdf`
 
     const uploadResponse = await imagekit.upload({
       file: buffer,
@@ -65,15 +96,18 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100)
     const search = searchParams.get('search') || ''
     const position = searchParams.get('position')
 
     const skip = (page - 1) * limit
 
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     if (search) {
       where.OR = [

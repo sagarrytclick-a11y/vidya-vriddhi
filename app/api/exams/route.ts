@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
+import { requireAdmin } from '@/lib/auth'
 
 // Schema for exam validation
 const examSchema = z.object({
@@ -57,8 +58,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
-    // Admin edit modals need full Json blobs; public list does not
-    const detail = searchParams.get('detail') === 'true'
+    // Full Json blobs are admin-only; public list stays light
+    const wantsDetail = searchParams.get('detail') === 'true'
+    if (wantsDetail) {
+      const authError = requireAdmin(request)
+      if (authError) return authError
+    }
+    const detail = wantsDetail
 
     const where = search
       ? {
@@ -119,6 +125,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const body = await request.json()
     const validatedData = examSchema.parse(body)
 

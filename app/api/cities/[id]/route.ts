@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
@@ -43,6 +44,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     const body = await request.json()
     const { description, cityImageURL, features, active, countryId } = body
@@ -109,6 +113,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authError = requireAdmin(request)
+    if (authError) return authError
+
     const { id } = await params
     // Check if city exists
     const existingCity = await db.city.findUnique({

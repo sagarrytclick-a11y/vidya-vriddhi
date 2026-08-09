@@ -5,9 +5,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const query = searchParams.get('q') || ''
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '10', 10) || 10, 1), 20)
 
-    if (!query) {
+    if (!query || query.length > 100) {
       return NextResponse.json({ results: [] })
     }
 
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const [colleges, exams, news, courses] = await Promise.all([
       db.college.findMany({
         where: {
+          active: true,
           OR: [
             { name: { contains: query, mode: 'insensitive' as const } },
             { slug: { contains: query, mode: 'insensitive' as const } }
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
 
       db.exam.findMany({
         where: {
+          active: true,
           OR: [
             { name: { contains: query, mode: 'insensitive' as const } },
             { slug: { contains: query, mode: 'insensitive' as const } }
@@ -54,6 +56,7 @@ export async function GET(request: NextRequest) {
 
       db.news.findMany({
         where: {
+          active: true,
           OR: [
             { title: { contains: query, mode: 'insensitive' as const } },
             { slug: { contains: query, mode: 'insensitive' as const } }
@@ -71,6 +74,7 @@ export async function GET(request: NextRequest) {
 
       db.course.findMany({
         where: {
+          active: true,
           OR: [
             { name: { contains: query, mode: 'insensitive' as const } },
             { slug: { contains: query, mode: 'insensitive' as const } }
