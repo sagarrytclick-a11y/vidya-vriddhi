@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { sendEnquiryEmail } from '@/lib/email'
-import { requireAdmin } from '@/lib/auth'
+import { requireCanViewLeads } from '@/lib/auth'
 import { enforceRateLimit } from '@/lib/rate-limit'
 
 const enquirySchema = z.object({
@@ -20,13 +20,13 @@ const enquirySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const ipLimited = enforceRateLimit(request, 'enquiry', 8, 60_000)
+    const ipLimited = await enforceRateLimit(request, 'enquiry', 8, 60_000)
     if (ipLimited) return ipLimited
 
     const body = await request.json()
     const validatedData = enquirySchema.parse(body)
 
-    const emailLimited = enforceRateLimit(request, {
+    const emailLimited = await enforceRateLimit(request, {
       scope: 'enquiry-email',
       limit: 5,
       windowMs: 60 * 60_000,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanViewLeads(request)
     if (authError) return authError
 
     const { searchParams } = new URL(request.url)

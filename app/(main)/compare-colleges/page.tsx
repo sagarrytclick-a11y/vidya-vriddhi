@@ -13,8 +13,8 @@ interface College {
   description?: string
   logoURL?: string
   establishment_year?: number
-  Countryranking?: number
-  Internationalranking?: number
+  Countryranking?: string
+  Internationalranking?: string
   features: string[]
   keyHighlights?: {
     title: string

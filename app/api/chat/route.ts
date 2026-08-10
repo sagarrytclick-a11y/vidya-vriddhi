@@ -10,14 +10,23 @@ const chatMessageSchema = z.object({
 })
 
 const chatBodySchema = z.object({
-  messages: z.array(chatMessageSchema).min(1).max(20),
+  messages: z.array(chatMessageSchema).min(1).max(12),
 })
 
 export async function POST(req: NextRequest) {
   try {
-    // Vercel-trusted IP — stops cheap X-Forwarded-For rotation
-    const limited = enforceRateLimit(req, 'chat', 15, 60_000)
+    // Soft IP limit + hard daily global cap (Neon, $0) — protects OpenRouter spend
+    const limited = await enforceRateLimit(req, 'chat', 8, 60_000)
     if (limited) return limited
+
+    const dayKey = new Date().toISOString().slice(0, 10)
+    const dailyLimited = await enforceRateLimit(req, {
+      scope: 'chat-daily',
+      limit: 400,
+      windowMs: 24 * 60 * 60_000,
+      identityKeys: [`day:${dayKey}`],
+    })
+    if (dailyLimited) return dailyLimited
 
     const body = await req.json()
     const parsed = chatBodySchema.safeParse(body)
@@ -137,7 +146,7 @@ At the end of EVERY response add:
           },
           ...messages,
         ],
-        max_tokens: 1024,
+        max_tokens: 768,
       }),
     })
 

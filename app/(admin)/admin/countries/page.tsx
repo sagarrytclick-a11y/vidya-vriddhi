@@ -15,6 +15,7 @@ import {
   AdminTableSkeleton,
 } from '@/components/admin/page-ui'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { useCountryContext } from '@/contexts/country-context'
 
 const AddCountryModal = dynamic(() => import('@/components/admin/countries/add-country-modal').then(m => ({ default: m.AddCountryModal })))
@@ -23,6 +24,7 @@ const EditCountryModal = dynamic(() => import('@/components/admin/countries/edit
 const DeleteCountryModal = dynamic(() => import('@/components/admin/countries/delete-country-modal').then(m => ({ default: m.DeleteCountryModal })))
 
 export default function CountriesPage() {
+  const { canDelete } = useCanDelete()
   const {
     countries,
     isLoading,
@@ -153,9 +155,11 @@ export default function CountriesPage() {
                           <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-slate-700" onClick={() => openEditModal(country)}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => openDeleteModal(country)}>
+                          {canDelete && (
+<Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => openDeleteModal(country)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
+)}
                         </div>
                       </td>
                     </tr>

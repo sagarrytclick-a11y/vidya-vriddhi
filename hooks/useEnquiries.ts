@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useAdminContext } from '@/contexts/admin-context'
 
 interface EnquiryStats {
   total: number
@@ -18,6 +19,7 @@ const fetchEnquiryStats = async (): Promise<EnquiryStats> => {
 }
 
 export function useEnquiryStats() {
+  const { canViewLeads, isLoading: sessionLoading } = useAdminContext()
   const {
     data: stats,
     isLoading,
@@ -26,8 +28,9 @@ export function useEnquiryStats() {
   } = useQuery({
     queryKey: ['enquiry-stats'],
     queryFn: fetchEnquiryStats,
-    staleTime: 30 * 1000, // 30 seconds
-    retry: 3,
+    staleTime: 30 * 1000,
+    retry: 1,
+    enabled: !sessionLoading && canViewLeads,
   })
 
   return {
@@ -37,7 +40,7 @@ export function useEnquiryStats() {
       resolved: 0,
       followUp: 0
     },
-    isLoading,
+    isLoading: sessionLoading || isLoading,
     error,
     refetch,
   }

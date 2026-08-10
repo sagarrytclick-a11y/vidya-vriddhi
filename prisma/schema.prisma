@@ -131,14 +131,16 @@ model Enquiry {
 }
 
 model CareerApplication {
-  id          String   @id @default(cuid())
-  name        String
-  email       String
-  phone       String
-  position    String
-  resumeUrl   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String
+  position     String
+  /// ImageKit file path (private) or legacy public URL
+  resumeUrl    String
+  resumeFileId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([createdAt])
   @@index([email])
@@ -204,8 +206,8 @@ model College {
   slug                 String     @unique
   description          String?
   establishment_year   Int?
-  Countryranking       Int?
-  Internationalranking Int?
+  Countryranking       String?
+  Internationalranking String?
   active               Boolean    @default(false)
   features             String[]   @default([])
   logoURL              String?
@@ -234,4 +236,39 @@ model College {
   @@index([active, createdAt])
   @@index([slug])
   @@index([name])
+}
+
+/// Staff accounts created from Admin UI (env ADMIN_USERNAME remains bootstrap superadmin)
+model AdminStaff {
+  id             String   @id @default(cuid())
+  username       String   @unique
+  passwordHash   String
+  /// admin | content_writer (superadmin stays env-only)
+  role           String
+  active         Boolean  @default(true)
+  /// Bumped on password change / deactivate — invalidates old cookies
+  sessionVersion Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([username])
+  @@index([active])
+}
+
+/// Shared rate-limit buckets (works across all Vercel instances — free Neon)
+model RateLimitBucket {
+  id        String   @id
+  count     Int      @default(0)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+}
+
+/// Logged-out / revoked admin tokens until natural expiry
+model AdminTokenDeny {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
 }

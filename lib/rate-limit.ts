@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
 type Bucket = { count: number; resetAt: number }
 
-const buckets = new Map<string, Bucket>()
+const memoryBuckets = new Map<string, Bucket>()
 
 /**
- * Simple in-memory fixed-window rate limiter.
- * Works per serverless instance on Vercel (soft protection).
- * Pair with Vercel-trusted IPs so clients cannot spoof the bucket key.
+ * In-memory fallback (dev / DB outage only).
  */
-export function checkRateLimit(
+function checkMemoryRateLimit(
   key: string,
   limit: number,
   windowMs: number
 ): { ok: true } | { ok: false; retryAfterSec: number } {
   const now = Date.now()
-  const entry = buckets.get(key)
+  const entry = memoryBuckets.get(key)
 
   if (!entry || now >= entry.resetAt) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs })
+    memoryBuckets.set(key, { count: 1, resetAt: now + windowMs })
     return { ok: true }
   }
 
@@ -30,6 +29,55 @@ export function checkRateLimit(
   return { ok: true }
 }
 
+/**
+ * Neon-backed fixed window — shared across all Vercel instances (no Redis cost).
+ */
+async function checkDbRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<{ ok: true } | { ok: false; retryAfterSec: number }> {
+  const now = new Date()
+  const resetAt = new Date(now.getTime() + windowMs)
+
+  const existing = await db.rateLimitBucket.findUnique({ where: { id: key } })
+
+  if (!existing || existing.resetAt.getTime() <= now.getTime()) {
+    await db.rateLimitBucket.upsert({
+      where: { id: key },
+      create: { id: key, count: 1, resetAt },
+      update: { count: 1, resetAt },
+    })
+    return { ok: true }
+  }
+
+  if (existing.count >= limit) {
+    return {
+      ok: false,
+      retryAfterSec: Math.max(1, Math.ceil((existing.resetAt.getTime() - now.getTime()) / 1000)),
+    }
+  }
+
+  await db.rateLimitBucket.update({
+    where: { id: key },
+    data: { count: { increment: 1 } },
+  })
+  return { ok: true }
+}
+
+async function checkRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<{ ok: true } | { ok: false; retryAfterSec: number }> {
+  try {
+    return await checkDbRateLimit(key, limit, windowMs)
+  } catch (error) {
+    console.error('DB rate limit failed, using memory fallback:', error)
+    return checkMemoryRateLimit(key, limit, windowMs)
+  }
+}
+
 function firstIp(value: string | null): string | null {
   if (!value) return null
   const ip = value.split(',')[0]?.trim()
@@ -37,33 +85,24 @@ function firstIp(value: string | null): string | null {
 }
 
 /**
- * Client IP on Vercel — prefer platform-set headers that clients cannot forge.
- * @see https://vercel.com/docs/headers/request-headers
- *
- * Priority:
- * 1. x-vercel-forwarded-for (Vercel-controlled)
- * 2. x-real-ip (Vercel-controlled)
- * 3. x-forwarded-for only when VERCEL=1 (also platform-managed there)
- * 4. Local/dev: shared bucket — do not trust spoofable XFF
+ * Client IP — only trust platform headers on Vercel (prevents X-Real-IP spoofing off-platform).
  */
 export function getClientIp(request: NextRequest | Request): string {
   const headers = request.headers
+  const onVercel = process.env.VERCEL === '1'
 
-  // Vercel-specific — set at the edge, not by the browser
-  const vercelForwarded = firstIp(headers.get('x-vercel-forwarded-for'))
-  if (vercelForwarded) return vercelForwarded
+  if (onVercel) {
+    const vercelForwarded = firstIp(headers.get('x-vercel-forwarded-for'))
+    if (vercelForwarded) return vercelForwarded
 
-  const realIp = firstIp(headers.get('x-real-ip'))
-  if (realIp) return realIp
+    const realIp = firstIp(headers.get('x-real-ip'))
+    if (realIp) return realIp
 
-  // On Vercel, x-forwarded-for is platform-managed. Prefer it only when
-  // VERCEL=1 so local/dev attackers cannot freely rotate fake XFF values.
-  if (process.env.VERCEL === '1') {
     const forwarded = firstIp(headers.get('x-forwarded-for'))
     if (forwarded) return forwarded
   }
 
-  // Local / non-Vercel: one shared bucket (better than trusting spoofable headers)
+  // Local / non-Vercel: do not trust spoofable client headers
   return 'local-dev'
 }
 
@@ -71,7 +110,6 @@ export type RateLimitOptions = {
   scope: string
   limit: number
   windowMs: number
-  /** Extra buckets e.g. `email:user@x.com` or `user:admin` — checked in addition to IP */
   identityKeys?: string[]
 }
 
@@ -86,16 +124,16 @@ function rateLimitResponse(retryAfterSec: number): NextResponse {
 }
 
 /**
- * Enforce IP-based limit (+ optional identity keys).
+ * Enforce IP-based limit (+ optional identity keys) via Neon.
  * Returns a 429 response when any bucket is exhausted, otherwise null.
  */
-export function enforceRateLimit(
+export async function enforceRateLimit(
   request: NextRequest | Request,
   scopeOrOptions: string | RateLimitOptions,
   limit?: number,
   windowMs?: number,
   identityKeys: string[] = []
-): NextResponse | null {
+): Promise<NextResponse | null> {
   const options: RateLimitOptions =
     typeof scopeOrOptions === 'string'
       ? {
@@ -112,12 +150,10 @@ export function enforceRateLimit(
     ...(options.identityKeys ?? []).map((k) => `${options.scope}:${k}`),
   ]
 
-  let maxRetry = 0
   for (const key of keys) {
-    const result = checkRateLimit(key, options.limit, options.windowMs)
+    const result = await checkRateLimit(key, options.limit, options.windowMs)
     if (!result.ok) {
-      maxRetry = Math.max(maxRetry, result.retryAfterSec)
-      return rateLimitResponse(maxRetry)
+      return rateLimitResponse(result.retryAfterSec)
     }
   }
 

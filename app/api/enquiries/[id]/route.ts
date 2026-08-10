@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/auth'
+import { requireCanViewLeads, requireCanDelete } from '@/lib/auth'
 
 // Validation schema for status update
 const statusUpdateSchema = z.object({
@@ -13,7 +13,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanViewLeads(request)
     if (authError) return authError
 
     const { id } = await params
@@ -59,7 +59,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanDelete(request)
     if (authError) return authError
 
     const { id } = await params

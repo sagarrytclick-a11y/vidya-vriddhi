@@ -10,6 +10,7 @@ import { useCollegeContext } from '@/contexts/college-context'
 import { useCountryContext } from '@/contexts/country-context'
 import { useCityContext } from '@/contexts/city-context'
 import { Pagination } from '@/components/ui/pagination'
+import { useCanDelete } from '@/contexts/admin-context'
 
 import { College, CollegeFormData } from '@/types/college'
 import {
@@ -23,6 +24,7 @@ import {
 } from '@/components/admin/page-ui'
 
 export function CollegeList() {
+  const { canDelete } = useCanDelete()
   const {
     colleges,
     isLoading,
@@ -181,9 +183,11 @@ export function CollegeList() {
                           <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-slate-700" onClick={async () => await openEditModal(college)}>
                             <Edit className="h-4 w-4" />
                           </Button>
+                          {canDelete && (
                           <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => handleDeleteCollege(college)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -230,7 +234,7 @@ export function CollegeList() {
         }}
         college={selectedCollege}
         onEdit={(college) => openEditModal(college)}
-        onDelete={(college) => openDeleteModal(college)}
+        onDelete={canDelete ? (college) => openDeleteModal(college) : undefined}
       />
 
       {/* Delete College Modal */}

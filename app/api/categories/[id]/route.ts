@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { categoryUpdateSchema } from '@/lib/validations/schema'
-import { requireAdmin, activeContentFilter } from '@/lib/auth'
+import { requireAdmin, activeContentFilter, requireCanDelete } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +12,7 @@ export async function GET(
     const category = await db.category.findFirst({
       where: {
         id,
-        ...activeContentFilter(request),
+        ...await activeContentFilter(request),
       },
     })
 
@@ -38,7 +38,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const { id } = await params
@@ -103,7 +103,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanDelete(request)
     if (authError) return authError
 
     const { id } = await params

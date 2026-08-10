@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Pagination } from '@/components/ui/pagination'
 import NextImage from "next/image";
 import { Plus, Trash2, ImageIcon, Eye, Edit, Upload, X, AlertTriangle } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -399,6 +400,7 @@ function DeleteCategoryModal({ isOpen, onClose, category, onConfirm, loading }: 
 
 // Main Page
 export default function CategoriesPage() {
+  const { canDelete } = useCanDelete()
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [search, setSearch] = useState('')
@@ -513,10 +515,12 @@ export default function CategoriesPage() {
                                 onClick={() => { setSelectedCategory(category); setIsEditOpen(true); }}>
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700"
+                              {canDelete && (
+<Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700"
                                 onClick={() => { setSelectedCategory(category); setIsDeleteOpen(true); }}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
+)}
                             </div>
                           </td>
                         </tr>

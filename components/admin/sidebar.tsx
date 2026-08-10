@@ -14,9 +14,11 @@ import {
   Library,
   Newspaper,
   Briefcase,
+  Users,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useEnquiryStats } from '@/hooks/useEnquiries'
+import { useAdminContext } from '@/contexts/admin-context'
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -98,7 +100,23 @@ function NavSection({
 export function Sidebar() {
   const pathname = usePathname()
   const { stats } = useEnquiryStats()
+  const { user, role, canDelete, canViewLeads } = useAdminContext()
   const hasOpenEnquiries = (stats.pending || 0) + (stats.followUp || 0) > 0
+  const accountNav = [
+    ...(canViewLeads ? accountItems : []),
+    ...(role === 'superadmin'
+      ? [{ href: '/admin/staff', label: 'Staff accounts', icon: Users }]
+      : []),
+  ]
+
+  const roleLabel =
+    role === 'superadmin'
+      ? 'Super Admin'
+      : role === 'admin'
+        ? 'Admin'
+        : role === 'content_writer'
+          ? 'Content Writer'
+          : 'Staff'
 
   return (
     <aside className="admin-sidebar relative flex h-screen w-[260px] shrink-0 flex-col border-r border-white/[0.04] bg-[#0c0f14]">
@@ -122,20 +140,30 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 pb-4 scrollbar-thin">
         <NavSection title="Menu" items={menuItems} pathname={pathname} />
         <NavSection title="Content" items={contentItems} pathname={pathname} />
-        <NavSection
-          title="Account"
-          items={accountItems}
-          pathname={pathname}
-          alertHref="/admin/enquiries"
-          showAlert={hasOpenEnquiries}
-        />
+        {accountNav.length > 0 && (
+          <NavSection
+            title="Account"
+            items={accountNav}
+            pathname={pathname}
+            alertHref="/admin/enquiries"
+            showAlert={canViewLeads && hasOpenEnquiries}
+          />
+        )}
       </div>
 
       <div className="border-t border-white/[0.04] p-4">
         <div className="rounded-2xl bg-gradient-to-br from-[#151a22] to-[#0f1319] p-4 ring-1 ring-white/[0.05]">
-          <p className="text-xs font-medium text-white">Need help?</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-[#6b7280]">
-            Manage colleges, exams & enquiries from one place.
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">
+            Signed in
+          </p>
+          <p className="mt-1 truncate text-sm font-medium text-white">
+            {user?.name || 'Admin'}
+          </p>
+          <p className="mt-0.5 text-xs text-[#9ca3af]">{roleLabel}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-[#6b7280]">
+            {canDelete
+              ? 'Full access including delete.'
+              : 'Can create & edit. Delete is blocked.'}
           </p>
         </div>
       </div>

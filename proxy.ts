@@ -1,15 +1,29 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { verifyAuthToken } from '@/lib/auth'
 import { safeAdminRedirectPath } from '@/lib/admin-redirect'
 
-// Define which routes should be protected for users
 const isUserProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/profile(.*)',
   '/saved(.*)',
   '/applications(.*)',
 ])
+
+/** Live session check via Node API (DB deny-list / deactivate) — Edge-safe, $0 */
+async function isLiveAdminSession(req: Request): Promise<boolean> {
+  try {
+    const verifyUrl = new URL('/api/admin-auth/verify', req.url)
+    const res = await fetch(verifyUrl, {
+      headers: {
+        cookie: req.headers.get('cookie') || '',
+      },
+      cache: 'no-store',
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl
@@ -19,8 +33,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     const token = req.cookies.get('admin-token')?.value
-
-    if (!token || !verifyAuthToken(token)) {
+    if (!token || !(await isLiveAdminSession(req))) {
       const loginUrl = new URL('/admin-login', req.url)
       loginUrl.searchParams.set('redirect', safeAdminRedirectPath(pathname))
       return NextResponse.redirect(loginUrl)

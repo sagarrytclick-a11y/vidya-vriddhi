@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth'
 // GET all tables with their data
 export async function GET(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     // Get paginated table data with limits

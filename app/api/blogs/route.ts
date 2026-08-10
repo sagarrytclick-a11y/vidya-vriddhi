@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
-    const visibility = activeContentFilter(request)
+    const visibility = await activeContentFilter(request)
     const filteredWhere = { ...where, ...visibility }
 
     // Fetch blogs with pagination
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

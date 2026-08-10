@@ -12,8 +12,8 @@ export interface College {
   features: string[]
   imageURL?: string
   logoURL?: string
-  Countryranking?: number
-  Internationalranking?: number
+  Countryranking?: string
+  Internationalranking?: string
   documentsRequired?: any
   feesStructure?: any
   galleryImages?: any
@@ -54,8 +54,8 @@ export interface CollegeFormData {
   slug: string
   description: string
   establishment_year?: number
-  Countryranking?: number
-  Internationalranking?: number
+  Countryranking?: string
+  Internationalranking?: string
   active: boolean
   features: string[]
   logoURL: string

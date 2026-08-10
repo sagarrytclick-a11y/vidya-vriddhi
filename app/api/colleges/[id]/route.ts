@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin, activeContentFilter } from '@/lib/auth'
+import { requireAdmin, activeContentFilter, requireCanDelete } from '@/lib/auth'
+import { rankingValueSchema } from '@/lib/ranking'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -12,8 +13,8 @@ const collegeSchema = z.object({
   countryId: z.string().min(1, 'Country is required'),
   cityId: z.string().min(1, 'City is required'),
   establishment_year: z.number().optional(),
-  Countryranking: z.number().optional(),
-  Internationalranking: z.number().optional(),
+  Countryranking: rankingValueSchema,
+  Internationalranking: rankingValueSchema,
   features: z.array(z.string()).default([]),
   imageURL: z.string().optional(),
   logoURL: z.string().optional(),
@@ -76,7 +77,7 @@ export async function GET(
   try {
     const { id } = await params
     const college = await db.college.findFirst({
-      where: { id, ...activeContentFilter(request) },
+      where: { id, ...await activeContentFilter(request) },
       select: {
         id: true,
         name: true,
@@ -160,7 +161,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const { id } = await params
@@ -291,7 +292,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanDelete(request)
     if (authError) return authError
 
     const { id } = await params

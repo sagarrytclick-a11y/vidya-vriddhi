@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, requireCanDelete } from '@/lib/auth'
 
 // Zod schema for validation
 const countrySchema = z.object({
@@ -17,7 +17,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const { id } = await params
@@ -99,7 +99,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanDelete(request)
     if (authError) return authError
 
     const { id } = await params

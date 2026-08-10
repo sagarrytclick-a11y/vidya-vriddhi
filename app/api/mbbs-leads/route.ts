@@ -15,13 +15,13 @@ const mbbsLeadSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const ipLimited = enforceRateLimit(request, 'mbbs-lead', 5, 60_000)
+    const ipLimited = await enforceRateLimit(request, 'mbbs-lead', 5, 60_000)
     if (ipLimited) return ipLimited
 
     const body = await request.json()
     const validatedData = mbbsLeadSchema.parse(body)
 
-    const emailLimited = enforceRateLimit(request, {
+    const emailLimited = await enforceRateLimit(request, {
       scope: 'mbbs-lead-email',
       limit: 5,
       windowMs: 60 * 60_000,

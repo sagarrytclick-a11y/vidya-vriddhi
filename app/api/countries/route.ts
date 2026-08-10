@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const excludeIndia = searchParams.get('excludeIndia') === 'true'
 
     const whereClause = {
-      ...activeContentFilter(request),
+      ...await activeContentFilter(request),
       ...(excludeIndia
         ? {
             NOT: {
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

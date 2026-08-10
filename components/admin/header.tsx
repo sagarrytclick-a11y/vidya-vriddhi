@@ -32,6 +32,7 @@ import {
   User,
 } from 'lucide-react'
 import { useEnquiryStats } from '@/hooks/useEnquiries'
+import { useAdminContext } from '@/contexts/admin-context'
 import { cn } from '@/lib/utils'
 
 const pageTitles: Record<string, { title: string; subtitle?: string }> = {
@@ -46,6 +47,7 @@ const pageTitles: Record<string, { title: string; subtitle?: string }> = {
   '/admin/news': { title: 'News', subtitle: 'Latest updates' },
   '/admin/enquiries': { title: 'Enquiries', subtitle: 'Student inquiries' },
   '/admin/job-applications': { title: 'Job Applications', subtitle: 'Career applications' },
+  '/admin/staff': { title: 'Staff accounts', subtitle: 'Create and manage admin logins' },
 }
 
 const searchTargets = [
@@ -63,6 +65,7 @@ const searchTargets = [
   { label: 'Follow Up Enquiries', href: '/admin/enquiries?status=FOLLOW_UP', keywords: 'followup follow-up', icon: MessageSquare },
   { label: 'Resolved Enquiries', href: '/admin/enquiries?status=RESOLVED', keywords: 'done completed', icon: MessageSquare },
   { label: 'Job Applications', href: '/admin/job-applications', keywords: 'career resume hiring', icon: Briefcase },
+  { label: 'Staff accounts', href: '/admin/staff', keywords: 'users password username rbac', icon: Briefcase },
 ]
 
 export function Header() {
@@ -70,6 +73,23 @@ export function Header() {
   const router = useRouter()
   const page = pageTitles[pathname] || { title: 'Admin', subtitle: 'Vidya Vriddhi console' }
   const { stats } = useEnquiryStats()
+  const { user, role, canDelete, canViewLeads } = useAdminContext()
+
+  const roleLabel =
+    role === 'superadmin'
+      ? 'Super Admin'
+      : role === 'admin'
+        ? 'Admin'
+        : role === 'content_writer'
+          ? 'Content Writer'
+          : 'Staff'
+
+  const roleBadgeClass =
+    role === 'content_writer'
+      ? 'bg-sky-500/15 text-sky-300 ring-sky-500/25'
+      : role === 'admin'
+        ? 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/25'
+        : 'bg-[#ea580c]/15 text-[#fdba74] ring-[#ea580c]/25'
 
   const [query, setQuery] = useState('')
   const [openSearch, setOpenSearch] = useState(false)
@@ -79,15 +99,22 @@ export function Header() {
   const alertCount = stats.pending + stats.followUp
 
   const results = useMemo(() => {
+    const allowed = searchTargets.filter((item) => {
+      if (!canViewLeads && (item.href.startsWith('/admin/enquiries') || item.href.startsWith('/admin/job-applications'))) {
+        return false
+      }
+      if (role !== 'superadmin' && item.href.startsWith('/admin/staff')) return false
+      return true
+    })
     const q = query.trim().toLowerCase()
-    if (!q) return searchTargets.slice(0, 6)
-    return searchTargets
+    if (!q) return allowed.slice(0, 6)
+    return allowed
       .filter((item) => {
         const hay = `${item.label} ${item.keywords} ${item.href}`.toLowerCase()
         return hay.includes(q)
       })
       .slice(0, 8)
-  }, [query])
+  }, [query, canViewLeads, role])
 
   useEffect(() => {
     setActiveIndex(0)
@@ -151,6 +178,25 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Always-visible RBAC role chip */}
+          {role && (
+            <div
+              className={cn(
+                'hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold ring-1 sm:flex',
+                roleBadgeClass
+              )}
+              title={canDelete ? 'Full access including delete' : 'Can create/edit — cannot delete'}
+            >
+              <User className="h-3.5 w-3.5" />
+              <span>{roleLabel}</span>
+              {!canDelete && (
+                <span className="rounded-md bg-black/20 px-1.5 py-0.5 text-[10px] font-medium text-sky-200/90">
+                  No delete
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Quick navigation search */}
           <div ref={searchWrapRef} className="relative hidden md:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
@@ -239,13 +285,15 @@ export function Header() {
                 <ExternalLink className="mr-2 h-4 w-4 text-[#9ca3af]" />
                 View live website
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer focus:bg-[#1e2430] focus:text-white"
-                onClick={() => router.push('/admin/enquiries')}
-              >
-                <MessageSquare className="mr-2 h-4 w-4 text-[#9ca3af]" />
-                Manage enquiries
-              </DropdownMenuItem>
+              {canViewLeads && (
+                <DropdownMenuItem
+                  className="cursor-pointer focus:bg-[#1e2430] focus:text-white"
+                  onClick={() => router.push('/admin/enquiries')}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4 text-[#9ca3af]" />
+                  Manage enquiries
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator className="bg-white/6" />
               <DropdownMenuItem
                 className="cursor-pointer text-rose-400 focus:bg-[#1e2430] focus:text-rose-300"
@@ -258,6 +306,7 @@ export function Header() {
           </DropdownMenu>
 
           {/* Notifications from real enquiry stats */}
+          {canViewLeads && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -333,6 +382,7 @@ export function Header() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+          )}
 
           {/* Profile */}
           <DropdownMenu>
@@ -353,9 +403,14 @@ export function Header() {
               align="end"
               className="z-[60] min-w-[180px] border-white/6 bg-[#151a22] text-white"
             >
-              <DropdownMenuItem className="flex items-center gap-2 focus:bg-[#1e2430] focus:text-white">
-                <User className="h-4 w-4 text-[#9ca3af]" />
-                <span>Super Admin</span>
+              <DropdownMenuItem className="flex flex-col items-start gap-0.5 focus:bg-[#1e2430] focus:text-white">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-[#9ca3af]" />
+                  <span>{roleLabel}</span>
+                </div>
+                {user?.name && (
+                  <span className="pl-6 text-xs text-[#6b7280]">{user.name}</span>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex cursor-pointer items-center gap-2 text-rose-400 focus:bg-[#1e2430] focus:text-rose-300"
@@ -368,6 +423,12 @@ export function Header() {
           </DropdownMenu>
         </div>
       </div>
+      {role === 'content_writer' && (
+        <div className="mt-3 rounded-xl border border-sky-500/20 bg-sky-500/10 px-4 py-2.5 text-sm text-sky-100">
+          You are logged in as <span className="font-semibold">Content Writer</span> — you can
+          create and edit content, but delete actions are disabled.
+        </div>
+      )}
     </header>
   )
 }

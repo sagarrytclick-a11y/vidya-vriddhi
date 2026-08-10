@@ -62,8 +62,8 @@ export interface College {
  */
 export interface CollegeDetail extends College {
   establishment_year: number | null
-  Countryranking: number | null
-  Internationalranking: number | null
+  Countryranking: string | null
+  Internationalranking: string | null
   logoURL: string | null
   imageURL: string | null
   features: string[]
@@ -91,8 +91,8 @@ export interface CollegeDetail extends College {
  */
 export interface CollegeListItem extends College {
   establishment_year: number | null
-  Countryranking: number | null
-  Internationalranking: number | null
+  Countryranking: string | null
+  Internationalranking: string | null
   logoURL: string | null
   imageURL: string | null
   city: CollegeCity
@@ -125,8 +125,8 @@ export interface CollegeFormData {
   slug: string
   description: string
   establishment_year?: number
-  Countryranking?: number
-  Internationalranking?: number
+  Countryranking?: string
+  Internationalranking?: string
   active: boolean
   features: string[]
   logoURL: string
