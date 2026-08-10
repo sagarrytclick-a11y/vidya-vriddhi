@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth'
+import { requireCanViewLeads } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanViewLeads(request)
     if (authError) return authError
 
     const stats = await db.$queryRaw<{ status: string; count: bigint }[]>`

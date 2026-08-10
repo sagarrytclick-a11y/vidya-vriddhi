@@ -7,8 +7,8 @@ interface College {
   description: string | null
   active: boolean
   establishment_year: number | null
-  Countryranking: number | null
-  Internationalranking: number | null
+  Countryranking: string | null
+  Internationalranking: string | null
   logoURL: string | null
   imageURL: string | null
   createdAt: string

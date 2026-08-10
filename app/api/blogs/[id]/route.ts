@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin, activeContentFilter } from '@/lib/auth'
+import { requireAdmin, activeContentFilter, requireCanDelete } from '@/lib/auth'
 
 const updateBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required').optional(),
@@ -20,7 +20,7 @@ export async function GET(
     const blog = await db.blog.findFirst({
       where: {
         id,
-        ...activeContentFilter(request),
+        ...await activeContentFilter(request),
       },
     })
 
@@ -46,7 +46,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const { id } = await params
@@ -108,7 +108,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanDelete(request)
     if (authError) return authError
 
     const { id } = await params

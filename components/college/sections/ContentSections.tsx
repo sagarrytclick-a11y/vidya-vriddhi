@@ -14,8 +14,8 @@ interface ContentSectionsProps {
     description: string | null
     features: string[]
     establishment_year: number | null
-    Countryranking: number | null
-    Internationalranking: number | null
+    Countryranking: string | null
+    Internationalranking: string | null
     courses: { id: string }[]
     exams: { id: string; name: string; slug: string }[]
     categories: { id: string; name: string }[]

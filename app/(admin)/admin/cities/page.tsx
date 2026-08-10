@@ -15,6 +15,7 @@ import {
   AdminTableSkeleton,
 } from '@/components/admin/page-ui'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { useCityContext } from '@/contexts/city-context'
 import { Pagination } from '@/components/ui/pagination'
 
@@ -24,6 +25,7 @@ const EditCityModal = dynamic(() => import('@/components/admin/cities/edit-city-
 const DeleteCityModal = dynamic(() => import('@/components/admin/cities/delete-city-modal').then(m => ({ default: m.DeleteCityModal })))
 
 export default function CitiesPage() {
+  const { canDelete } = useCanDelete()
   const {
     cities,
     pagination,
@@ -150,9 +152,11 @@ export default function CitiesPage() {
                           <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-slate-700" onClick={() => openEditModal(city)}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => openDeleteModal(city)}>
+                          {canDelete && (
+<Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-slate-700" onClick={() => openDeleteModal(city)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
+)}
                         </div>
                       </td>
                     </tr>

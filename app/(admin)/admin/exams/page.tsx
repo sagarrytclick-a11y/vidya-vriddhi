@@ -17,6 +17,7 @@ import {
 } from '@/components/admin/page-ui'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { useExamContext } from '@/contexts/exam-context'
 import { ExamFormData } from '@/hooks/useAdminExams'
 import { Pagination } from '@/components/ui/pagination'
@@ -26,6 +27,7 @@ const ViewExamModal = dynamic(() => import('@/components/admin/exams/view-exam-m
 const DeleteExamModal = dynamic(() => import('@/components/admin/exams/delete-exam-modal').then(m => ({ default: m.DeleteExamModal })))
 
 export default function ExamsPage() {
+  const { canDelete } = useCanDelete()
   const [searchTerm, setSearchTerm] = useState('')
   
   const {
@@ -171,7 +173,8 @@ export default function ExamsPage() {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button
+                            {canDelete && (
+<Button
                               variant="ghost"
                               size="sm"
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
@@ -179,6 +182,7 @@ export default function ExamsPage() {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
+)}
                           </div>
                         </td>
                       </tr>

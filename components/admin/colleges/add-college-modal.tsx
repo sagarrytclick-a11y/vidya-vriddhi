@@ -24,6 +24,30 @@ import {
   adminLabelClass,
 } from '@/components/admin/modal-ui'
 
+/** Fetch every page from a paginated admin list API (no truncated dropdowns). */
+async function fetchAllPages<T>(endpoint: string): Promise<T[]> {
+  const pageSize = 100
+  let page = 1
+  let totalPages = 1
+  const items: T[] = []
+
+  while (page <= totalPages) {
+    const separator = endpoint.includes('?') ? '&' : '?'
+    const response = await fetch(`${endpoint}${separator}page=${page}&limit=${pageSize}`)
+    if (!response.ok) break
+
+    const json = await response.json()
+    const batch = Array.isArray(json.data) ? json.data : []
+    items.push(...batch)
+
+    totalPages = Math.max(1, json.pagination?.totalPages ?? 1)
+    if (batch.length === 0) break
+    page += 1
+  }
+
+  return items
+}
+
 interface AddCollegeModalProps {
   isOpen: boolean
   onClose: () => void
@@ -180,47 +204,22 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
     }
   }, [formData.name, isEdit])
 
-  // Fetch dynamic data
+  // Fetch dynamic data — load ALL options (not first page only)
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       try {
-        // Fetch exams
-        const examsResponse = await fetch('/api/exams')
-        if (examsResponse.ok) {
-          const examsData = await examsResponse.json()
-          // API returns { data: [...], pagination: {...} }
-          const examsArray = examsData.data || []
-          setExams(Array.isArray(examsArray) ? examsArray : [])
-        }
+        const [examsArray, categoriesArray, coursesArray, citiesArray] = await Promise.all([
+          fetchAllPages<any>('/api/exams'),
+          fetchAllPages<any>('/api/categories'),
+          fetchAllPages<any>('/api/courses'),
+          fetchAllPages<any>('/api/cities'),
+        ])
 
-        // Fetch categories
-        const categoriesResponse = await fetch('/api/categories?limit=100')
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json()
-          // API returns { data: [...], pagination: {...} }
-          const categoriesArray = categoriesData.data || []
-          setCategories(Array.isArray(categoriesArray) ? categoriesArray : [])
-        } else {
-          console.error('Categories fetch failed:', categoriesResponse.status)
-        }
-
-        // Fetch courses
-        const coursesResponse = await fetch('/api/courses')
-        if (coursesResponse.ok) {
-          const coursesData = await coursesResponse.json()
-          // API returns { data: [...], pagination: {...} }
-          const coursesArray = coursesData.data || []
-          setCourses(Array.isArray(coursesArray) ? coursesArray : [])
-        }
-
-        // Fetch all cities (no pagination limit)
-        const citiesResponse = await fetch('/api/cities?limit=100')
-        if (citiesResponse.ok) {
-          const citiesData = await citiesResponse.json()
-          const citiesArray = citiesData.data || []
-          setAllCities(Array.isArray(citiesArray) ? citiesArray : [])
-        }
+        setExams(examsArray)
+        setCategories(categoriesArray)
+        setCourses(coursesArray)
+        setAllCities(citiesArray)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -593,25 +592,37 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
               <Label htmlFor="Countryranking" className={adminLabelClass}>Country Ranking</Label>
               <Input
                 id="Countryranking"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.Countryranking || ''}
-                onChange={(e) => handleInputChange('Countryranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
+                onChange={(e) =>
+                  handleInputChange(
+                    'Countryranking',
+                    e.target.value.trim() ? e.target.value.trim() : undefined
+                  )
+                }
                 className={adminFieldClass}
-                placeholder="e.g., 1"
-                min="1"
+                placeholder="e.g. 12 or 90-110"
               />
+              <p className="mt-1 text-xs text-[#6b7280]">Number or range (90-110)</p>
             </div>
             <div>
               <Label htmlFor="Internationalranking" className={adminLabelClass}>International Ranking</Label>
               <Input
                 id="Internationalranking"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.Internationalranking || ''}
-                onChange={(e) => handleInputChange('Internationalranking', e.target.value ? parseInt(e.target.value) || undefined : undefined)}
+                onChange={(e) =>
+                  handleInputChange(
+                    'Internationalranking',
+                    e.target.value.trim() ? e.target.value.trim() : undefined
+                  )
+                }
                 className={adminFieldClass}
-                placeholder="e.g., 100"
-                min="1"
+                placeholder="e.g. 250 or 200-300"
               />
+              <p className="mt-1 text-xs text-[#6b7280]">Number or range (200-300)</p>
             </div>
           </div>
 

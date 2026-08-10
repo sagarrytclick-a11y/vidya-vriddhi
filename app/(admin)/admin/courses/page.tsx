@@ -19,6 +19,7 @@ import { CourseProvider, useCourseContext } from '@/contexts/course-context'
 import { CourseUIProvider, useCourseUIContext } from '@/contexts/course-ui-context'
 import { Course, CourseFormData } from '@/hooks/useAdminCourses'
 import { Plus, Trash2, Eye, Edit, Building } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { Pagination } from '@/components/ui/pagination'
 
 const AddCourseModal = dynamic(() => import('@/components/admin/courses/add-course-modal').then(m => ({ default: m.AddCourseModal })))
@@ -28,6 +29,7 @@ const DeleteCourseModal = dynamic(() => import('@/components/admin/courses/delet
 
 // Inner component that uses the UI context
 function CoursesPageContent() {
+  const { canDelete } = useCanDelete()
   const [searchTerm, setSearchTerm] = useState('')
 
   // Data from CourseContext
@@ -83,28 +85,21 @@ function CoursesPageContent() {
   )
 
   if (isLoading) {
-    return (
-      <AdminLayout>
-        <AdminPageSkeleton rows={6} columns={6} />
-      </AdminLayout>
-    )
+    return <AdminPageSkeleton rows={6} columns={6} />
   }
 
   if (error) {
     return (
-      <AdminLayout>
-        <div className={adminPagePadClass}>
-          <div className="flex items-center justify-center min-h-96">
-            <div className="text-red-500">Error: {error}</div>
-          </div>
+      <div className={adminPagePadClass}>
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-red-500">Error: {error}</div>
         </div>
-      </AdminLayout>
+      </div>
     )
   }
 
   return (
-    <AdminLayout>
-      <div className={adminPagePadClass}>
+    <div className={adminPagePadClass}>
         <AdminPageHeader
           title="Course List"
           action={
@@ -195,7 +190,8 @@ function CoursesPageContent() {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button 
+                            {canDelete && (
+<Button 
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
@@ -203,6 +199,7 @@ function CoursesPageContent() {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
+)}
                           </div>
                         </td>
                       </tr>
@@ -259,16 +256,17 @@ function CoursesPageContent() {
           course={selectedCourse}
         />
       </div>
-    </AdminLayout>
   )
 }
 
 export default function CoursesPage() {
   return (
-    <CourseProvider>
-      <CourseUIProvider>
-        <CoursesPageContent />
-      </CourseUIProvider>
-    </CourseProvider>
+    <AdminLayout>
+      <CourseProvider>
+        <CourseUIProvider>
+          <CoursesPageContent />
+        </CourseUIProvider>
+      </CourseProvider>
+    </AdminLayout>
   )
 }

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     // Full Json blobs are admin-only; public list stays light
     const wantsDetail = searchParams.get('detail') === 'true'
     if (wantsDetail) {
-      const authError = requireAdmin(request)
+      const authError = await requireAdmin(request)
       if (authError) return authError
     }
     const detail = wantsDetail
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
-    const visibility = activeContentFilter(request)
+    const visibility = await activeContentFilter(request)
     const filteredWhere = { ...where, ...visibility }
 
     const lightSelect = {
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

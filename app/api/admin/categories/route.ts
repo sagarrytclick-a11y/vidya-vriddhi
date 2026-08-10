@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth'
 // GET /api/admin/categories?page=1&limit=10&search=
 export async function GET(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const { searchParams } = new URL(request.url)
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/categories
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

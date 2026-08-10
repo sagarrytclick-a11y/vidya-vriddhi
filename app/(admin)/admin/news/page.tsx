@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { useNewsContext } from '@/contexts/news-context'
 import { useAdminNews, News, NewsFormData } from '@/hooks/useAdminNews'
 import { Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { Pagination } from '@/components/ui/pagination'
 
 const AddNewsModal = dynamic(() => import('@/components/admin/news/add-news-modal').then(m => ({ default: m.AddNewsModal })))
@@ -27,6 +28,7 @@ const EditNewsModal = dynamic(() => import('@/components/admin/news/edit-news-mo
 const DeleteNewsModal = dynamic(() => import('@/components/admin/news/delete-news-modal').then(m => ({ default: m.DeleteNewsModal })))
 
 export default function NewsPage() {
+  const { canDelete } = useCanDelete()
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -215,7 +217,8 @@ export default function NewsPage() {
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button 
+                              {canDelete && (
+<Button 
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-red-400 hover:text-red-300 hover:bg-slate-700"
@@ -223,6 +226,7 @@ export default function NewsPage() {
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
+)}
                             </div>
                           </td>
                         </tr>

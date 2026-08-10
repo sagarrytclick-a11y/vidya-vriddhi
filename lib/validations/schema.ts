@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { rankingValueSchema } from '@/lib/ranking'
 
 /**
  * Centralized Zod Validation Schemas
@@ -164,8 +165,8 @@ export const collegeCreateSchema = z.object({
   slug: slugSchema,
   description: descriptionSchema,
   establishment_year: z.number().int().min(1800).max(new Date().getFullYear()).optional(),
-  Countryranking: z.number().int().positive().optional(),
-  Internationalranking: z.number().int().positive().optional(),
+  Countryranking: rankingValueSchema,
+  Internationalranking: rankingValueSchema,
   active: booleanSchema,
   features: z.array(z.string()).default([]),
   logoURL: urlSchema,

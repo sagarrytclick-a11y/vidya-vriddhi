@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuthToken } from '@/lib/auth'
+import { canDelete, canViewLeads, resolveAdminSession } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('admin-token')?.value
+    const session = await resolveAdminSession(request)
 
-    if (!token || !verifyAuthToken(token)) {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      )
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Token is valid' 
+    return NextResponse.json({
+      success: true,
+      message: 'Token is valid',
+      username: session.username,
+      role: session.role,
+      canDelete: canDelete(session.role),
+      canViewLeads: canViewLeads(session.role),
     })
   } catch (error) {
     console.error('Token verification error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

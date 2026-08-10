@@ -11,7 +11,7 @@ interface HeroSectionProps {
     logoURL: string | null
     description: string | null
     establishment_year: number | null
-    Countryranking: number | null
+    Countryranking: string | null
     city: { name: string } | null
     country: { name: string } | null
     categories: { id: string; name: string }[]

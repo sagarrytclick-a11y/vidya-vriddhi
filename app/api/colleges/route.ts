@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 import { requireAdmin, activeContentFilter } from '@/lib/auth'
+import { rankingValueSchema } from '@/lib/ranking'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -13,8 +14,8 @@ const collegeSchema = z.object({
   countryId: z.string().min(1, 'Country is required'),
   cityId: z.string().min(1, 'City is required'),
   establishment_year: z.number().optional(),
-  Countryranking: z.number().optional(),
-  Internationalranking: z.number().optional(),
+  Countryranking: rankingValueSchema,
+  Internationalranking: rankingValueSchema,
   features: z.array(z.string()).default([]),
   imageURL: z.string().optional(),
   logoURL: z.string().optional(),
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
-    const visibility = activeContentFilter(request)
+    const visibility = await activeContentFilter(request)
     const filteredWhere = { ...where, ...visibility }
 
     // Fetch colleges with pagination - only essential fields for list view
@@ -142,7 +143,7 @@ export async function GET(request: NextRequest) {
 // POST create college
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

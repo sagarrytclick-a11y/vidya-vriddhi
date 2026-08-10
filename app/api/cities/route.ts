@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Public: active only. Admin cookie: all (including drafts)
     const where = {
-      ...activeContentFilter(request),
+      ...await activeContentFilter(request),
       ...(search
         ? {
             OR: [
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireAdmin(request)
     if (authError) return authError
 
     const body = await request.json()

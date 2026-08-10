@@ -3,7 +3,7 @@ import ImageKit from 'imagekit'
 import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth'
+import { requireCanViewLeads } from '@/lib/auth'
 import { enforceRateLimit } from '@/lib/rate-limit'
 import { detectPdf } from '@/lib/file-magic'
 
@@ -24,9 +24,13 @@ const careerApplicationSchema = z.object({
   position: z.string().min(2).max(150).trim(),
 })
 
+function publicResumePath(id: string) {
+  return `/api/career/${id}/resume`
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const ipLimited = enforceRateLimit(request, 'career', 5, 60_000)
+    const ipLimited = await enforceRateLimit(request, 'career', 5, 60_000)
     if (ipLimited) return ipLimited
 
     const formData = await request.formData()
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     const { name, email, phone, position } = parsed.data
 
-    const emailLimited = enforceRateLimit(request, {
+    const emailLimited = await enforceRateLimit(request, {
       scope: 'career-email',
       limit: 3,
       windowMs: 60 * 60_000,
@@ -79,11 +83,13 @@ export async function POST(request: NextRequest) {
     const safeName = name.replace(/[^a-zA-Z0-9-_]/g, '-').slice(0, 40)
     const uniqueFilename = `resume-${safeName}-${randomUUID()}.pdf`
 
+    // Private file — not publicly listable/guessable on CDN (ImageKit free tier)
     const uploadResponse = await imagekit.upload({
       file: buffer,
       fileName: uniqueFilename,
       folder: '/career-resumes',
       useUniqueFileName: false,
+      isPrivateFile: true,
       tags: ['resume', 'career', 'vidya-vridhi'],
     })
 
@@ -93,7 +99,8 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         position,
-        resumeUrl: uploadResponse.url,
+        resumeUrl: uploadResponse.filePath,
+        resumeFileId: uploadResponse.fileId,
       },
     })
 
@@ -106,7 +113,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authError = requireAdmin(request)
+    const authError = await requireCanViewLeads(request)
     if (authError) return authError
 
     const { searchParams } = new URL(request.url)
@@ -131,15 +138,30 @@ export async function GET(request: NextRequest) {
       where.position = position
     }
 
-    const [total, applications] = await Promise.all([
+    const [total, rows] = await Promise.all([
       db.careerApplication.count({ where }),
       db.careerApplication.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          position: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       }),
     ])
+
+    // Never leak ImageKit paths — admin UI uses auth-only proxy
+    const applications = rows.map((app) => ({
+      ...app,
+      resumeUrl: publicResumePath(app.id),
+    }))
 
     return NextResponse.json({
       applications,

@@ -33,6 +33,7 @@ const envSchema = z.object({
 
   // Optional
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
+  ADMIN_USERS: z.string().optional(),
 })
 
 /**

@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pagination } from '@/components/ui/pagination'
 import { Search, Trash2, Eye, Mail, Phone, User, Calendar, MapPin, X } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { toast } from 'sonner'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
 
@@ -50,6 +51,7 @@ export default function EnquiriesPage() {
 }
 
 function EnquiriesPageContent() {
+  const { canDelete } = useCanDelete()
   const searchParams = useSearchParams()
   const router = useRouter()
   const statusFromUrl = searchParams.get('status') || ''
@@ -352,7 +354,8 @@ function EnquiriesPageContent() {
                                 </SelectItem>
                               </SelectContent>
                             </Select>
-                            <Button 
+                            {canDelete && (
+<Button 
                               variant="ghost" 
                               size="sm" 
                               className="text-red-400 hover:text-red-300 hover:bg-slate-700"
@@ -360,6 +363,7 @@ function EnquiriesPageContent() {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
+)}
                           </div>
                         </td>
                       </tr>

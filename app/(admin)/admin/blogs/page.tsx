@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAdminBlogs } from '@/hooks/useAdminBlogs'
 import { Blog, BlogFormData } from '@/contexts/blog-context'
 import { Plus, Trash2, Image as ImageIcon, Eye, Edit } from 'lucide-react'
+import { useCanDelete } from '@/contexts/admin-context'
 import { Pagination } from '@/components/ui/pagination'
 
 const AddBlogModal = dynamic(() => import('@/components/admin/blogs/add-blog-modal').then(m => ({ default: m.AddBlogModal })))
@@ -27,6 +28,7 @@ const EditBlogModal = dynamic(() => import('@/components/admin/blogs/edit-blog-m
 const DeleteBlogModal = dynamic(() => import('@/components/admin/blogs/delete-blog-modal').then(m => ({ default: m.DeleteBlogModal })))
 
 export default function BlogsPage() {
+  const { canDelete } = useCanDelete()
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -203,7 +205,8 @@ export default function BlogsPage() {
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button 
+                              {canDelete && (
+<Button 
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-red-400 hover:text-red-300 hover:bg-slate-700"
@@ -211,6 +214,7 @@ export default function BlogsPage() {
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
+)}
                             </div>
                           </td>
                         </tr>
