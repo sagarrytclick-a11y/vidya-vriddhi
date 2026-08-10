@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 // Schema for exam validation
 const examSchema = z.object({
@@ -75,6 +75,9 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     const lightSelect = {
       id: true,
       name: true,
@@ -94,7 +97,7 @@ export async function GET(request: NextRequest) {
 
     const [exams, total] = await Promise.all([
       db.exam.findMany({
-        where,
+        where: filteredWhere,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -108,7 +111,7 @@ export async function GET(request: NextRequest) {
             }
           : lightSelect,
       }),
-      db.exam.count({ where })
+      db.exam.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(exams, total, page, limit), {

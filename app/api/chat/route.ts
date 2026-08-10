@@ -5,17 +5,18 @@ import { z } from 'zod'
 import { enforceRateLimit } from '@/lib/rate-limit'
 
 const chatMessageSchema = z.object({
-  role: z.enum(['user', 'assistant', 'system']),
+  role: z.literal('user'),
   content: z.string().min(1).max(4000),
 })
 
 const chatBodySchema = z.object({
-  messages: z.array(chatMessageSchema).min(1).max(30),
+  messages: z.array(chatMessageSchema).min(1).max(20),
 })
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = enforceRateLimit(req, 'chat', 20, 60_000)
+    // Vercel-trusted IP — stops cheap X-Forwarded-For rotation
+    const limited = enforceRateLimit(req, 'chat', 15, 60_000)
     if (limited) return limited
 
     const body = await req.json()
@@ -28,8 +29,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Never forward client-supplied system prompts
-    const messages = parsed.data.messages.filter((m) => m.role !== 'system')
+    // Only user turns from the client (blocks system / fake assistant injection)
+    const messages = parsed.data.messages
 
     const apiKey = process.env.OPENROUTER_API_KEY
     if (!apiKey) {

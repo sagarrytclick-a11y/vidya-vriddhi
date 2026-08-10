@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const createCitySchema = z.object({
   name: z.string().min(1, 'City name is required'),
@@ -19,11 +19,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const { page, limit, skip } = createPaginationParams(searchParams)
     const search = searchParams.get('search') || ''
-    const activeOnly = searchParams.get('active') === 'true'
 
-    // Build where clause for search / public active filter
+    // Public: active only. Admin cookie: all (including drafts)
     const where = {
-      ...(activeOnly ? { active: true } : {}),
+      ...activeContentFilter(request),
       ...(search
         ? {
             OR: [

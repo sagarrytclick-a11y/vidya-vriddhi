@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -75,8 +75,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const college = await db.college.findUnique({
-      where: { id },
+    const college = await db.college.findFirst({
+      where: { id, ...activeContentFilter(request) },
       select: {
         id: true,
         name: true,

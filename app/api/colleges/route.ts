@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 // Schema for college validation
 const collegeSchema = z.object({
@@ -77,10 +77,13 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     // Fetch colleges with pagination - only essential fields for list view
     const [colleges, total] = await Promise.all([
       db.college.findMany({
-        where,
+        where: filteredWhere,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
           }
         }
       }),
-      db.college.count({ where })
+      db.college.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(colleges, total, page, limit), {

@@ -4,6 +4,7 @@ import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Lock, Eye, EyeOff, Shield, User } from 'lucide-react'
 import Image from 'next/image'
+import { safeAdminRedirectPath } from '@/lib/admin-redirect'
 
 function AdminLoginContent() {
   const [showPassword, setShowPassword] = useState(false)
@@ -16,7 +17,7 @@ function AdminLoginContent() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/admin'
+  const redirectTo = safeAdminRedirectPath(searchParams.get('redirect'))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

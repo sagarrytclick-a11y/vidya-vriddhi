@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const createNewsSchema = z.object({
   title: z.string().min(1, 'News title is required'),
@@ -29,10 +29,13 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     // Fetch news with pagination
     const [news, total] = await Promise.all([
       db.news.findMany({
-        where,
+        where: filteredWhere,
         skip,
         take: limit,
         orderBy: {
@@ -49,7 +52,7 @@ export async function GET(request: NextRequest) {
           updatedAt: true
         }
       }),
-      db.news.count({ where })
+      db.news.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(news, total, page, limit))

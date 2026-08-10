@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 // Zod schema for validation
 const countrySchema = z.object({
@@ -16,10 +16,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const excludeIndia = searchParams.get('excludeIndia') === 'true'
-    const activeOnly = searchParams.get('active') === 'true'
-    
+
     const whereClause = {
-      ...(activeOnly ? { active: true } : {}),
+      ...activeContentFilter(request),
       ...(excludeIndia
         ? {
             NOT: {

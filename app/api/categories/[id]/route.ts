@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { categoryUpdateSchema } from '@/lib/validations/schema'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
@@ -9,10 +9,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const category = await db.category.findUnique({
+    const category = await db.category.findFirst({
       where: {
-        id
-      }
+        id,
+        ...activeContentFilter(request),
+      },
     })
 
     if (!category) {

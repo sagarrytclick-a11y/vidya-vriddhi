@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
@@ -8,8 +8,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const city = await db.city.findUnique({
-      where: { id },
+    const city = await db.city.findFirst({
+      where: {
+        id,
+        ...activeContentFilter(request),
+      },
       include: {
         country: {
           select: {

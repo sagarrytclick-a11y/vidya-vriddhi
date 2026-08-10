@@ -10,8 +10,9 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const limited = enforceRateLimit(request, 'admin-login', 5, 15 * 60_000)
-    if (limited) return limited
+    // Per-IP: slow down spray attacks (Vercel-trusted IP)
+    const ipLimited = enforceRateLimit(request, 'admin-login', 10, 15 * 60_000)
+    if (ipLimited) return ipLimited
 
     const body = await request.json()
     const parsed = loginSchema.safeParse(body)
@@ -24,9 +25,28 @@ export async function POST(request: NextRequest) {
     }
 
     const { username, password } = parsed.data
+    const normalizedUser = username.trim().toLowerCase()
+
+    // Per-username: stop hammering one account from many IPs
+    const userLimited = enforceRateLimit(request, {
+      scope: 'admin-login-user',
+      limit: 5,
+      windowMs: 15 * 60_000,
+      identityKeys: [`user:${normalizedUser}`],
+    })
+    if (userLimited) return userLimited
 
     if (verifyCredentials(username, password)) {
-      const token = createAuthToken()
+      let token: string
+      try {
+        token = createAuthToken()
+      } catch (err) {
+        console.error('Admin session secret misconfigured:', err)
+        return NextResponse.json(
+          { error: 'Admin login is temporarily unavailable' },
+          { status: 500 }
+        )
+      }
 
       const response = NextResponse.json({
         success: true,

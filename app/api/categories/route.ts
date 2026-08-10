@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 import { categoryCreateSchema, categoryUpdateSchema } from '@/lib/validations/schema'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,10 +22,13 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     // Get total count and categories in parallel
     const [categories, total] = await Promise.all([
       db.category.findMany({
-        where,
+        where: filteredWhere,
         orderBy: {
           name: 'asc'
         },
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
           updatedAt: true
         }
       }),
-      db.category.count({ where })
+      db.category.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(categories, total, page, limit), {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const updateBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required').optional(),
@@ -17,10 +17,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const blog = await db.blog.findUnique({
+    const blog = await db.blog.findFirst({
       where: {
-        id
-      }
+        id,
+        ...activeContentFilter(request),
+      },
     })
 
     if (!blog) {
