@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { escapeHtml, escapeHtmlAttr } from '@/lib/html-escape'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -10,10 +11,17 @@ export async function sendEnquiryEmail(data: {
   category?: string
 }) {
   try {
+    const name = escapeHtml(data.name)
+    const email = escapeHtml(data.email)
+    const phone = escapeHtml(data.phone || 'Not provided')
+    const city = escapeHtml(data.city || 'Not provided')
+    const category = escapeHtml(data.category || 'Not provided')
+    const mailto = escapeHtmlAttr(data.email)
+
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'noreply@vidyavriddhi.com',
       to: [process.env.ADMIN_EMAIL || 'admin@vidyavriddhi.com'],
-      subject: `New Admission Enquiry from ${data.name}`,
+      subject: `New Admission Enquiry from ${data.name.replace(/[\r\n]/g, ' ').slice(0, 100)}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -90,19 +98,19 @@ export async function sendEnquiryEmail(data: {
             
             <div class="info-grid">
               <div class="info-label">Name:</div>
-              <div class="info-value">${data.name}</div>
+              <div class="info-value">${name}</div>
               
               <div class="info-label">Email:</div>
-              <div class="info-value">${data.email}</div>
+              <div class="info-value">${email}</div>
               
               <div class="info-label">Phone:</div>
-              <div class="info-value">${data.phone || 'Not provided'}</div>
+              <div class="info-value">${phone}</div>
               
               <div class="info-label">City:</div>
-              <div class="info-value">${data.city || 'Not provided'}</div>
+              <div class="info-value">${city}</div>
               
               <div class="info-label">Category:</div>
-              <div class="info-value">${data.category || 'Not provided'}</div>
+              <div class="info-value">${category}</div>
               
               <div class="info-label">Received:</div>
               <div class="info-value">${new Date().toLocaleString('en-US', { 
@@ -116,7 +124,7 @@ export async function sendEnquiryEmail(data: {
             </div>
             
             <div style="text-align: center;">
-              <a href="mailto:${data.email}" class="btn">Reply to Student</a>
+              <a href="mailto:${mailto}" class="btn">Reply to Student</a>
             </div>
             
             <div class="footer">

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const createCourseSchema = z.object({
   name: z.string().min(1, 'Course name is required'),
@@ -27,10 +27,13 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     // Fetch courses with pagination
     const [courses, total] = await Promise.all([
       db.course.findMany({
-        where,
+        where: filteredWhere,
         orderBy: {
           createdAt: 'desc',
         },
@@ -51,7 +54,7 @@ export async function GET(request: NextRequest) {
           }
         }
       }),
-      db.course.count({ where })
+      db.course.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(courses, total, page, limit), {

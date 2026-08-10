@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth'
 import { enforceRateLimit } from '@/lib/rate-limit'
+import { detectPdf } from '@/lib/file-magic'
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
@@ -25,8 +26,8 @@ const careerApplicationSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const limited = enforceRateLimit(request, 'career', 5, 60_000)
-    if (limited) return limited
+    const ipLimited = enforceRateLimit(request, 'career', 5, 60_000)
+    if (ipLimited) return ipLimited
 
     const formData = await request.formData()
     const parsed = careerApplicationSchema.safeParse({
@@ -50,14 +51,18 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, phone, position } = parsed.data
+
+    const emailLimited = enforceRateLimit(request, {
+      scope: 'career-email',
+      limit: 3,
+      windowMs: 60 * 60_000,
+      identityKeys: [`email:${email}`],
+    })
+    if (emailLimited) return emailLimited
     const resume = formData.get('resume') as File | null
 
     if (!resume || resume.size === 0) {
       return NextResponse.json({ error: 'Resume PDF is required' }, { status: 400 })
-    }
-
-    if (resume.type !== 'application/pdf') {
-      return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 })
     }
 
     if (resume.size > 10 * 1024 * 1024) {
@@ -66,6 +71,11 @@ export async function POST(request: NextRequest) {
 
     const bytes = await resume.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const pdfCheck = detectPdf(buffer)
+    if (!pdfCheck.ok) {
+      return NextResponse.json({ error: pdfCheck.error }, { status: 400 })
+    }
+
     const safeName = name.replace(/[^a-zA-Z0-9-_]/g, '-').slice(0, 40)
     const uniqueFilename = `resume-${safeName}-${randomUUID()}.pdf`
 

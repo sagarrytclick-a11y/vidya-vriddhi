@@ -20,11 +20,19 @@ const enquirySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const limited = enforceRateLimit(request, 'enquiry', 8, 60_000)
-    if (limited) return limited
+    const ipLimited = enforceRateLimit(request, 'enquiry', 8, 60_000)
+    if (ipLimited) return ipLimited
 
     const body = await request.json()
     const validatedData = enquirySchema.parse(body)
+
+    const emailLimited = enforceRateLimit(request, {
+      scope: 'enquiry-email',
+      limit: 5,
+      windowMs: 60 * 60_000,
+      identityKeys: [`email:${validatedData.email}`],
+    })
+    if (emailLimited) return emailLimited
 
     await db.enquiry.create({
       data: {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const createBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required'),
@@ -30,10 +30,13 @@ export async function GET(request: NextRequest) {
         }
       : {}
 
+    const visibility = activeContentFilter(request)
+    const filteredWhere = { ...where, ...visibility }
+
     // Fetch blogs with pagination
     const [blogs, total] = await Promise.all([
       db.blog.findMany({
-        where,
+        where: filteredWhere,
         skip,
         take: limit,
         orderBy: {
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
           updatedAt: true
         }
       }),
-      db.blog.count({ where })
+      db.blog.count({ where: filteredWhere })
     ])
 
     return NextResponse.json(createPaginationResponse(blogs, total, page, limit))

@@ -123,10 +123,13 @@ export function VVSaarthiSidebar() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...currentMessages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
+          messages: [...currentMessages, userMessage]
+            .filter((m) => m.role === 'user')
+            .slice(-10)
+            .map((m) => ({
+              role: 'user' as const,
+              content: m.content,
+            })),
         }),
       })
 

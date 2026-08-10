@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin, activeContentFilter } from '@/lib/auth'
 
 const examSchema = z.object({
   name: z.string().min(1, 'Exam name is required'),
@@ -57,8 +57,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const exam = await db.exam.findUnique({
-      where: { id },
+    const exam = await db.exam.findFirst({
+      where: { id, ...activeContentFilter(request) },
       select: {
         id: true,
         name: true,

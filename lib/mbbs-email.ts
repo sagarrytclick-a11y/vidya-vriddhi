@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { escapeHtml, escapeHtmlAttr } from '@/lib/html-escape'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -12,10 +13,21 @@ export async function sendMBBSLeadEmail(data: {
   category: string
 }) {
   try {
+    const name = escapeHtml(data.name)
+    const email = escapeHtml(data.email)
+    const phone = escapeHtml(data.phone)
+    const city = escapeHtml(data.city)
+    const state = escapeHtml(data.state)
+    const neetScore = escapeHtml(data.neetScore || 'Not provided')
+    const category = escapeHtml(data.category)
+    const mailto = escapeHtmlAttr(data.email)
+    const safeSubjectCategory = data.category.replace(/[\r\n]/g, ' ').slice(0, 80)
+    const safeSubjectName = data.name.replace(/[\r\n]/g, ' ').slice(0, 80)
+
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'noreply@vidyavriddhi.com',
       to: [process.env.MBBS_LEAD_EMAIL || process.env.ADMIN_EMAIL || 'admin@vidyavriddhi.com'],
-      subject: `New MBBS Lead - ${data.name} - ${data.category}`,
+      subject: `New MBBS Lead - ${safeSubjectName} - ${safeSubjectCategory}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -40,28 +52,28 @@ export async function sendMBBSLeadEmail(data: {
           <div class="container">
             <div class="header">
               <h1>New MBBS Admission Lead</h1>
-              <p>${data.category}</p>
+              <p>${category}</p>
             </div>
             <div class="info-grid">
               <div class="info-label">Name:</div>
-              <div class="info-value">${data.name}</div>
+              <div class="info-value">${name}</div>
               <div class="info-label">Email:</div>
-              <div class="info-value">${data.email}</div>
+              <div class="info-value">${email}</div>
               <div class="info-label">Phone:</div>
-              <div class="info-value">${data.phone}</div>
+              <div class="info-value">${phone}</div>
               <div class="info-label">City:</div>
-              <div class="info-value">${data.city}</div>
+              <div class="info-value">${city}</div>
               <div class="info-label">State:</div>
-              <div class="info-value">${data.state}</div>
+              <div class="info-value">${state}</div>
               <div class="info-label">NEET Score:</div>
-              <div class="info-value">${data.neetScore || 'Not provided'}</div>
+              <div class="info-value">${neetScore}</div>
               <div class="info-label">Category:</div>
-              <div class="info-value"><span class="tag">${data.category}</span></div>
+              <div class="info-value"><span class="tag">${category}</span></div>
               <div class="info-label">Received:</div>
               <div class="info-value">${new Date().toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
             </div>
             <div style="text-align: center; margin-top: 20px;">
-              <a href="mailto:${data.email}" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">Reply to Student</a>
+              <a href="mailto:${mailto}" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">Reply to Student</a>
             </div>
             <div class="footer">
               <p>Vidya Vriddhi - MBBS Admissions Portal</p>
