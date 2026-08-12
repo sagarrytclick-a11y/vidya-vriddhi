@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Vercel may block `next/image` optimization requests with 402
+    // (`OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED`). Your images (ImageKit/others)
+    // are already publicly accessible, so disable optimization to render directly.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

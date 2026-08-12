@@ -14,8 +14,13 @@ export function GallerySection({ images }: GallerySectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // Filter valid images
-  const validImages = images.filter(img => typeof img === 'string' && img.startsWith('data:'))
+  // Filter valid images.
+  // In production, your ImageKit URLs are typically `https://...` (not `data:` URLs).
+  const validImages = images.filter((img) => {
+    if (typeof img !== 'string') return false
+    const s = img.trim()
+    return s.startsWith('data:') || s.startsWith('http://') || s.startsWith('https://')
+  })
 
   if (validImages.length === 0) {
     return (
