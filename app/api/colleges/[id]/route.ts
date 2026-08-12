@@ -2,72 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { requireAdmin, activeContentFilter, requireCanDelete } from '@/lib/auth'
-import { rankingValueSchema } from '@/lib/ranking'
-
-// Schema for college validation
-const collegeSchema = z.object({
-  name: z.string().min(1, 'College name is required'),
-  slug: z.string().min(1, 'College slug is required'),
-  description: z.string().optional(),
-  active: z.boolean(),
-  countryId: z.string().min(1, 'Country is required'),
-  cityId: z.string().min(1, 'City is required'),
-  establishment_year: z.number().optional(),
-  Countryranking: rankingValueSchema,
-  Internationalranking: rankingValueSchema,
-  features: z.array(z.string()).default([]),
-  imageURL: z.string().optional(),
-  logoURL: z.string().optional(),
-  keyHighlights: z.object({
-    title: z.string(),
-    description: z.string(),
-    features: z.array(z.string())
-  }).optional(),
-  documentsRequired: z.object({
-    title: z.string(),
-    description: z.string(),
-    documents: z.array(z.string())
-  }).optional(),
-  feesStructure: z.object({
-    title: z.string(),
-    description: z.string(),
-    courses: z.array(z.object({
-      course_name: z.string(),
-      duration: z.string(),
-      annual_tuition_fee: z.string()
-    }))
-  }).optional(),
-  admissionProcess: z.object({
-    title: z.string(),
-    description: z.string(),
-    steps: z.array(z.string())
-  }).optional(),
-  whyChooseUs: z.object({
-    title: z.string(),
-    description: z.string(),
-    features: z.array(z.object({
-      title: z.string(),
-      description: z.string()
-    }))
-  }).optional(),
-  campusHighlights: z.object({
-    title: z.string(),
-    description: z.string(),
-    highlights: z.array(z.string())
-  }).optional(),
-  categories: z.union([
-    z.array(z.string()),
-    z.array(z.object({ id: z.string() }))
-  ]).optional(),
-  exams: z.union([
-    z.array(z.string()),
-    z.array(z.object({ id: z.string() }))
-  ]).optional(),
-  courses: z.union([
-    z.array(z.string()),
-    z.array(z.object({ id: z.string() }))
-  ]).optional()
-})
+import { collegeBodySchema, formatZodIssues } from '@/lib/validations/college'
 
 // GET college by ID
 export async function GET(
@@ -96,6 +31,8 @@ export async function GET(
         feesStructure: true,
         admissionProcess: true,
         campusHighlights: true,
+        countryId: true,
+        cityId: true,
         createdAt: true,
         updatedAt: true,
         city: {
@@ -166,7 +103,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const validatedData = collegeSchema.parse(body)
+    const validatedData = collegeBodySchema.parse(body)
 
     // Prepare update data with relations
     const updateData: any = {
@@ -192,32 +129,20 @@ export async function PUT(
 
     // Add relations to update data only if they exist in the request
     if (validatedData.categories !== undefined) {
-      updateData.categories = validatedData.categories.length > 0 ? {
-        set: validatedData.categories.map((item: string | { id: string }) => 
-          typeof item === 'string' ? { id: item } : item
-        )
-      } : {
-        set: []
+      updateData.categories = {
+        set: validatedData.categories.map((id) => ({ id })),
       }
     }
 
     if (validatedData.exams !== undefined) {
-      updateData.exams = validatedData.exams.length > 0 ? {
-        set: validatedData.exams.map((item: string | { id: string }) => 
-          typeof item === 'string' ? { id: item } : item
-        )
-      } : {
-        set: []
+      updateData.exams = {
+        set: validatedData.exams.map((id) => ({ id })),
       }
     }
 
     if (validatedData.courses !== undefined) {
-      updateData.courses = validatedData.courses.length > 0 ? {
-        set: validatedData.courses.map((item: string | { id: string }) => 
-          typeof item === 'string' ? { id: item } : item
-        )
-      } : {
-        set: []
+      updateData.courses = {
+        set: validatedData.courses.map((id) => ({ id })),
       }
     }
 
@@ -274,7 +199,10 @@ export async function PUT(
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', issues: error.issues },
+        {
+          error: formatZodIssues(error.issues) || 'Validation failed',
+          issues: error.issues,
+        },
         { status: 400 }
       )
     }

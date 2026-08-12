@@ -67,12 +67,17 @@ export function CollegeList() {
     })
   }
 
-  const handleEditCollege = (data: CollegeFormData) => {
+  const handleEditCollege = async (data: CollegeFormData) => {
     if (!selectedCollege) return
     const id = selectedCollege.id
-    closeEditModal()
-    closeViewModal()
-    void updateCollege(id, data)
+    try {
+      await updateCollege(id, data)
+      closeEditModal()
+      closeViewModal()
+    } catch (error) {
+      console.error('Failed to update college:', error)
+      throw error
+    }
   }
 
   const handleDeleteCollege = async (college: College) => {
