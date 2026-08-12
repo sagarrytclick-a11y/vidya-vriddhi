@@ -86,11 +86,21 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           description: "",
           documents: []
         },
-        feesStructure: initialData.feesStructure || {
-          title: "Fees Structure",
-          description: "",
-          courses: []
-        },
+        feesStructure: initialData.feesStructure
+          ? {
+              title: initialData.feesStructure.title || 'Fees Structure',
+              description: initialData.feesStructure.description || '',
+              courses: (initialData.feesStructure.courses || []).map((course: any) => ({
+                course_name: course?.course_name || '',
+                duration: course?.duration || '',
+                annual_tuition_fee: course?.annual_tuition_fee || '',
+              })),
+            }
+          : {
+              title: 'Fees Structure',
+              description: '',
+              courses: [],
+            },
         admissionProcess: initialData.admissionProcess || {
           title: "Admission Process",
           description: "",
@@ -540,7 +550,17 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="country" className={adminLabelClass}>Country *</Label>
-              <Select value={formData.countryId} onValueChange={(value) => handleInputChange('countryId', value)} disabled={loading}>
+              <Select
+                value={formData.countryId || undefined}
+                onValueChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    countryId: value,
+                    cityId: prev.countryId === value ? prev.cityId : '',
+                  }))
+                }}
+                disabled={loading}
+              >
                 <SelectTrigger className={adminFieldClass}>
                   <SelectValue placeholder={loading ? "Loading countries..." : "Select country"} />
                 </SelectTrigger>
@@ -556,8 +576,8 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
             <div>
               <Label htmlFor="city" className={adminLabelClass}>City *</Label>
               <Select 
-                value={formData.cityId || ''} 
-                onValueChange={(value) => handleInputChange('cityId', value || undefined)}
+                value={formData.cityId || undefined} 
+                onValueChange={(value) => handleInputChange('cityId', value)}
                 disabled={!formData.countryId || loading}
               >
                 <SelectTrigger className={adminFieldClass}>

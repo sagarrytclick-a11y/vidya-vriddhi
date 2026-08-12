@@ -104,7 +104,7 @@ const createCollege = async (collegeData: CollegeFormData): Promise<College> => 
   })
 
   if (!response.ok) {
-    const error = await response.json()
+    const error = await response.json().catch(() => ({}))
     throw new Error(error.error || 'Failed to create college')
   }
 
@@ -121,7 +121,7 @@ const updateCollege = async ({ id, data }: { id: string; data: CollegeFormData }
   })
 
   if (!response.ok) {
-    const error = await response.json()
+    const error = await response.json().catch(() => ({}))
     throw new Error(error.error || 'Failed to update college')
   }
 

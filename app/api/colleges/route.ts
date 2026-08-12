@@ -3,63 +3,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
 import { requireAdmin, activeContentFilter } from '@/lib/auth'
-import { rankingValueSchema } from '@/lib/ranking'
-
-// Schema for college validation
-const collegeSchema = z.object({
-  name: z.string().min(1, 'College name is required'),
-  slug: z.string().min(1, 'College slug is required'),
-  description: z.string().optional(),
-  active: z.boolean(),
-  countryId: z.string().min(1, 'Country is required'),
-  cityId: z.string().min(1, 'City is required'),
-  establishment_year: z.number().optional(),
-  Countryranking: rankingValueSchema,
-  Internationalranking: rankingValueSchema,
-  features: z.array(z.string()).default([]),
-  imageURL: z.string().optional(),
-  logoURL: z.string().optional(),
-  keyHighlights: z.object({
-    title: z.string(),
-    description: z.string(),
-    features: z.array(z.string())
-  }).optional(),
-  documentsRequired: z.object({
-    title: z.string(),
-    description: z.string(),
-    documents: z.array(z.string())
-  }).optional(),
-  feesStructure: z.object({
-    title: z.string(),
-    description: z.string(),
-    courses: z.array(z.object({
-      course_name: z.string(),
-      duration: z.string(),
-      annual_tuition_fee: z.string()
-    }))
-  }).optional(),
-  admissionProcess: z.object({
-    title: z.string(),
-    description: z.string(),
-    steps: z.array(z.string())
-  }).optional(),
-  whyChooseUs: z.object({
-    title: z.string(),
-    description: z.string(),
-    features: z.array(z.object({
-      title: z.string(),
-      description: z.string()
-    }))
-  }).optional(),
-  campusHighlights: z.object({
-    title: z.string(),
-    description: z.string(),
-    highlights: z.array(z.string())
-  }).optional(),
-  categories: z.array(z.string()).optional(),
-  exams: z.array(z.string()).optional(),
-  courses: z.array(z.string()).optional()
-})
+import { collegeBodySchema, formatZodIssues } from '@/lib/validations/college'
 
 // GET all colleges with pagination
 export async function GET(request: NextRequest) {
@@ -147,7 +91,7 @@ export async function POST(request: NextRequest) {
     if (authError) return authError
 
     const body = await request.json()
-    const validatedData = collegeSchema.parse(body)
+    const validatedData = collegeBodySchema.parse(body)
 
     // Prepare create data with relations
     const createData: any = {
@@ -243,7 +187,10 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', issues: error.issues },
+        {
+          error: formatZodIssues(error.issues) || 'Validation failed',
+          issues: error.issues,
+        },
         { status: 400 }
       )
     }
