@@ -106,36 +106,37 @@ export function CollegeTabs() {
   }, [])
 
   return (
-    <div className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:top-18">
+    <div className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:top-[4.5rem]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2">
-          {/* Left Arrow */}
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
+            type="button"
             onClick={() => handleScroll('left')}
+            aria-label="Scroll tabs left"
             className={cn(
-              'p-2 rounded-full transition-all duration-200',
-              canScrollLeft 
-                ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-                : 'opacity-0 pointer-events-none'
+              'hidden rounded-full p-2 transition-all duration-200 sm:inline-flex',
+              canScrollLeft
+                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'pointer-events-none opacity-0'
             )}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
 
-          {/* Tabs Container */}
-          <div 
+          <div
             id="tabs-container"
-            className="flex-1 overflow-x-auto scrollbar-hide"
+            className="flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <div className="flex items-center gap-1 py-3 min-w-max">
+            <div className="flex min-w-max items-center gap-1 py-3">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => scrollToTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
+                    'flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 sm:px-4 sm:py-2.5',
                     activeTab === tab.id
-                      ? 'bg-blue-600 text-white shadow-md'
+                      ? 'bg-orange-600 text-white shadow-md'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                   )}
                 >
@@ -146,17 +147,18 @@ export function CollegeTabs() {
             </div>
           </div>
 
-          {/* Right Arrow */}
           <button
+            type="button"
             onClick={() => handleScroll('right')}
+            aria-label="Scroll tabs right"
             className={cn(
-              'p-2 rounded-full transition-all duration-200',
-              canScrollRight 
-                ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-                : 'opacity-0 pointer-events-none'
+              'hidden rounded-full p-2 transition-all duration-200 sm:inline-flex',
+              canScrollRight
+                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'pointer-events-none opacity-0'
             )}
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       </div>
