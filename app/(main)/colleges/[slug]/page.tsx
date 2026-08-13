@@ -6,7 +6,6 @@ import { CollegeTabs } from '@/components/college/CollegeTabs'
 import { HeroSection } from '@/components/college/sections/HeroSection'
 import { ContentSections } from '@/components/college/sections/ContentSections'
 import { CollegeSidebar } from '@/components/college/sections/CollegeSidebar'
-import Link from 'next/link'
 
 interface PageProps {
   params: Promise<{ slug: string }>

@@ -6,7 +6,6 @@ import { AdmissionButton } from '@/components/ui/AdmissionButton'
 import { GallerySection } from '@/components/college/GallerySection'
 import { getColorClasses } from '@/lib/college-utils'
 import Link from 'next/link'
-import Image from 'next/image'
 
 interface ContentSectionsProps {
   college: {
@@ -427,47 +426,57 @@ export function ContentSections({ college, keyHighlights, whyChooseUs, documents
         </section>
       )}
 
-      {/* Campus Highlights */}
-      {campusHighlights?.highlights && (
-        <section id="campus" className="scroll-mt-24">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">{campusHighlights.title || 'Campus Highlights'}</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {campusHighlights.highlights.map((highlight: any, idx: number) => {
-              const isDataUrl = typeof highlight === 'string' && highlight.startsWith('data:')
-              const isHttpUrl = typeof highlight === 'string' && (highlight.startsWith('http://') || highlight.startsWith('https://'))
-              return (
-                <div key={idx} className="relative rounded-lg overflow-hidden aspect-video">
-                  {isDataUrl ? (
-                    <Image
-                      src={highlight}
-                      alt={`Campus ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : isHttpUrl ? (
-                    <Image
-                      src={highlight}
-                      alt={`Campus ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-500">{highlight}</span>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </section>
-      )}
+      {/* Campus / Gallery images */}
+      {(() => {
+        const highlights = Array.isArray(campusHighlights?.highlights)
+          ? campusHighlights.highlights
+          : []
+        const imageHighlights = highlights.filter(
+          (h: unknown): h is string =>
+            typeof h === 'string' &&
+            (h.startsWith('http://') || h.startsWith('https://') || h.startsWith('data:'))
+        )
+        const textHighlights = highlights.filter(
+          (h: unknown) => typeof h === 'string' && !imageHighlights.includes(h as string)
+        )
 
-      {/* Gallery Section */}
-      <section id="gallery" className="scroll-mt-24">
-        <GallerySection images={campusHighlights?.highlights || []} />
-      </section>
+        return (
+          <>
+            {(campusHighlights?.description || textHighlights.length > 0) && (
+              <section id="campus" className="scroll-mt-24">
+                <h2 className="mb-4 text-xl font-bold text-gray-900">
+                  {campusHighlights.title || 'Campus Highlights'}
+                </h2>
+                {campusHighlights.description ? (
+                  <p className="mb-4 text-[15px] leading-relaxed text-gray-700">
+                    {campusHighlights.description}
+                  </p>
+                ) : null}
+                {textHighlights.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {textHighlights.map((highlight: string, idx: number) => (
+                      <Card key={idx} className="border-0 shadow-md">
+                        <CardContent className="flex items-start gap-3 p-4">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+                            <Building2 className="h-4 w-4" />
+                          </div>
+                          <p className="pt-1 text-sm text-gray-700">{highlight}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            )}
+
+            {imageHighlights.length > 0 && (
+              <section id="gallery" className="scroll-mt-24">
+                <GallerySection images={imageHighlights} />
+              </section>
+            )}
+          </>
+        )
+      })()}
 
       {/* Exams Section */}
       {college.exams.length > 0 && (
