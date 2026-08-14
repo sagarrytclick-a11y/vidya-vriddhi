@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 interface AdmissionButtonProps {
   examName: string
-  variant?: 'default' | 'white'
+  variant?: 'default' | 'white' | 'compact'
 }
 
 export function AdmissionButton({ examName, variant = 'default' }: AdmissionButtonProps) {
@@ -22,6 +22,18 @@ export function AdmissionButton({ examName, variant = 'default' }: AdmissionButt
         className="w-full bg-white text-orange-600 hover:bg-orange-50 font-bold rounded-xl"
       >
         Apply for Admission
+      </Button>
+    )
+  }
+
+  if (variant === 'compact') {
+    return (
+      <Button
+        onClick={handleClick}
+        size="sm"
+        className="h-8 rounded-md bg-orange-600 px-3 text-xs font-semibold text-white hover:bg-orange-700"
+      >
+        Apply
       </Button>
     )
   }

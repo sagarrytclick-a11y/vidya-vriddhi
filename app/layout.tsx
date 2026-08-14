@@ -12,7 +12,11 @@ export const viewport: Viewport = {
   themeColor: SITE_IDENTITY.brand.primaryColor,
 };
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${SITE_IDENTITY.domain}`),

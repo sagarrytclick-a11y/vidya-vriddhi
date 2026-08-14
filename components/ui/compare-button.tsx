@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Plus, Check } from 'lucide-react'
 import { Button } from './button'
-import { CompareLimitModal } from './success-modal'
 
 interface College {
   id: string
@@ -76,70 +76,50 @@ interface CompareButtonProps {
 }
 
 export default function CompareButton({ college, variant = 'default', size = 'default' }: CompareButtonProps) {
+  const router = useRouter()
   const [isAdded, setIsAdded] = useState(false)
-  const [showLimitModal, setShowLimitModal] = useState(false)
 
   const handleCompare = () => {
-    // Get current compare list from localStorage
-    const currentCompare = JSON.parse(localStorage.getItem('compareColleges') || '[]')
-    
-    // Check if college is already added
-    const exists = currentCompare.some((c: College) => c.id === college.id)
-    
-    if (exists) {
-      // Remove from compare list
-      const updated = currentCompare.filter((c: College) => c.id !== college.id)
-      localStorage.setItem('compareColleges', JSON.stringify(updated))
-      setIsAdded(false)
-    } else {
-      // Check max limit (4 colleges)
+    const currentCompare = JSON.parse(localStorage.getItem('compareColleges') || '[]') as College[]
+    const exists = currentCompare.some((c) => c.id === college.id)
+
+    if (!exists) {
       if (currentCompare.length >= 4) {
-        setShowLimitModal(true)
+        router.push('/compare-colleges')
         return
       }
-      
-      // Add to compare list
       const updated = [...currentCompare, college]
       localStorage.setItem('compareColleges', JSON.stringify(updated))
       setIsAdded(true)
+      window.dispatchEvent(new Event('storage'))
     }
 
-    // Trigger storage event to update other components
-    window.dispatchEvent(new Event('storage'))
+    router.push('/compare-colleges')
   }
 
-  // Check if college is already in compare list on mount
   useEffect(() => {
-    const currentCompare = JSON.parse(localStorage.getItem('compareColleges') || '[]')
-    setIsAdded(currentCompare.some((c: College) => c.id === college.id))
+    const currentCompare = JSON.parse(localStorage.getItem('compareColleges') || '[]') as College[]
+    setIsAdded(currentCompare.some((c) => c.id === college.id))
   }, [college.id])
 
   return (
-    <>
-      <Button
-        variant={isAdded ? 'secondary' : variant}
-        size={size}
-        onClick={handleCompare}
-        className={isAdded ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' : ''}
-      >
-        {isAdded ? (
-          <>
-            <Check className="w-4 h-4 mr-2" />
-            Added to Compare
-          </>
-        ) : (
-          <>
-            <Plus className="w-4 h-4 mr-2" />
-            Compare
-          </>
-        )}
-      </Button>
-      
-      {/* Compare Limit Modal */}
-      <CompareLimitModal 
-        isOpen={showLimitModal} 
-        onClose={() => setShowLimitModal(false)} 
-      />
-    </>
+    <Button
+      variant={isAdded ? 'secondary' : variant}
+      size={size}
+      onClick={handleCompare}
+      className={isAdded ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' : ''}
+    >
+      {isAdded ? (
+        <>
+          <Check className="w-4 h-4 mr-2" />
+          Go to Compare
+        </>
+      ) : (
+        <>
+          <Plus className="w-4 h-4 mr-2" />
+          Compare
+        </>
+      )}
+    </Button>
   )
 }

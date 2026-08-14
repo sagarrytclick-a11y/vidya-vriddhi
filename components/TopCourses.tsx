@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Clock, DollarSign, Building, ChevronLeft, ChevronRight, ArrowRight, BookOpen, ExternalLink, MapPin } from 'lucide-react'
+import React from 'react'
+import { Building, ExternalLink, MapPin, BookOpen } from 'lucide-react'
 import { useCourses } from '@/hooks/useCourses'
 import { CourseWithColleges } from '@/types/domain'
 import { SkeletonPulse } from '@/components/ui/skeletons'
@@ -13,52 +13,47 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
-    <div className="shrink-0 w-64 sm:w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
-      <div className="flex flex-col h-full">
-      <div className="flex items-center space-x-2 text-[#94A3B8] mb-3">
-      <MapPin className="w-6 h-6 text-orange-500" />
-    </div>
+    <Link
+      href={`/colleges?course=${encodeURIComponent(course.slug)}`}
+      className="shrink-0 w-64 sm:w-80 block group"
+    >
+      <div className="h-full bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md hover:border-orange-200 transition-all">
+        <div className="flex flex-col h-full">
+          <div className="flex items-center space-x-2 text-[#94A3B8] mb-3">
+            <MapPin className="w-6 h-6 text-orange-500" />
+          </div>
 
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-tight">{course.name}</h3>
-            {course.description && (
-              <p className="text-sm text-gray-500 line-clamp-2">{course.description}</p>
-            )}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-tight group-hover:text-orange-600 transition-colors">
+                {course.name}
+              </h3>
+              {course.description && (
+                <p className="text-sm text-gray-500 line-clamp-2">{course.description}</p>
+              )}
+            </div>
           </div>
-        </div>
-        
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Building className="w-4 h-4 text-gray-400" />
-            <span>{course._count?.colleges ?? course.colleges?.length ?? 0} Colleges</span>
+
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Building className="w-4 h-4 text-gray-400" />
+              <span>{course._count?.colleges ?? course.colleges?.length ?? 0} Colleges</span>
+            </div>
           </div>
+
+          <span className="mt-auto text-sm font-medium text-orange-500 group-hover:text-orange-600 inline-flex items-center gap-1">
+            View colleges
+            <ExternalLink className="w-3.5 h-3.5" />
+          </span>
         </div>
-        
-      
       </div>
-    </div>
+    </Link>
   )
 }
 
 const TopCourses: React.FC = () => {
-  // Fetch courses using custom hook
   const { data: response, isLoading, error } = useCourses()
   const courses = response?.data || []
-
-  const scrollLeft = () => {
-    const element = document.getElementById('courses-scroll-container')
-    if (element) {
-      element.scrollBy({ left: -320, behavior: 'smooth' })
-    }
-  }
-
-  const scrollRight = () => {
-    const element = document.getElementById('courses-scroll-container')
-    if (element) {
-      element.scrollBy({ left: 320, behavior: 'smooth' })
-    }
-  }
 
   return (
     <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
@@ -73,7 +68,6 @@ const TopCourses: React.FC = () => {
           </Link>
         </div>
 
-        {/* Loading State */}
         {isLoading && (
           <div className="relative">
             <div className="flex space-x-6 overflow-hidden pb-4">
@@ -94,7 +88,6 @@ const TopCourses: React.FC = () => {
           </div>
         )}
 
-        {/* Error State */}
         {error && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
             <BookOpen className="w-12 h-12 text-orange-500 mx-auto mb-4" />
@@ -103,7 +96,6 @@ const TopCourses: React.FC = () => {
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && !error && courses && courses.length === 0 && (
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
             <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -112,7 +104,6 @@ const TopCourses: React.FC = () => {
           </div>
         )}
 
-        {/* Course Cards */}
         {!isLoading && !error && courses && courses.length > 0 && (
           <div className="relative">
             <div

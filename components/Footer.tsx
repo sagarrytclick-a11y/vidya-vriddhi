@@ -50,21 +50,21 @@ const Footer = () => {
               
               {/* Contact Information */}
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-orange-400" />
+                <div className="flex items-start space-x-3">
+                  <Mail className="mt-0.5 h-5 w-5 shrink-0 text-orange-400" />
                   <a href={`mailto:${SITE_IDENTITY.contact.email.support}`} className="text-gray-300 hover:text-white transition-colors">
                     {SITE_IDENTITY.contact.email.support}
                   </a>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-orange-400" />
+                <div className="flex items-start space-x-3">
+                  <Phone className="mt-0.5 h-5 w-5 shrink-0 text-orange-400" />
                   <a href={`tel:${SITE_IDENTITY.contact.phone.raw}`} className="text-gray-300 hover:text-white transition-colors">
                     {SITE_IDENTITY.contact.phone.display}
                   </a>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-orange-400" />
-                  <span className="text-gray-300">
+                <div className="flex items-start space-x-3">
+                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-orange-400" />
+                  <span className="text-gray-300 leading-relaxed">
                     {SITE_IDENTITY.contact.address.office}
                   </span>
                 </div>
@@ -90,10 +90,10 @@ const Footer = () => {
               <ul className="space-y-2">
                 <li><Link href="/colleges/national-law-school-of-india-university-bangalore" className="text-gray-300 hover:text-white transition-colors">NLSI</Link></li>
                 <li><Link href="/colleges/all-india-institute-of-medical-sciences-aiims" className="text-gray-300 hover:text-white transition-colors">AIIMS</Link></li>
-                <li><Link href="/colleges/Indian%20Institute%20of%20Management%20Bangalore" className="text-gray-300 hover:text-white transition-colors">IIM Bangalore</Link></li>
+                <li><Link href="/colleges/maulana-azad-college" className="text-gray-300 hover:text-white transition-colors">Maulana Azad College</Link></li>
                 <li><Link href="/colleges/hindu-college-university-of-delhi" className="text-gray-300 hover:text-white transition-colors">Hindu College</Link></li>
-                <li><Link href="/colleges/dr-d-y-patil-vidyapeeth-deemed-to-be-university" className="text-gray-300 hover:text-white transition-colors">Dr. D.Y. Patil University</Link></li>
-                <li><Link href="/colleges/vardhman-mahavir-medical-college-vmmc" className="text-gray-300 hover:text-white transition-colors">VMMC</Link></li>
+                <li><Link href="/colleges/gd-goenka-university" className="text-gray-300 hover:text-white transition-colors">GD Goenka University</Link></li>
+                <li><Link href="/colleges/niet-greater-noida" className="text-gray-300 hover:text-white transition-colors">NIET Greater Noida</Link></li>
                 <li><Link href="/colleges/the-institute-of-hotel-management-bangalore" className="text-gray-300 hover:text-white transition-colors">IHM Bangalore</Link></li>
               </ul>
             </div>

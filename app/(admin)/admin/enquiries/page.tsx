@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pagination } from '@/components/ui/pagination'
-import { Search, Trash2, Eye, Mail, Phone, User, Calendar, MapPin, X } from 'lucide-react'
+import { Search, Trash2, Eye, Mail, Phone, User, Calendar, MapPin, X, Download } from 'lucide-react'
 import { useCanDelete } from '@/contexts/admin-context'
 import { toast } from 'sonner'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
@@ -59,6 +59,9 @@ function EnquiriesPageContent() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState(statusFromUrl)
+  const [cityFilter, setCityFilter] = useState('')
+  const [cities, setCities] = useState<string[]>([])
+  const [exporting, setExporting] = useState(false)
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [total, setTotal] = useState(0)
@@ -84,7 +87,8 @@ function EnquiriesPageContent() {
         page: page.toString(),
         limit: limit.toString(),
         search,
-        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter })
+        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter }),
+        ...(cityFilter && cityFilter !== 'all' && { city: cityFilter }),
       })
       
       const response = await fetch(`/api/enquiries?${params}`)
@@ -96,6 +100,9 @@ function EnquiriesPageContent() {
         setTotalPages(data.pagination.totalPages)
         setHasNext(data.pagination.hasNext)
         setHasPrev(data.pagination.hasPrev)
+        if (Array.isArray(data.cities)) {
+          setCities(data.cities)
+        }
       } else {
         toast.error('Failed to fetch enquiries')
       }
@@ -114,7 +121,7 @@ function EnquiriesPageContent() {
   useEffect(() => {
     setLoading(true)
     fetchEnquiries()
-  }, [page, limit, search, statusFilter])
+  }, [page, limit, search, statusFilter, cityFilter])
 
   const handleStatusFilterChange = (value: string) => {
     const next = !value || value === 'all' ? '' : value
@@ -128,6 +135,44 @@ function EnquiriesPageContent() {
     }
     const qs = params.toString()
     router.replace(qs ? `/admin/enquiries?${qs}` : '/admin/enquiries')
+  }
+
+  const handleCityFilterChange = (value: string) => {
+    const next = !value || value === 'all' ? '' : value
+    setCityFilter(next)
+    setPage(1)
+  }
+
+  const handleExport = async (format: 'csv' | 'xlsx' | 'pdf') => {
+    setExporting(true)
+    try {
+      const params = new URLSearchParams({
+        format,
+        ...(search && { search }),
+        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter }),
+        ...(cityFilter && cityFilter !== 'all' && { city: cityFilter }),
+      })
+      const response = await fetch(`/api/enquiries/export?${params}`)
+      if (!response.ok) {
+        toast.error('Failed to export enquiries')
+        return
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      const ext = format === 'xlsx' ? 'xls' : format
+      link.href = url
+      link.download = `enquiries.${ext}`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+      toast.success(`Exported as ${format.toUpperCase()}`)
+    } catch {
+      toast.error('Failed to export enquiries')
+    } finally {
+      setExporting(false)
+    }
   }
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
@@ -212,9 +257,27 @@ function EnquiriesPageContent() {
           title="All Enquiries"
           subtitle="Manage student enquiries and contacts"
           action={
-            <div className="text-white">
-              <span className="text-sm text-gray-400">Total Enquiries:</span>
-              <span className="ml-2 text-lg font-semibold">{total}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-400">
+                Total: <span className="font-semibold text-white">{total}</span>
+              </span>
+              <Select disabled={exporting} onValueChange={(value) => handleExport(value as 'csv' | 'xlsx' | 'pdf')}>
+                <SelectTrigger className={cn('w-[160px]', adminFilterClass)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder={exporting ? 'Exporting…' : 'Export'} />
+                </SelectTrigger>
+                <SelectContent className={adminSelectContentClass}>
+                  <SelectItem value="csv" className="focus:bg-[#1e2430] focus:text-white">
+                    Download CSV
+                  </SelectItem>
+                  <SelectItem value="xlsx" className="focus:bg-[#1e2430] focus:text-white">
+                    Download Excel
+                  </SelectItem>
+                  <SelectItem value="pdf" className="focus:bg-[#1e2430] focus:text-white">
+                    Download PDF
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           }
         />
@@ -237,8 +300,25 @@ function EnquiriesPageContent() {
             <SelectContent className={adminSelectContentClass}>
               <SelectItem value="all" className="focus:bg-[#1e2430] focus:text-white">All Status</SelectItem>
               <SelectItem value="PENDING" className="focus:bg-[#1e2430] focus:text-white text-amber-300">Pending</SelectItem>
-              <SelectItem value="RESOLVED" className="focus:bg-[#1e2430] focus:text-white text-emerald-300">Resolved</SelectItem>
+              <SelectItem value="RESOLVED" className="focus:bg-[#1e2430] focus:text-white text-emerald-300">Fulfilled</SelectItem>
               <SelectItem value="FOLLOW_UP" className="focus:bg-[#1e2430] focus:text-white text-[#fdba74]">Follow Up</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={cityFilter || 'all'} onValueChange={handleCityFilterChange}>
+            <SelectTrigger className={cn('w-48', adminFilterClass)}>
+              <SelectValue placeholder="Filter by state" />
+            </SelectTrigger>
+            <SelectContent className={adminSelectContentClass}>
+              <SelectItem value="all" className="focus:bg-[#1e2430] focus:text-white">All States</SelectItem>
+              {cities.map((city) => (
+                <SelectItem
+                  key={city}
+                  value={city}
+                  className="focus:bg-[#1e2430] focus:text-white"
+                >
+                  {city}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -347,7 +427,7 @@ function EnquiriesPageContent() {
                                   Pending
                                 </SelectItem>
                                 <SelectItem value="RESOLVED" className="focus:bg-[#1e2430] focus:text-emerald-300 text-emerald-300">
-                                  Resolved
+                                  Resolved / Fulfilled
                                 </SelectItem>
                                 <SelectItem value="FOLLOW_UP" className="focus:bg-[#1e2430] focus:text-[#fdba74] text-[#fdba74]">
                                   Follow Up

@@ -71,7 +71,7 @@ export function SearchInput({ placeholder = 'Search colleges by name...', classN
     debounceTimerRef.current = setTimeout(() => {
       performSearch(newValue)
       userTriggeredRef.current = false
-    }, 500)
+    }, 400)
   }
 
   const handleClear = () => {

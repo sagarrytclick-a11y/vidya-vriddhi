@@ -14,14 +14,13 @@ const fetchFiltersData = async (): Promise<FilterData> => {
 }
 
 export function useCollegesFilters() {
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['colleges-filters'],
     queryFn: fetchFiltersData,
-    staleTime: 30 * 60 * 1000,
+    staleTime: 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   })
 
   return {
@@ -29,7 +28,7 @@ export function useCollegesFilters() {
     courses: data?.courses || [],
     cities: data?.cities || [],
     exams: data?.exams || [],
-    isLoading,
+    isLoading: isLoading && !data,
     error: error?.message || null,
   }
 }

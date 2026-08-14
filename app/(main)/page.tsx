@@ -1,19 +1,27 @@
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import Hero from '@/components/Hero'
-import ExplorePrograms from '@/components/ExplorePrograms'
-import TopColleges from '@/components/TopColleges'
-import UpcomingExams from '@/components/UpcomingExams'
-import TopCourses from '@/components/TopCourses'
-import TopStudyPlaces from '@/components/TopStudyPlaces'
-import StudyAbroad from '@/components/StudyAbroad'
-import Services from '@/components/Services'
-import WhyChooseUs from '@/components/WhyChooseUs'
-import FAQ from '@/components/FAQ'
-import { TrendingInsights } from '@/components/TrendingInsights'
-import CollegeListing from '@/components/CollegeListing'
-import { InfiniteMovingCardsDemo } from '@/components/MovingCards'
-import NeetRankPredictorSection from '@/components/NeetRankPredictorSection'
 import { SITE_IDENTITY } from './site-identity'
+
+const ExplorePrograms = dynamic(() => import('@/components/ExplorePrograms'))
+const TopColleges = dynamic(() => import('@/components/TopColleges'))
+const UpcomingExams = dynamic(() => import('@/components/UpcomingExams'))
+const NeetRankPredictorSection = dynamic(() => import('@/components/NeetRankPredictorSection'))
+const TopCourses = dynamic(() => import('@/components/TopCourses'))
+const TrendingInsights = dynamic(() =>
+  import('@/components/TrendingInsights').then((m) => m.TrendingInsights)
+)
+const CollegeListing = dynamic(() => import('@/components/CollegeListing'))
+const TopStudyPlaces = dynamic(() => import('@/components/TopStudyPlaces'))
+const StudyAbroad = dynamic(() => import('@/components/StudyAbroad'))
+const Services = dynamic(() => import('@/components/Services'))
+const WhyChooseUs = dynamic(() => import('@/components/WhyChooseUs'))
+const InfiniteMovingCardsDemo = dynamic(() =>
+  import('@/components/MovingCards').then((m) => m.InfiniteMovingCardsDemo)
+)
+const FAQ = dynamic(() => import('@/components/FAQ'))
+
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'VidyaVriddhi | Best College Guidance, Exam Help, Study Abroad, and Admissions Support',
@@ -56,19 +64,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `https://${SITE_IDENTITY.domain}/`,
   },
-};
+}
 
 const page = () => {
   return (
-    <main className='h-full w-full relative overflow-x-hidden'>
+    <main className="relative h-full w-full overflow-x-hidden">
       <Hero />
       <ExplorePrograms />
-      <TopColleges/>
+      <TopColleges />
       <UpcomingExams />
       <NeetRankPredictorSection />
       <TopCourses />
       <TrendingInsights />
-      <CollegeListing/>
+      <CollegeListing />
       <TopStudyPlaces />
       <StudyAbroad />
       <Services />
