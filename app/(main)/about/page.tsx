@@ -110,48 +110,47 @@ const AboutPage = () => {
 
         {/* Founder & Office */}
         <section className="mb-16">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-100/50 transition-shadow duration-300">
-              <div className="p-6 md:p-8">
-                <div className="flex flex-col sm:flex-row items-start gap-6">
-                  <div className="relative w-32 h-48 sm:w-40 sm:h-60 rounded-xl overflow-hidden shadow-lg shrink-0">
-                    <Image
-                      src="/about/founder.png"
-                      alt="Abhishek Tiwari - Founder & CEO"
-                      fill
-                      className="object-cover"
-                      sizes="160px"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold shrink-0">
-                        AT
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-900">Abhishek Tiwari</h3>
-                        <p className="text-orange-500 font-medium text-sm">Founder & Chief Executive Officer</p>
-                      </div>
-                    </div>
-                    <p className="text-slate-600 leading-relaxed text-sm">
-                      With extensive experience in education and career counseling, our founder
-                      established {SITE_IDENTITY.name} with a vision to democratize access to quality higher education.
-                      Their passion for mentoring young minds has helped thousands of students find their
-                      path to success at premier institutions across the nation.
-                    </p>
-                    <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-4 text-sm text-slate-500">
-                      <span className="flex items-center gap-1.5">
-                        <Mail className="w-4 h-4" />
-                        {SITE_IDENTITY.contact.email.general}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="mb-8 text-center">
+            <span className="mb-4 inline-block rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-sm font-medium text-orange-600">
+              Leadership & Presence
+            </span>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">The People & Place Behind Us</h2>
+          </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-100/50 transition-shadow duration-300">
-              <div className="relative h-56 w-full">
+          <div className="grid items-stretch gap-8 md:grid-cols-2">
+            <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex-row">
+              <div className="relative h-72 w-full shrink-0 bg-slate-200 sm:h-auto sm:w-48 md:w-52">
+                <Image
+                  src="/about/founder.png"
+                  alt="Abhishek Tiwari - Founder & CEO"
+                  fill
+                  className="object-cover object-[center_20%]"
+                  sizes="(max-width: 640px) 100vw, 208px"
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-6">
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-slate-900">Abhishek Tiwari</h3>
+                  <p className="mt-0.5 text-sm font-medium text-orange-600">Founder & Chief Executive Officer</p>
+                </div>
+                <p className="flex-1 text-sm leading-relaxed text-slate-600">
+                  With extensive experience in education and career counseling, our founder
+                  established {SITE_IDENTITY.name} with a vision to democratize access to quality higher education.
+                  Their passion for mentoring young minds has helped thousands of students find their
+                  path to success at premier institutions across the nation.
+                </p>
+                <a
+                  href={`mailto:${SITE_IDENTITY.contact.email.general}`}
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-700 transition-colors hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                >
+                  <Mail className="h-4 w-4 shrink-0 text-orange-500" />
+                  {SITE_IDENTITY.contact.email.general}
+                </a>
+              </div>
+            </article>
+
+            <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="relative h-48 w-full shrink-0 bg-slate-100 sm:h-52">
                 <Image
                   src="/about/image-4.jpg"
                   alt="Vidya Vriddhi Office"
@@ -160,24 +159,26 @@ const AboutPage = () => {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-orange-500" />
+              <div className="flex flex-1 flex-col p-6">
+                <div className="mb-4 flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
+                    <MapPin className="h-5 w-5 text-orange-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900">Our Headquarters</h3>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Our Headquarters</h3>
+                    <p className="text-sm font-medium text-orange-600">Noida, Uttar Pradesh</p>
+                  </div>
                 </div>
-                <p className="text-slate-600 leading-relaxed mb-4 text-sm">
+                <p className="flex-1 text-sm leading-relaxed text-slate-600">
                   Located in the heart of Noida, our modern office serves as the central hub
                   where our expert counselors work tirelessly to guide students toward their academic dreams.
-                  The welcoming environment reflects our commitment to making every student feel supported
-                  throughout their educational journey.
                 </p>
-                <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
-                  <strong className="text-slate-900">Address:</strong> {getFullAddress()}
-                </div>
+                <p className="mt-5 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-600">
+                  <span className="font-semibold text-slate-900">Address: </span>
+                  {SITE_IDENTITY.contact.address.office}
+                </p>
               </div>
-            </div>
+            </article>
           </div>
         </section>
 

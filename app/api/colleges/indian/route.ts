@@ -23,6 +23,7 @@ const collegeListSelect = {
   description: true,
   establishment_year: true,
   Countryranking: true,
+  Internationalranking: true,
   logoURL: true,
   imageURL: true,
   city: {
@@ -33,6 +34,10 @@ const collegeListSelect = {
   },
   categories: {
     select: { id: true, name: true, slug: true },
+    take: 3,
+  },
+  courses: {
+    select: { id: true, name: true },
     take: 3,
   },
   _count: {
@@ -53,7 +58,7 @@ export async function GET(request: NextRequest) {
     const exam = searchParams.get('exam')?.trim() || ''
     const search = searchParams.get('search')?.trim() || ''
 
-    const cacheKey = `indian-colleges:v4:${page}:${limit}:${category}:${course}:${city}:${exam}:${search}`
+    const cacheKey = `indian-colleges:v5:${page}:${limit}:${category}:${course}:${city}:${exam}:${search}`
     const cached = get<{
       colleges: unknown[]
       pagination: {

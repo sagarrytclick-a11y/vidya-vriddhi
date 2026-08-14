@@ -1,7 +1,11 @@
 import { Resend } from 'resend'
 import { escapeHtml, escapeHtmlAttr } from '@/lib/html-escape'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return null
+  return new Resend(key)
+}
 
 export async function sendEnquiryEmail(data: {
   name: string
@@ -11,6 +15,12 @@ export async function sendEnquiryEmail(data: {
   category?: string
 }) {
   try {
+    const resend = getResend()
+    if (!resend) {
+      console.warn('RESEND_API_KEY is not set; skipping enquiry email')
+      return { success: false, error: 'Email is not configured' }
+    }
+
     const name = escapeHtml(data.name)
     const email = escapeHtml(data.email)
     const phone = escapeHtml(data.phone || 'Not provided')

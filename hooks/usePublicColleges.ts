@@ -13,18 +13,30 @@ interface College {
   id: string
   name: string
   slug: string
+  description?: string | null
   establishment_year: number | null
   Countryranking: string | null
+  Internationalranking?: string | null
   logoURL: string | null
   city: {
     id: string
     name: string
     slug: string
   } | null
+  country?: {
+    id: string
+    name: string
+    slug: string
+    flagEmoji?: string | null
+  } | null
   categories: {
     id: string
     name: string
     slug: string
+  }[]
+  courses?: {
+    id: string
+    name: string
   }[]
   _count: {
     courses: number

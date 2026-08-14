@@ -25,8 +25,8 @@ interface CollegeActionsProps {
     campusHighlights?: unknown
     city?: { name: string } | null
     country?: { name: string } | null
-    categories?: { name: string }[]
-    courses?: { name: string }[]
+    categories?: { id?: string; name: string }[]
+    courses?: { id?: string; name?: string }[]
   }
 }
 

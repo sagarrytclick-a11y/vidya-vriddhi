@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, MapPin, Building2, Award, BookOpen, Loader2 } from 'lucide-react'
+import { ChevronRight, MapPin, Building2, Award, BookOpen, Loader2, Globe2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -353,11 +353,12 @@ function CollegesPageContent() {
                             <h3 className="mb-1 text-[20px] font-semibold text-gray-900 hover:text-blue-600">
                               {college.name}
                             </h3>
-                            <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                            <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
                               {college.city?.name && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="h-4 w-4" />
                                   {college.city.name}
+                                  {college.country?.name ? `, ${college.country.name}` : ''}
                                 </span>
                               )}
                               {college.establishment_year && (
@@ -368,6 +369,12 @@ function CollegesPageContent() {
                               )}
                             </div>
 
+                            {college.description && (
+                              <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                                {college.description}
+                              </p>
+                            )}
+
                             <div className="mb-3 flex flex-wrap gap-2">
                               {college.categories?.map((cat) => (
                                 <Badge key={cat.id} variant="secondary" className="text-xs">
@@ -376,18 +383,37 @@ function CollegesPageContent() {
                               ))}
                             </div>
 
-                            <div className="flex items-center gap-4 text-sm">
-                              <div className="flex items-center gap-1 text-gray-600">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-gray-600">
+                              <div className="flex items-center gap-1">
                                 <BookOpen className="h-4 w-4 text-orange-500" />
                                 <span>{college._count.courses} Courses</span>
                               </div>
                               {college.Countryranking && (
-                                <div className="flex items-center gap-1 text-gray-600">
+                                <div className="flex items-center gap-1">
                                   <Award className="h-4 w-4 text-orange-500" />
                                   <span>Rank #{college.Countryranking}</span>
                                 </div>
                               )}
+                              {college.Internationalranking && (
+                                <div className="flex items-center gap-1">
+                                  <Globe2 className="h-4 w-4 text-orange-500" />
+                                  <span>QS #{college.Internationalranking}</span>
+                                </div>
+                              )}
                             </div>
+
+                            {college.courses && college.courses.length > 0 && (
+                              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                                {college.courses.slice(0, 3).map((course) => (
+                                  <span
+                                    key={course.id}
+                                    className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600"
+                                  >
+                                    {course.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </Link>
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { sendEnquiryEmail } from '@/lib/email'
 import { requireCanViewLeads } from '@/lib/auth'
 import { enforceRateLimit } from '@/lib/rate-limit'
 
@@ -44,6 +43,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    const { sendEnquiryEmail } = await import('@/lib/email')
     const emailResult = await sendEnquiryEmail({
       name: validatedData.name,
       email: validatedData.email,
@@ -100,6 +100,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100)
     const search = searchParams.get('search') || ''
     const status = searchParams.get('status')
+    const city = searchParams.get('city')
 
     const skip = (page - 1) * limit
 
@@ -114,11 +115,15 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    if (status) {
+    if (status && ['PENDING', 'RESOLVED', 'FOLLOW_UP'].includes(status)) {
       where.status = status
     }
 
-    const [total, enquiries] = await Promise.all([
+    if (city) {
+      where.city = { equals: city, mode: 'insensitive' }
+    }
+
+    const [total, enquiries, cityRows] = await Promise.all([
       db.enquiry.count({ where }),
       db.enquiry.findMany({
         where,
@@ -128,10 +133,18 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
+      db.enquiry.findMany({
+        where: { city: { not: null } },
+        distinct: ['city'],
+        select: { city: true },
+        orderBy: { city: 'asc' },
+        take: 80,
+      }),
     ])
 
     return NextResponse.json({
       enquiries,
+      cities: cityRows.map((row) => row.city).filter(Boolean),
       pagination: {
         page,
         limit,
