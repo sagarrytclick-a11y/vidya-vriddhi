@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Vercel may block `next/image` optimization requests with 402
+    // (`OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED`). Images (ImageKit/others)
+    // are already publicly accessible, so serve them directly.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

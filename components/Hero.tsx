@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Search, GraduationCap, FileText, MonitorPlay, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
@@ -10,7 +9,7 @@ const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
 
 const slides = [
   {
-    image: 'https://i.pinimg.com/736x/46/43/f8/4643f8e7ec4b3bd90e949b544bf6da15.jpg',
+    image: 'https://i.pinimg.com/1200x/46/43/f8/4643f8e7ec4b3bd90e949b544bf6da15.jpg',
     title: 'Engineering Excellence in India',
     subtitle: "India's #1 Ranked Engineering Institute",
     collegeName: 'IIT Madras (Indian Institute of Technology)',
@@ -22,7 +21,7 @@ const slides = [
     collegeName: 'IIM Ahmedabad (Indian Institute of Management)',
   },
   {
-    image: 'https://i.pinimg.com/736x/79/f9/4e/79f94eb175c510f6ac8fd9d87e5ba43c.jpg',
+    image: 'https://i.pinimg.com/1200x/79/f9/4e/79f94eb175c510f6ac8fd9d87e5ba43c.jpg',
     title: 'Center for Advanced Research',
     subtitle: 'Pursue Science and Innovation in India',
     collegeName: 'IISc Bangalore (Indian Institute of Science)',
@@ -66,27 +65,17 @@ const Hero = () => {
   return (
     <section className="relative min-h-[400px] sm:h-[500px] w-full flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
-        {slides.map((slide, index) => (
-          <Image
-            key={slide.image}
-            src={slide.image}
-            alt={slide.collegeName}
-            fill
-            priority={index === 0}
-            fetchPriority={index === 0 ? 'high' : 'low'}
-            quality={70}
-            sizes="100vw"
-            className={`object-cover transition-opacity duration-700 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-        ))}
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute bottom-4 left-2 z-10 sm:left-4">
-          <div className="rounded-lg bg-white/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2">
-            <p className="max-w-[200px] truncate text-[10px] font-semibold text-gray-900 sm:max-w-none sm:text-sm">
-              {active.collegeName}
-            </p>
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+          style={{ backgroundImage: `url('${active.image}')` }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute bottom-4 left-2 z-10 sm:left-4">
+            <div className="rounded-lg bg-white/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2">
+              <p className="max-w-[200px] truncate text-[10px] font-semibold text-gray-900 sm:max-w-none sm:text-sm">
+                {active.collegeName}
+              </p>
+            </div>
           </div>
         </div>
       </div>
