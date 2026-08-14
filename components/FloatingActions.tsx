@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 
 const FloatingActions: React.FC = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
-  const { data: newsData } = useNews(3)
+  const { data: newsData } = useNews(3, 0, isNotificationOpen)
   const newsItems = newsData?.data || []
   const router = useRouter()
 

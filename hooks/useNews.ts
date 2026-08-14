@@ -34,10 +34,11 @@ const fetchNews = async (limit: number = 10, skip: number = 0): Promise<NewsResp
   return response.json()
 }
 
-export const useNews = (limit: number = 10, skip: number = 0) => {
+export const useNews = (limit: number = 10, skip: number = 0, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['news', limit, skip],
     queryFn: () => fetchNews(limit, skip),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled,
+    staleTime: 5 * 60 * 1000,
   })
 }

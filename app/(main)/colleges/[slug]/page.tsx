@@ -86,7 +86,7 @@ export default async function CollegeDetailPage({ params }: PageProps) {
   const { slug } = await params
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Suspense fallback={<BreadcrumbFallback />}>
         <HeroSectionWrapper slug={slug} />
       </Suspense>

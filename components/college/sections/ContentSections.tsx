@@ -1,11 +1,35 @@
-import { Building2, CheckCircle2, Sparkles, GraduationCap, BookOpen, Clock, Wallet, Download, ListOrdered, Star, Award, Trophy, FileText } from 'lucide-react'
+import {
+  Building2,
+  CheckCircle2,
+  Sparkles,
+  GraduationCap,
+  ListOrdered,
+  Star,
+  Award,
+  Trophy,
+  FileText,
+  Download,
+  Clock,
+  Wifi,
+  HeartPulse,
+  Dumbbell,
+  BookOpen,
+  Utensils,
+  Home,
+  Globe2,
+  Flag,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { AdmissionButton } from '@/components/ui/AdmissionButton'
 import { GallerySection } from '@/components/college/GallerySection'
-import { getColorClasses } from '@/lib/college-utils'
 import Link from 'next/link'
+
+interface FeeCourse {
+  course_name: string
+  duration: string
+  annual_tuition_fee: string
+}
 
 interface ContentSectionsProps {
   college: {
@@ -19,489 +43,618 @@ interface ContentSectionsProps {
     exams: { id: string; name: string; slug: string }[]
     categories: { id: string; name: string }[]
   }
-  keyHighlights: any
-  whyChooseUs: any
-  documentsRequired: any
-  feesStructure: any
-  admissionProcess: any
-  campusHighlights: any
+  keyHighlights: {
+    title?: string
+    description?: string
+    features?: string[]
+  }
+  whyChooseUs: {
+    title?: string
+    description?: string
+    features?: { title: string; description: string }[]
+  }
+  documentsRequired: {
+    title?: string
+    description?: string
+    documents?: string[]
+  }
+  feesStructure: {
+    title?: string
+    description?: string
+    courses?: FeeCourse[]
+  }
+  admissionProcess: {
+    title?: string
+    description?: string
+    steps?: string[]
+  }
+  campusHighlights: {
+    title?: string
+    description?: string
+    highlights?: string[]
+  }
 }
 
-export function ContentSections({ college, keyHighlights, whyChooseUs, documentsRequired, feesStructure, admissionProcess, campusHighlights }: ContentSectionsProps) {
+function SectionHeading({
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  subtitle?: string
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-sm shadow-orange-200">
+          <Icon className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            {title}
+          </h2>
+          {subtitle ? (
+            <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
+          ) : null}
+        </div>
+      </div>
+      <div className="mt-4 h-px w-full bg-gradient-to-r from-orange-300 via-slate-200 to-transparent" />
+    </div>
+  )
+}
+
+export function ContentSections({
+  college,
+  keyHighlights,
+  whyChooseUs,
+  documentsRequired,
+  feesStructure,
+  admissionProcess,
+  campusHighlights,
+}: ContentSectionsProps) {
   const features = college.features || []
+  const feeCourses = feesStructure?.courses || []
+  const shortName = college.name?.split(' ').slice(0, 3).join(' ')
+
+  const highlights = Array.isArray(campusHighlights?.highlights)
+    ? campusHighlights.highlights
+    : []
+  const imageHighlights = highlights.filter(
+    (h): h is string =>
+      typeof h === 'string' &&
+      (h.startsWith('http://') || h.startsWith('https://') || h.startsWith('data:'))
+  )
+  const textHighlights = highlights.filter(
+    (h): h is string => typeof h === 'string' && !imageHighlights.includes(h)
+  )
 
   return (
     <div className="flex-1 space-y-12">
-      {/* About Section */}
+      {/* About */}
       <section id="about" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            About {college.name?.split(' ').slice(0, 3).join(' ')}
-          </h2>
-        </div>
+        <SectionHeading
+          icon={Building2}
+          title={`About ${shortName}`}
+          subtitle="Overview, features & quick facts"
+        />
 
-        <Card className="overflow-hidden border-0 shadow-lg shadow-gray-100">
-          <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400" />
-          <CardContent className="p-6">
-            <p className="text-gray-700 leading-relaxed text-[15px]">
-              {college.description}
-            </p>
-
-            {features.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Key Features</p>
-                <div className="flex flex-wrap gap-2">
-                  {features.map((feature, idx) => (
-                    <Badge
-                      key={idx}
-                      className="bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 px-3 py-1.5 font-medium"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+          <div className="p-5 sm:p-7">
+            {college.description ? (
+              <p className="text-[15px] leading-7 text-slate-700">
+                {college.description}
+              </p>
+            ) : (
+              <p className="text-[15px] text-slate-500">
+                College overview will be updated soon.
+              </p>
             )}
 
-            <div className="mt-6 grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-xl font-bold text-blue-600">{college.establishment_year || '2000'}</p>
-                <p className="text-xs text-gray-600 mt-0.5">Established</p>
+            {features.length > 0 && (
+              <div className="mt-6 rounded-xl border border-orange-100 bg-orange-50/40 p-4 sm:p-5">
+                <p className="mb-3 text-sm font-semibold text-slate-900">Key Features</p>
+                <ul className="grid gap-2.5 sm:grid-cols-2">
+                  {features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-orange-100">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-orange-600" />
+                      </span>
+                      <span className="leading-relaxed">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-xl font-bold text-green-600">{college.courses.length || '15'}+</p>
-                <p className="text-xs text-gray-600 mt-0.5">Courses</p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-xl font-bold text-orange-600">5000+</p>
-                <p className="text-xs text-gray-600 mt-0.5">Students</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Highlights Section */}
-      {keyHighlights?.features && (
-        <section id="highlights" className="scroll-mt-24">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-200">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {keyHighlights.title || 'Key Highlights'}
-            </h2>
+            )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {keyHighlights.features.map((feature: string, idx: number) => (
-              <Card
+          <div className="grid grid-cols-3 gap-px border-t border-slate-200 bg-slate-200">
+            {[
+              {
+                value: college.establishment_year || '—',
+                label: 'Established',
+              },
+              {
+                value: `${college.courses.length || 0}+`,
+                label: 'Courses',
+              },
+              {
+                value: college.Countryranking ? `#${college.Countryranking}` : '—',
+                label: 'Country Rank',
+              },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-slate-50 px-3 py-5 text-center sm:px-4">
+                <p className="text-xl font-bold text-slate-900 sm:text-2xl">{stat.value}</p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Highlights */}
+      {keyHighlights?.features && keyHighlights.features.length > 0 && (
+        <section id="highlights" className="scroll-mt-24">
+          <SectionHeading
+            icon={Sparkles}
+            title={keyHighlights.title || 'Key Highlights'}
+            subtitle="What stands out about this college"
+          />
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {keyHighlights.features.map((feature, idx) => (
+              <div
                 key={idx}
-                className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md hover:-translate-y-1"
+                className="flex gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <CardContent className="p-4 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-200">
-                    <CheckCircle2 className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-gray-700 text-[15px] leading-relaxed pt-2">{feature}</p>
-                </CardContent>
-              </Card>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-sm font-bold text-orange-600">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+                <p className="pt-1.5 text-sm leading-relaxed text-slate-700">{feature}</p>
+              </div>
             ))}
           </div>
 
           {keyHighlights.description && (
-            <Card className="mt-4 border-0 bg-gradient-to-r from-amber-50 to-orange-50">
-              <CardContent className="p-4">
-                <p className="text-gray-700 text-[15px] flex items-start gap-2">
-                  <span className="text-2xl">💡</span>
-                  {keyHighlights.description}
-                </p>
-              </CardContent>
-            </Card>
+            <p className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-600 shadow-sm">
+              {keyHighlights.description}
+            </p>
           )}
         </section>
       )}
 
-      {/* Courses & Fees Section */}
+      {/* Courses & Fees */}
       <section id="courses" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-200">
-            <GraduationCap className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Courses & Fees 2026</h2>
-        </div>
+        <SectionHeading
+          icon={GraduationCap}
+          title={feesStructure?.title || 'Courses & Fees 2026'}
+          subtitle={
+            feeCourses.length > 0
+              ? `${feeCourses.length} program${feeCourses.length > 1 ? 's' : ''} with fee details`
+              : 'Fee details for popular programs'
+          }
+        />
 
-        {feesStructure?.courses ? (
-          <div className="grid gap-4">
-            {feesStructure.courses.map((course: any, idx: number) => (
-              <Card
-                key={idx}
-                className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+        {feeCourses.length > 0 ? (
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3.5 sm:px-5">
+              <div>
+                <p className="text-sm font-semibold text-white">Fee Structure</p>
+                <p className="text-xs text-slate-300">Academic year 2026</p>
+              </div>
+              <Badge className="border-0 bg-orange-500 text-white hover:bg-orange-500">
+                {feeCourses.length} Courses
+              </Badge>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/90">
+                    <th className="w-12 px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5">
+                      #
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5">
+                      Course / Program
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5">
+                      Duration
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5">
+                      Total Fees
+                    </th>
+                    <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5">
+                      Apply
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {feeCourses.map((course, idx) => (
+                    <tr
+                      key={idx}
+                      className="border-b border-slate-100 last:border-0 transition-colors hover:bg-orange-50/50"
+                    >
+                      <td className="px-4 py-4 text-slate-400 sm:px-5">{idx + 1}</td>
+                      <td className="px-4 py-4 sm:px-5">
+                        <div className="flex items-start gap-3">
+                          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+                            <BookOpen className="h-4 w-4" />
+                          </span>
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {course.course_name}
+                            </p>
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              Full program fee
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 sm:px-5">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700">
+                          <Clock className="h-3.5 w-3.5 text-slate-400" />
+                          {course.duration}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 sm:px-5">
+                        <p className="text-base font-bold text-orange-600">
+                          {course.annual_tuition_fee}
+                        </p>
+                      </td>
+                      <td className="px-4 py-4 sm:px-5">
+                        <div className="flex justify-end">
+                          <AdmissionButton examName={college.name} variant="compact" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <p className="text-xs leading-relaxed text-slate-500">
+                Fees may vary by specialization and academic year. Confirm with the college before applying.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 border-slate-300 bg-white hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700"
               >
-                <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="font-bold text-white text-lg">{course.course_name}</h3>
-                  </div>
-                  <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
-                    {course.duration}
-                  </Badge>
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                        <Clock className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</p>
-                        <p className="font-semibold text-gray-900 mt-0.5">{course.duration}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-                        <Wallet className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Fees</p>
-                        <p className="font-bold text-green-600 mt-0.5 text-lg">{course.annual_tuition_fee}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                      <AdmissionButton examName={college.name} variant="default" />
-                      <Button
-                        variant="outline"
-                        className="w-full h-12 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-colors group/btn"
-                      >
-                        <Download className="w-4 h-4 mr-2 group-hover/btn:animate-bounce" />
-                        Download Brochure
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                <Download className="mr-2 h-4 w-4" />
+                Download Brochure
+              </Button>
+            </div>
           </div>
         ) : (
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-gray-50 to-gray-100">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 font-medium">Course details coming soon</p>
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+              <GraduationCap className="h-6 w-6 text-slate-400" />
+            </div>
+            <p className="font-medium text-slate-600">Course & fee details coming soon</p>
+          </div>
         )}
 
         {feesStructure?.description && (
-          <Card className="mt-4 border-0 bg-gradient-to-r from-blue-50 to-cyan-50">
-            <CardContent className="p-4">
-              <p className="text-gray-700 text-[15px] flex items-start gap-2">
-                <span className="text-xl">ℹ️</span>
-                {feesStructure.description}
-              </p>
-            </CardContent>
-          </Card>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            {feesStructure.description}
+          </p>
         )}
       </section>
 
       {/* Admission Process */}
-      {admissionProcess?.steps && (
+      {admissionProcess?.steps && admissionProcess.steps.length > 0 && (
         <section id="admission" className="scroll-mt-24">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-200">
-              <ListOrdered className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {admissionProcess.title || 'Admission Process'}
-            </h2>
+          <SectionHeading
+            icon={ListOrdered}
+            title={admissionProcess.title || 'Admission Process'}
+            subtitle="Step-by-step guide to apply"
+          />
+
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-7">
+            <ol className="space-y-0">
+              {admissionProcess.steps.map((step, idx) => (
+                <li key={idx} className="relative flex gap-4 pb-7 last:pb-0">
+                  {idx < admissionProcess.steps!.length - 1 && (
+                    <span
+                      aria-hidden
+                      className="absolute left-4 top-10 bottom-0 w-0.5 bg-orange-100"
+                    />
+                  )}
+                  <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-sm font-bold text-white shadow-sm shadow-orange-200">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+                    <p className="text-[15px] leading-relaxed text-slate-700">{step}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            {admissionProcess.description && (
+              <p className="mt-5 border-t border-slate-100 pt-4 text-sm text-slate-600">
+                {admissionProcess.description}
+              </p>
+            )}
           </div>
-
-          <Card className="border-0 shadow-lg overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500" />
-            <CardContent className="p-6">
-              <div className="relative">
-                <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200 hidden md:block" />
-
-                <div className="space-y-6">
-                  {admissionProcess.steps.map((step: string, idx: number) => (
-                    <div key={idx} className="flex gap-4 relative group">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform duration-300 z-10">
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1 bg-gradient-to-r from-orange-50 to-white p-4 rounded-xl border border-orange-100 group-hover:shadow-md transition-shadow duration-300">
-                        <p className="text-gray-800 font-medium text-[15px] leading-relaxed">{step}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {admissionProcess.description && (
-                <p className="mt-6 text-gray-600 text-sm bg-gray-50 p-4 rounded-lg">
-                  {admissionProcess.description}
-                </p>
-              )}
-            </CardContent>
-          </Card>
         </section>
       )}
 
-      {/* Why Choose Us */}
-      {whyChooseUs?.features && (
+      {/* Why Choose */}
+      {whyChooseUs?.features && whyChooseUs.features.length > 0 && (
         <section id="why-choose" className="scroll-mt-24">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-200">
-              <Star className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {whyChooseUs.title || 'Why Choose Us'}
-            </h2>
-          </div>
+          <SectionHeading
+            icon={Star}
+            title={whyChooseUs.title || 'Why Choose Us'}
+            subtitle="Reasons students pick this college"
+          />
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {whyChooseUs.features.map((feature: any, idx: number) => (
-              <Card
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {whyChooseUs.features.map((feature, idx) => (
+              <div
                 key={idx}
-                className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
+                className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md"
               >
-                <div className="h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400" />
-
-                <CardContent className="p-6 relative">
-                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500" />
-
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-orange-200 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                      <span className="text-2xl">
-                        {idx === 0 ? '🏆' : idx === 1 ? '📚' : idx === 2 ? '🌟' : '🎯'}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-gray-900 mb-3 text-lg">{feature.title}</h3>
-                    <p className="text-gray-600 text-[15px] leading-relaxed">{feature.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-400 to-amber-400" />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-sm font-bold text-orange-600 transition-colors group-hover:bg-orange-500 group-hover:text-white">
+                  {String(idx + 1).padStart(2, '0')}
+                </div>
+                <h3 className="mb-2 font-semibold text-slate-900">{feature.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600">
+                  {feature.description}
+                </p>
+              </div>
             ))}
           </div>
         </section>
       )}
 
-
-
-      {/* Scholarships Section */}
+      {/* Scholarships */}
       <section id="scholarship" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-200">
-            <Award className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Scholarships</h2>
-        </div>
+        <SectionHeading
+          icon={Award}
+          title="Scholarships"
+          subtitle="Financial aid & fee waivers available"
+        />
 
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid gap-3 sm:grid-cols-2">
           {[
-            { title: 'Merit Scholarship', desc: '100% tuition waiver for top 10 rank holders', icon: '🏆', color: 'yellow' },
-            { title: 'Need-Based Financial Aid', desc: 'Up to 75% fee waiver based on family income', icon: '💰', color: 'blue' },
-            { title: 'Sports Excellence', desc: '50% fee waiver for national level athletes', icon: '⚽', color: 'green' },
-            { title: 'Research Fellowship', desc: 'Monthly stipend for research scholars', icon: '🔬', color: 'purple' },
-          ].map((item, idx) => {
-            const c = getColorClasses(item.color)
-            return (
-              <Card key={idx} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl ${c.bg} flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform`}>
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 text-lg mb-1">{item.title}</h4>
-                      <p className="text-gray-600 text-[15px]">{item.desc}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+            {
+              title: 'Merit Scholarship',
+              desc: '100% tuition waiver for top 10 rank holders',
+              tag: 'Upto 100%',
+            },
+            {
+              title: 'Need-Based Financial Aid',
+              desc: 'Up to 75% fee waiver based on family income',
+              tag: 'Upto 75%',
+            },
+            {
+              title: 'Sports Excellence',
+              desc: '50% fee waiver for national level athletes',
+              tag: 'Upto 50%',
+            },
+            {
+              title: 'Research Fellowship',
+              desc: 'Monthly stipend for research scholars',
+              tag: 'Stipend',
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="flex items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <Award className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex flex-wrap items-center gap-2">
+                  <h4 className="font-semibold text-slate-900">{item.title}</h4>
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-50 text-orange-700 hover:bg-orange-50"
+                  >
+                    {item.tag}
+                  </Badge>
+                </div>
+                <p className="text-sm leading-relaxed text-slate-600">{item.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Rankings Section */}
+      {/* Rankings */}
       <section id="ranking" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
-            <Trophy className="w-5 h-5 text-white" />
+        <SectionHeading
+          icon={Trophy}
+          title="Rankings"
+          subtitle="National & international recognition"
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-3">
+              <Flag className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-semibold text-slate-700">NIRF Ranking</span>
+            </div>
+            <div className="px-5 py-6 text-center">
+              <p className="text-4xl font-bold tracking-tight text-orange-600 sm:text-5xl">
+                #{college.Countryranking || '—'}
+              </p>
+              <p className="mt-2 text-sm font-medium text-slate-700">National ranking</p>
+              <p className="mt-1 text-xs text-slate-500">Among top institutes in India</p>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Rankings</h2>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-5">
-          <Card className="border-0 shadow-lg overflow-hidden group hover:shadow-xl transition-all">
-            <div className="h-2 bg-gradient-to-r from-blue-500 to-cyan-500" />
-            <CardContent className="p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">🇮🇳</span>
-              </div>
-              <p className="text-5xl font-bold text-blue-600 mb-2">#{college.Countryranking || '1'}</p>
-              <p className="font-semibold text-gray-700">NIRF Ranking 2025</p>
-              <p className="text-sm text-gray-500 mt-1">Among Top Business Schools in India</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg overflow-hidden group hover:shadow-xl transition-all">
-            <div className="h-2 bg-gradient-to-r from-orange-500 to-red-500" />
-            <CardContent className="p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">🌍</span>
-              </div>
-              <p className="text-5xl font-bold text-orange-600 mb-2">#{college.Internationalranking || '100'}</p>
-              <p className="font-semibold text-gray-700">QS World Ranking</p>
-              <p className="text-sm text-gray-500 mt-1">Global MBA Rankings 2025</p>
-            </CardContent>
-          </Card>
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-3">
+              <Globe2 className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-semibold text-slate-700">QS World Ranking</span>
+            </div>
+            <div className="px-5 py-6 text-center">
+              <p className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+                #{college.Internationalranking || '—'}
+              </p>
+              <p className="mt-2 text-sm font-medium text-slate-700">International ranking</p>
+              <p className="mt-1 text-xs text-slate-500">Global recognition</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Hostel Section */}
+      {/* Hostel */}
       <section id="hostel" className="scroll-mt-24">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-200">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Hostel & Campus</h2>
-        </div>
+        <SectionHeading
+          icon={Building2}
+          title="Hostel & Campus"
+          subtitle="Facilities available on campus"
+        />
 
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: '🏠', title: 'Accommodation', desc: 'Separate hostels for boys and girls with modern amenities', color: 'blue' },
-            { icon: '📶', title: 'Wi-Fi Campus', desc: 'High-speed internet connectivity throughout the campus', color: 'green' },
-            { icon: '🏥', title: 'Medical Facilities', desc: '24/7 security and on-campus medical facilities', color: 'red' },
-            { icon: '🏋️', title: 'Sports Complex', desc: 'State-of-the-art gym and sports facilities', color: 'orange' },
-            { icon: '📚', title: 'Library', desc: 'Library with 100,000+ books and digital resources', color: 'purple' },
-            { icon: '🍽️', title: 'Cafeteria', desc: 'Hygienic cafeteria with diverse food options', color: 'yellow' },
-          ].map((item, idx) => {
-            const c = getColorClasses(item.color)
-            return (
-              <Card key={idx} className="group border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-5 flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl ${c.bg} flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform`}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">{item.title}</h4>
-                    <p className="text-gray-600 text-sm">{item.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+            {
+              icon: Home,
+              title: 'Accommodation',
+              desc: 'Separate hostels for boys and girls with modern amenities',
+            },
+            {
+              icon: Wifi,
+              title: 'Wi-Fi Campus',
+              desc: 'High-speed internet connectivity throughout the campus',
+            },
+            {
+              icon: HeartPulse,
+              title: 'Medical Facilities',
+              desc: '24/7 security and on-campus medical facilities',
+            },
+            {
+              icon: Dumbbell,
+              title: 'Sports Complex',
+              desc: 'Gym and sports facilities for students',
+            },
+            {
+              icon: BookOpen,
+              title: 'Library',
+              desc: 'Library with books and digital resources',
+            },
+            {
+              icon: Utensils,
+              title: 'Cafeteria',
+              desc: 'Hygienic cafeteria with diverse food options',
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <h4 className="mb-1 font-semibold text-slate-900">{item.title}</h4>
+              <p className="text-sm leading-relaxed text-slate-600">{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Documents Required */}
-      {documentsRequired?.documents && (
+      {/* Documents */}
+      {documentsRequired?.documents && documentsRequired.documents.length > 0 && (
         <section id="documents" className="scroll-mt-24">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">{documentsRequired.title || 'Documents Required'}</h2>
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-3">
-                {documentsRequired.documents.map((doc: string, idx: number) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-blue-500" />
-                    <span className="text-gray-700">{doc}</span>
-                  </div>
-                ))}
-              </div>
-              {documentsRequired.description && (
-                <p className="mt-4 text-sm text-gray-600">{documentsRequired.description}</p>
-              )}
-            </CardContent>
-          </Card>
+          <SectionHeading
+            icon={FileText}
+            title={documentsRequired.title || 'Documents Required'}
+            subtitle="Keep these ready before applying"
+          />
+
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {documentsRequired.documents.map((doc, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/80 px-3.5 py-3 text-sm text-slate-700"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-orange-500 shadow-sm">
+                    <FileText className="h-4 w-4" />
+                  </span>
+                  <span>{doc}</span>
+                </li>
+              ))}
+            </ul>
+            {documentsRequired.description && (
+              <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-600">
+                {documentsRequired.description}
+              </p>
+            )}
+          </div>
         </section>
       )}
 
-      {/* Campus / Gallery images */}
-      {(() => {
-        const highlights = Array.isArray(campusHighlights?.highlights)
-          ? campusHighlights.highlights
-          : []
-        const imageHighlights = highlights.filter(
-          (h: unknown): h is string =>
-            typeof h === 'string' &&
-            (h.startsWith('http://') || h.startsWith('https://') || h.startsWith('data:'))
-        )
-        const textHighlights = highlights.filter(
-          (h: unknown) => typeof h === 'string' && !imageHighlights.includes(h as string)
-        )
+      {/* Campus highlights + gallery */}
+      {(campusHighlights?.description || textHighlights.length > 0) && (
+        <section id="campus" className="scroll-mt-24">
+          <SectionHeading
+            icon={Building2}
+            title={campusHighlights.title || 'Campus Highlights'}
+          />
 
-        return (
-          <>
-            {(campusHighlights?.description || textHighlights.length > 0) && (
-              <section id="campus" className="scroll-mt-24">
-                <h2 className="mb-4 text-xl font-bold text-gray-900">
-                  {campusHighlights.title || 'Campus Highlights'}
-                </h2>
-                {campusHighlights.description ? (
-                  <p className="mb-4 text-[15px] leading-relaxed text-gray-700">
-                    {campusHighlights.description}
-                  </p>
-                ) : null}
-                {textHighlights.length > 0 ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {textHighlights.map((highlight: string, idx: number) => (
-                      <Card key={idx} className="border-0 shadow-md">
-                        <CardContent className="flex items-start gap-3 p-4">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-                            <Building2 className="h-4 w-4" />
-                          </div>
-                          <p className="pt-1 text-sm text-gray-700">{highlight}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : null}
-              </section>
-            )}
+          {campusHighlights.description && (
+            <p className="mb-4 text-[15px] leading-7 text-slate-700">
+              {campusHighlights.description}
+            </p>
+          )}
 
-            {imageHighlights.length > 0 && (
-              <section id="gallery" className="scroll-mt-24">
-                <GallerySection images={imageHighlights} />
-              </section>
-            )}
-          </>
-        )
-      })()}
+          {textHighlights.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {textHighlights.map((highlight, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3.5 text-sm text-slate-700 shadow-sm"
+                >
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                  <span className="leading-relaxed">{highlight}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
-      {/* Exams Section */}
+      {imageHighlights.length > 0 && (
+        <section id="gallery" className="scroll-mt-24">
+          <GallerySection images={imageHighlights} />
+        </section>
+      )}
+
+      {/* Exams */}
       {college.exams.length > 0 && (
         <section className="scroll-mt-24">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Accepted Exams</h2>
-            <Link href="/exams">
-              <Button variant="outline" size="sm" className="border-gray-200 hover:bg-orange-50 hover:border-orange-200">
-                View All Exams
-              </Button>
-            </Link>
-          </div>
-          <div className="flex flex-wrap gap-2">
+          <SectionHeading icon={FileText} title="Accepted Exams" />
+          <div className="flex flex-wrap items-center gap-2">
             {college.exams.map((exam) => (
               <Link key={exam.id} href={`/exams/${exam.slug}`}>
-                <Badge variant="secondary" className="text-sm px-4 py-2 hover:bg-orange-100 hover:text-orange-700 transition-colors cursor-pointer">
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800"
+                >
                   {exam.name}
                 </Badge>
               </Link>
             ))}
+            <Link href="/exams">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-slate-200 hover:border-orange-300 hover:bg-orange-50"
+              >
+                View All
+              </Button>
+            </Link>
           </div>
         </section>
       )}
-
-
     </div>
   )
 }

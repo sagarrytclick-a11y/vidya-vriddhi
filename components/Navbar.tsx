@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine, Bot, Sparkles } from 'lucide-react'
-import SearchOverlay from './SearchOverlay'
+import dynamic from 'next/dynamic'
+
+const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import { useVVSaarthi } from '@/contexts/vv-saarthi-context'
 import Link from 'next/link'
@@ -213,7 +215,9 @@ const Navbar = () => {
         </nav>
 
         {/* Search Overlay */}
-        <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        {isSearchOpen && (
+          <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        )}
 
         {/* Desktop Secondary Navigation */}
         <div className="hidden lg:block bg-white border-b border-gray-100">

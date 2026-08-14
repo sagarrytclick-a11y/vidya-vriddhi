@@ -15,24 +15,47 @@ const getIndiaCountryId = unstable_cache(
   { revalidate: 86400 }
 )
 
-// GET Indian colleges with pagination
+/** Lean list payload — only fields the colleges page needs */
+const collegeListSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  description: true,
+  establishment_year: true,
+  Countryranking: true,
+  logoURL: true,
+  imageURL: true,
+  city: {
+    select: { id: true, name: true, slug: true },
+  },
+  country: {
+    select: { id: true, name: true, slug: true, flagEmoji: true },
+  },
+  categories: {
+    select: { id: true, name: true, slug: true },
+    take: 3,
+  },
+  _count: {
+    select: { courses: true },
+  },
+} as const
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10')))
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1)
+    const limit = Math.min(24, Math.max(1, parseInt(searchParams.get('limit') || '12', 10) || 12))
     const skip = (page - 1) * limit
 
-    // Get filter parameters
-    const category = searchParams.get('category')?.trim()
-    const course = searchParams.get('course')?.trim()
-    const city = searchParams.get('city')?.trim()
-    const exam = searchParams.get('exam')?.trim()
-    const search = searchParams.get('search')?.trim()
+    const category = searchParams.get('category')?.trim() || ''
+    const course = searchParams.get('course')?.trim() || ''
+    const city = searchParams.get('city')?.trim() || ''
+    const exam = searchParams.get('exam')?.trim() || ''
+    const search = searchParams.get('search')?.trim() || ''
 
-    const cacheKey = `indian-colleges:${page}:${limit}:${category || ''}:${course || ''}:${city || ''}:${exam || ''}:${search || ''}`
+    const cacheKey = `indian-colleges:v4:${page}:${limit}:${category}:${course}:${city}:${exam}:${search}`
     const cached = get<{
-      colleges: any[]
+      colleges: unknown[]
       pagination: {
         page: number
         limit: number
@@ -46,14 +69,16 @@ export async function GET(request: NextRequest) {
     if (cached) {
       return NextResponse.json(cached, {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
-        }
+          'Cache-Control': search
+            ? 'public, s-maxage=60, stale-while-revalidate=120'
+            : 'public, s-maxage=300, stale-while-revalidate=900',
+          'X-Cache': 'HIT',
+        },
       })
     }
 
     const indiaId = await getIndiaCountryId()
 
-    // If India not found, return empty results
     if (!indiaId) {
       const emptyResponse = {
         colleges: [],
@@ -63,139 +88,69 @@ export async function GET(request: NextRequest) {
           total: 0,
           totalPages: 0,
           hasNext: false,
-          hasPrev: false
-        }
+          hasPrev: false,
+        },
       }
-
       set(cacheKey, emptyResponse)
-
-      return NextResponse.json(emptyResponse, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
-        }
-      })
+      return NextResponse.json(emptyResponse)
     }
 
-    // Build where clause
-    let whereClause: any = {
+    // Prefer indexed fields: countryId + active
+    const whereClause: Record<string, unknown> = {
       countryId: indiaId,
-      active: true
+      active: true,
     }
 
-    // Add search filter
     if (search) {
-      whereClause.name = {
-        contains: search,
-        mode: 'insensitive'
-      }
+      whereClause.name = { contains: search, mode: 'insensitive' }
     }
-
-    // Add category filter
     if (category) {
-      whereClause.categories = {
-        some: {
-          slug: category
-        }
-      }
+      whereClause.categories = { some: { slug: category } }
     }
-
-    // Add course filter
     if (course) {
-      whereClause.courses = {
-        some: {
-          slug: course
-        }
-      }
+      whereClause.courses = { some: { slug: course } }
     }
-
-    // Add city filter
     if (city) {
-      whereClause.city = {
-        slug: city
-      }
+      whereClause.city = { slug: city }
     }
-
-    // Add exam filter
     if (exam) {
-      whereClause.exams = {
-        some: {
-          slug: exam
-        }
-      }
+      whereClause.exams = { some: { slug: exam } }
     }
 
-    // Fetch Indian colleges with pagination and filters
+    // Avoid nulls: 'last' ranking sort — expensive on large tables
     const [colleges, totalCount] = await Promise.all([
       db.college.findMany({
         where: whereClause,
-        orderBy: [
-          { Countryranking: { sort: 'asc', nulls: 'last' } },
-          { createdAt: 'desc' }
-        ],
+        orderBy: [{ createdAt: 'desc' }],
         skip,
         take: limit,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          establishment_year: true,
-          Countryranking: true,
-          logoURL: true,
-          imageURL: true,
-          city: {
-            select: {
-              id: true,
-              name: true,
-              slug: true
-            }
-          },
-          country: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              flagEmoji: true
-            }
-          },
-          categories: {
-            select: {
-              id: true,
-              name: true,
-              slug: true
-            },
-            take: 3
-          },
-          _count: {
-            select: {
-              courses: true
-            }
-          }
-        }
+        select: collegeListSelect,
       }),
-      db.college.count({
-        where: whereClause
-      })
+      db.college.count({ where: whereClause }),
     ])
 
+    const totalPages = Math.ceil(totalCount / limit) || 0
     const response = {
       colleges,
       pagination: {
         page,
         limit,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit),
-        hasNext: page < Math.ceil(totalCount / limit),
-        hasPrev: page > 1
-      }
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     }
 
     set(cacheKey, response)
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
-      }
+        'Cache-Control': search
+          ? 'public, s-maxage=60, stale-while-revalidate=120'
+          : 'public, s-maxage=300, stale-while-revalidate=900',
+        'X-Cache': 'MISS',
+      },
     })
   } catch (error) {
     console.error('Error fetching Indian colleges:', error)

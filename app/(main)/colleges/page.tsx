@@ -1,34 +1,32 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, MapPin, Building2, GraduationCap, Award, BookOpen } from 'lucide-react'
+import { ChevronRight, MapPin, Building2, Award, BookOpen, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SearchInput } from '@/components/SearchInput'
 import { CollegeActionButtons } from '@/components/college/CollegeActionButtons'
-import CompareButton from '@/components/ui/compare-button'
 import { usePublicColleges } from '@/hooks/usePublicColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 
-function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newParams: Record<string, string | undefined>) {
+function buildFilterUrl(
+  baseUrl: string,
+  currentParams: URLSearchParams,
+  newParams: Record<string, string | undefined>
+) {
   const params = new URLSearchParams(currentParams)
 
-  // Add/update new params
   Object.entries(newParams).forEach(([key, value]) => {
-    if (value) {
-      params.set(key, value)
-    } else {
-      params.delete(key)
-    }
+    if (value) params.set(key, value)
+    else params.delete(key)
   })
 
-  // Remove page when filter changes
-  if (Object.keys(newParams).some(k => k !== 'page')) {
+  if (Object.keys(newParams).some((k) => k !== 'page')) {
     params.delete('page')
   }
 
@@ -36,91 +34,94 @@ function buildFilterUrl(baseUrl: string, currentParams: URLSearchParams, newPara
   return queryString ? `${baseUrl}?${queryString}` : baseUrl
 }
 
+function labelFromSlug(slug: string) {
+  return slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
+function ListSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="h-32 animate-pulse rounded-xl bg-gray-200" />
+      ))}
+    </div>
+  )
+}
+
 function CollegesPageContent() {
   const searchParams = useSearchParams()
-  const { colleges, pagination, isLoading, error } = usePublicColleges({
-    category: searchParams.get('category') || undefined,
-    course: searchParams.get('course') || undefined,
-    city: searchParams.get('city') || undefined,
-    exam: searchParams.get('exam') || undefined,
-    search: searchParams.get('search') || undefined,
-    page: searchParams.get('page') || undefined,
-  })
-  const { categories, courses: filterCourses, cities, exams, isLoading: filtersLoading } = useCollegesFilters()
+  const categoryParam = searchParams.get('category') || undefined
+  const courseParam = searchParams.get('course') || undefined
+  const cityParam = searchParams.get('city') || undefined
+  const examParam = searchParams.get('exam') || undefined
+  const searchParam = searchParams.get('search') || undefined
+  const pageParam = searchParams.get('page') || undefined
 
-  // Get active filter names for display
-  const activeFilters: { key: string; name: string; slug: string }[] = []
-  if (searchParams.get('category')) {
-    const cat = categories.find(c => c.slug === searchParams.get('category'))
-    if (cat) activeFilters.push({ key: 'category', name: cat.name, slug: cat.slug })
+  const { colleges, pagination, isLoading, isFetching, error } = usePublicColleges({
+    category: categoryParam,
+    course: courseParam,
+    city: cityParam,
+    exam: examParam,
+    search: searchParam,
+    page: pageParam,
+  })
+
+  const { categories, courses: filterCourses, cities, exams } = useCollegesFilters()
+
+  const activeFilters: { key: string; name: string }[] = []
+  if (categoryParam) {
+    activeFilters.push({
+      key: 'category',
+      name: categories.find((c) => c.slug === categoryParam)?.name || labelFromSlug(categoryParam),
+    })
   }
-  if (searchParams.get('course')) {
-    const course = filterCourses.find(c => c.slug === searchParams.get('course'))
-    if (course) activeFilters.push({ key: 'course', name: course.name, slug: course.slug })
+  if (courseParam) {
+    activeFilters.push({
+      key: 'course',
+      name: filterCourses.find((c) => c.slug === courseParam)?.name || labelFromSlug(courseParam),
+    })
   }
-  if (searchParams.get('city')) {
-    const city = cities.find(c => c.slug === searchParams.get('city'))
-    if (city) activeFilters.push({ key: 'city', name: city.name, slug: city.slug })
+  if (cityParam) {
+    activeFilters.push({
+      key: 'city',
+      name: cities.find((c) => c.slug === cityParam)?.name || labelFromSlug(cityParam),
+    })
   }
-  if (searchParams.get('exam')) {
-    const exam = exams.find(e => e.slug === searchParams.get('exam'))
-    if (exam) activeFilters.push({ key: 'exam', name: exam.name, slug: exam.slug })
+  if (examParam) {
+    activeFilters.push({
+      key: 'exam',
+      name: exams.find((e) => e.slug === examParam)?.name || labelFromSlug(examParam),
+    })
   }
-  if (searchParams.get('search')) {
-    activeFilters.push({ key: 'search', name: `"${searchParams.get('search')}"`, slug: searchParams.get('search') || '' })
+  if (searchParam) {
+    activeFilters.push({ key: 'search', name: `"${searchParam}"` })
   }
 
   const baseUrl = '/colleges'
-
-  // Show loading skeleton while data is loading
-  if (isLoading || filtersLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div className="flex gap-4">
-              <div className="w-72 h-96 bg-gray-200 rounded"></div>
-              <div className="flex-1 space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Colleges</h2>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    )
-  }
+  const showListSkeleton = isLoading && colleges.length === 0
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
-      <div className="bg-white border-b border-orange-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-y-1 text-[15px] font-medium">
-            <Link href="/" className="text-slate-700 hover:text-orange-600 transition-colors">
+      <div className="border-b border-orange-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-3.5 sm:px-6 lg:px-8">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex flex-wrap items-center gap-y-1 text-[15px] font-medium"
+          >
+            <Link href="/" className="text-slate-700 transition-colors hover:text-orange-600">
               Home
             </Link>
-            <ChevronRight className="w-4 h-4 mx-2 text-orange-400 shrink-0" />
-            <span className="text-orange-600 font-semibold">Colleges</span>
-            {searchParams.get('category') && (
+            <ChevronRight className="mx-2 h-4 w-4 shrink-0 text-orange-400" />
+            <span className="font-semibold text-orange-600">Colleges</span>
+            {categoryParam && (
               <>
-                <ChevronRight className="w-4 h-4 mx-2 text-orange-400 shrink-0" />
-                <span className="text-slate-900 font-semibold">
-                  {categories.find(c => c.slug === searchParams.get('category'))?.name}
+                <ChevronRight className="mx-2 h-4 w-4 shrink-0 text-orange-400" />
+                <span className="font-semibold text-slate-900">
+                  {categories.find((c) => c.slug === categoryParam)?.name ||
+                    labelFromSlug(categoryParam)}
                 </span>
               </>
             )}
@@ -128,90 +129,97 @@ function CollegesPageContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          {/* Search Input with Debounce */}
-          <div className="max-w-md w-full sm:w-auto">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full max-w-md sm:w-auto">
             <SearchInput placeholder="Search Indian colleges..." />
           </div>
-
-          <h1 className="text-2xl font-bold text-gray-900">
-            All Indian Colleges
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">All Indian Colleges</h1>
+            {isFetching && !showListSkeleton && (
+              <Loader2 className="h-4 w-4 animate-spin text-orange-500" aria-label="Updating results" />
+            )}
+          </div>
         </div>
 
-        {/* Active Filters */}
         {activeFilters.length > 0 && (
-          <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500">Active Filters:</span>
             {activeFilters.map((filter) => (
               <Link
                 key={filter.key}
                 href={buildFilterUrl(baseUrl, searchParams, { [filter.key]: '' })}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200"
+                className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm text-orange-700 hover:bg-orange-200"
               >
                 {filter.name}
                 <span className="text-orange-500">×</span>
               </Link>
             ))}
-            <Link
-              href={baseUrl}
-              className="text-sm text-blue-600 hover:text-blue-700 ml-2"
-            >
+            <Link href={baseUrl} className="ml-2 text-sm text-blue-600 hover:text-blue-700">
               Reset All
             </Link>
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar Filters */}
-          <aside className="w-full lg:w-72 shrink-0">
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <aside className="w-full shrink-0 lg:w-72">
             <Card className="sticky top-24">
               <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <h2 className="font-semibold text-gray-900">Filter By</h2>
                   <Link href={baseUrl} className="text-sm text-blue-600 hover:text-blue-700">
                     Reset All
                   </Link>
                 </div>
 
-                {/* Categories */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Streams</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {categories.map((category: any) => {
-                      const isActive = searchParams.get('category') === category.slug
-                      const count = colleges.filter((c: any) => c.categories?.some?.((cat: any) => cat.id === category.id)).length
-                      return (
-                        <Link
-                          key={category.id}
-                          href={buildFilterUrl(baseUrl, searchParams, { category: isActive ? '' : category.slug })}
-                          className={`flex items-center justify-between py-2 px-3 rounded text-[16px] font-semibold ${isActive ? 'bg-blue-50 text-blue-700' : 'text-black hover:bg-gray-50'
+                  <h3 className="mb-3 text-sm font-medium text-gray-700">Streams</h3>
+                  <div className="max-h-48 space-y-1 overflow-y-auto">
+                    {categories.length === 0 ? (
+                      <p className="px-3 py-2 text-sm text-gray-400">Loading…</p>
+                    ) : (
+                      categories.map((category) => {
+                        const isActive = categoryParam === category.slug
+                        return (
+                          <Link
+                            key={category.id}
+                            href={buildFilterUrl(baseUrl, searchParams, {
+                              category: isActive ? '' : category.slug,
+                            })}
+                            prefetch={false}
+                            className={`flex items-center justify-between rounded px-3 py-2 text-[15px] font-semibold ${
+                              isActive
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-black hover:bg-gray-50'
                             }`}
-                        >
-                          <span>{category.name}</span>
-                          {count > 0 && <span className="text-gray-500 text-sm font-medium">({count})</span>}
-                        </Link>
-                      )
-                    })}
+                          >
+                            <span>{category.name}</span>
+                          </Link>
+                        )
+                      })
+                    )}
                   </div>
                 </div>
 
                 <Separator className="my-4" />
 
-                {/* Courses */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Courses</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {filterCourses.slice(0, 10).map((course: any) => {
-                      const isActive = searchParams.get('course') === course.slug
+                  <h3 className="mb-3 text-sm font-medium text-gray-700">Courses</h3>
+                  <div className="max-h-48 space-y-1 overflow-y-auto">
+                    {filterCourses.slice(0, 12).map((course) => {
+                      const isActive = courseParam === course.slug
                       return (
                         <Link
                           key={course.id}
-                          href={buildFilterUrl(baseUrl, searchParams, { course: isActive ? '' : course.slug })}
-                          className={`flex items-center justify-between py-2 px-3 rounded text-[16px] font-semibold ${isActive ? 'bg-blue-50 text-blue-700' : 'text-black hover:bg-gray-50'
-                            }`}
+                          href={buildFilterUrl(baseUrl, searchParams, {
+                            course: isActive ? '' : course.slug,
+                          })}
+                          prefetch={false}
+                          className={`flex items-center justify-between rounded px-3 py-2 text-[15px] font-semibold ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'text-black hover:bg-gray-50'
+                          }`}
                         >
                           <span>{course.name}</span>
                         </Link>
@@ -222,18 +230,23 @@ function CollegesPageContent() {
 
                 <Separator className="my-4" />
 
-                {/* Cities */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Cities</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {cities.slice(0, 15).map((city: any) => {
-                      const isActive = searchParams.get('city') === city.slug
+                  <h3 className="mb-3 text-sm font-medium text-gray-700">Cities</h3>
+                  <div className="max-h-48 space-y-1 overflow-y-auto">
+                    {cities.slice(0, 15).map((city) => {
+                      const isActive = cityParam === city.slug
                       return (
                         <Link
                           key={city.id}
-                          href={buildFilterUrl(baseUrl, searchParams, { city: isActive ? '' : city.slug })}
-                          className={`flex items-center justify-between py-2 px-3 rounded text-[16px] font-semibold ${isActive ? 'bg-blue-50 text-blue-700' : 'text-black hover:bg-gray-50'
-                            }`}
+                          href={buildFilterUrl(baseUrl, searchParams, {
+                            city: isActive ? '' : city.slug,
+                          })}
+                          prefetch={false}
+                          className={`flex items-center justify-between rounded px-3 py-2 text-[15px] font-semibold ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'text-black hover:bg-gray-50'
+                          }`}
                         >
                           <span>{city.name}</span>
                         </Link>
@@ -244,18 +257,23 @@ function CollegesPageContent() {
 
                 <Separator className="my-4" />
 
-                {/* Exams */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Exams</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {exams.slice(0, 10).map((exam: any) => {
-                      const isActive = searchParams.get('exam') === exam.slug
+                  <h3 className="mb-3 text-sm font-medium text-gray-700">Exams</h3>
+                  <div className="max-h-48 space-y-1 overflow-y-auto">
+                    {exams.slice(0, 10).map((exam) => {
+                      const isActive = examParam === exam.slug
                       return (
                         <Link
                           key={exam.id}
-                          href={buildFilterUrl(baseUrl, searchParams, { exam: isActive ? '' : exam.slug })}
-                          className={`flex items-center justify-between py-2 px-3 rounded text-[16px] font-semibold ${isActive ? 'bg-blue-50 text-blue-700' : 'text-black hover:bg-gray-50'
-                            }`}
+                          href={buildFilterUrl(baseUrl, searchParams, {
+                            exam: isActive ? '' : exam.slug,
+                          })}
+                          prefetch={false}
+                          className={`flex items-center justify-between rounded px-3 py-2 text-[15px] font-semibold ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'text-black hover:bg-gray-50'
+                          }`}
                         >
                           <span>{exam.name}</span>
                         </Link>
@@ -267,115 +285,134 @@ function CollegesPageContent() {
             </Card>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1">
-            {colleges.length === 0 ? (
+          <main className="relative flex-1">
+            {error && colleges.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
-                  <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No colleges found</h3>
-                  <p className="text-gray-500">Try adjusting your filters or reset them to see all colleges.</p>
+                  <h3 className="mb-2 text-lg font-medium text-gray-900">
+                    Error loading colleges
+                  </h3>
+                  <p className="text-gray-500">{error}</p>
+                </CardContent>
+              </Card>
+            ) : showListSkeleton ? (
+              <ListSkeleton />
+            ) : colleges.length === 0 ? (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Building2 className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                  <h3 className="mb-2 text-lg font-medium text-gray-900">No colleges found</h3>
+                  <p className="text-gray-500">
+                    Try adjusting your filters or reset them to see all colleges.
+                  </p>
                   <Link href={baseUrl}>
-                    <Button variant="outline" className="mt-4">Reset Filters</Button>
+                    <Button variant="outline" className="mt-4">
+                      Reset Filters
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div
+                className={`space-y-4 transition-opacity ${isFetching ? 'opacity-60' : 'opacity-100'}`}
+              >
+                {pagination.total > 0 && (
+                  <p className="text-sm text-gray-500">
+                    Showing {colleges.length} of {pagination.total} colleges
+                  </p>
+                )}
+
                 {colleges.map((college) => (
-                  <Card key={college.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <Card
+                    key={college.id}
+                    className="overflow-hidden transition-shadow hover:shadow-md"
+                  >
                     <CardContent className="p-0">
-                      <Link href={`/colleges/${college.slug}`} className="flex flex-col md:flex-row">
-                        {/* Logo Section */}
-                        <div className="p-4 md:w-24 shrink-0">
-                          <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                            {college.logoURL ? (
-                              <Image
-                                src={college.logoURL}
-                                alt={college.name}
-                                width={64}
-                                height={64}
-                                className="w-full h-full object-contain"
-                              />
-                            ) : (
-                              <Building2 className="w-8 h-8 text-gray-400" />
-                            )}
+                      <div className="flex flex-col md:flex-row">
+                        <Link
+                          href={`/colleges/${college.slug}`}
+                          className="flex min-w-0 flex-1 flex-col md:flex-row"
+                        >
+                          <div className="shrink-0 p-4 md:w-24">
+                            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+                              {college.logoURL ? (
+                                <Image
+                                  src={college.logoURL}
+                                  alt={college.name}
+                                  width={64}
+                                  height={64}
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : (
+                                <Building2 className="h-8 w-8 text-gray-400" />
+                              )}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Content Section */}
-                        <div className="flex-1 p-4 pt-0 md:pt-4">
-                          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                            <div className="flex-1">
-                              <h3 className="text-[20px] font-semibold text-gray-900 mb-1 block group-hover:text-blue-600">
-                                {college.name}
-                              </h3>
-                              <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                          <div className="flex-1 p-4 pt-0 md:pt-4">
+                            <h3 className="mb-1 text-[20px] font-semibold text-gray-900 hover:text-blue-600">
+                              {college.name}
+                            </h3>
+                            <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                              {college.city?.name && (
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {college.city?.name}
+                                  <MapPin className="h-4 w-4" />
+                                  {college.city.name}
                                 </span>
-                                <span>•</span>
-                                <span>Private</span>
-                                {college.establishment_year && (
-                                  <>
-                                    <span>•</span>
-                                    <span>Est. {college.establishment_year}</span>
-                                  </>
-                                )}
-                              </div>
-
-                              {/* Categories */}
-                              <div className="flex flex-wrap gap-2 mb-3">
-                                {college.categories?.map((cat: any) => (
-                                  <Badge key={cat.id} variant="secondary" className="text-xs">
-                                    {cat.name}
-                                  </Badge>
-                                ))}
-                              </div>
-
-                              {/* Courses */}
-                              <div className="flex items-center gap-4 text-sm">
-                                <div className="flex items-center gap-1 text-gray-600">
-                                  <BookOpen className="w-4 h-4 text-orange-500" />
-                                  <span>{college._count.courses} Courses</span>
-                                </div>
-                                {college.Countryranking && (
-                                  <div className="flex items-center gap-1 text-gray-600">
-                                    <Award className="w-4 h-4 text-orange-500" />
-                                    <span>Rank #{college.Countryranking}</span>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Quick Links */}
-                              <div className="flex gap-4 mt-3 text-sm text-blue-600">
-                                <span>Admission</span>
-                                <span>•</span>
-                                <span>Courses</span>
-                                <span>•</span>
-                                <span>Scholarship</span>
-                              </div>
+                              )}
+                              {college.establishment_year && (
+                                <>
+                                  <span>•</span>
+                                  <span>Est. {college.establishment_year}</span>
+                                </>
+                              )}
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-2">
-                              <CollegeActionButtons collegeSlug={college.slug} college={college} />
+                            <div className="mb-3 flex flex-wrap gap-2">
+                              {college.categories?.map((cat) => (
+                                <Badge key={cat.id} variant="secondary" className="text-xs">
+                                  {cat.name}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center gap-4 text-sm">
+                              <div className="flex items-center gap-1 text-gray-600">
+                                <BookOpen className="h-4 w-4 text-orange-500" />
+                                <span>{college._count.courses} Courses</span>
+                              </div>
+                              {college.Countryranking && (
+                                <div className="flex items-center gap-1 text-gray-600">
+                                  <Award className="h-4 w-4 text-orange-500" />
+                                  <span>Rank #{college.Countryranking}</span>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        </div>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+                        </Link>
 
-                {/* Pagination */}
+                        <div
+                          className="flex shrink-0 gap-2 p-4 md:items-start"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <CollegeActionButtons
+                            collegeSlug={college.slug}
+                            college={college}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
                 {pagination.totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-6">
+                  <div className="mt-6 flex items-center justify-center gap-2">
                     {pagination.hasPrev && (
                       <Link
-                        href={buildFilterUrl(baseUrl, searchParams, { page: (pagination.page - 1).toString() })}
-                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+                        href={buildFilterUrl(baseUrl, searchParams, {
+                          page: (pagination.page - 1).toString(),
+                        })}
+                        className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
                       >
                         Previous
                       </Link>
@@ -385,8 +422,10 @@ function CollegesPageContent() {
                     </span>
                     {pagination.hasNext && (
                       <Link
-                        href={buildFilterUrl(baseUrl, searchParams, { page: (pagination.page + 1).toString() })}
-                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+                        href={buildFilterUrl(baseUrl, searchParams, {
+                          page: (pagination.page + 1).toString(),
+                        })}
+                        className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
                       >
                         Next
                       </Link>
@@ -404,24 +443,15 @@ function CollegesPageContent() {
 
 export default function CollegesPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div className="flex gap-4">
-              <div className="w-72 h-96 bg-gray-200 rounded"></div>
-              <div className="flex-1 space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
-                ))}
-              </div>
-            </div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <ListSkeleton />
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <CollegesPageContent />
     </Suspense>
   )

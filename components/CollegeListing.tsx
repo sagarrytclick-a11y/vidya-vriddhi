@@ -13,7 +13,7 @@ const CollegeListing: React.FC = () => {
   const colleges = collegesData?.colleges || []
 
   return (
-    <section className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <section className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -53,14 +53,21 @@ const CollegeListing: React.FC = () => {
                 className="group block bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-lg"
               >
                 {/* Campus Image */}
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image
-                    src={college.imageURL || 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop'} 
-                    alt="Campus"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
+                <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                  {college.imageURL ? (
+                    <Image
+                      src={college.imageURL}
+                      alt={college.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      quality={70}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                      <Building2 className="h-12 w-12 text-slate-400" />
+                    </div>
+                  )}
                   {college.Countryranking && (
                     <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <Award className="w-3 h-3" />
