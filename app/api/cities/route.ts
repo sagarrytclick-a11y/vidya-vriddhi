@@ -74,7 +74,11 @@ export async function GET(request: NextRequest) {
     ])
 
     return NextResponse.json(createPaginationResponse(cities, total, page, limit), {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+      headers: {
+        'Cache-Control': search
+          ? 'private, no-store'
+          : 'public, s-maxage=300, stale-while-revalidate=600',
+      },
     })
   } catch (error) {
     console.error('Error fetching cities:', error)

@@ -1,10 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, QueryFunctionContext } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { CityWithCountry, CreateCityData, UpdateCityData } from '@/types/domain'
 import { apiClient, ApiClientError } from '@/lib/api-client'
+import { ApiResponse, Pagination } from '@/types/api'
 
 // Re-export types for backward compatibility
 export type { CityWithCountry as City, CreateCityData, UpdateCityData }
+
+type CitiesListKey = readonly ['cities', 'list', number, number, string]
+type CitiesListResponse = ApiResponse<CityWithCountry>
+
+function emptyPagination(page: number, limit: number): Pagination {
+  return { page, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+}
 
 // Query keys for consistent cache management
 export const cityKeys = {
@@ -15,10 +23,17 @@ export const cityKeys = {
   detail: (id: string) => [...cityKeys.details(), id] as const,
 }
 
-async function fetchCities({ queryKey }: any): Promise<{ data: CityWithCountry[], pagination: any }> {
-  const [, , page = 1, limit = 10] = queryKey
+async function fetchCities({ queryKey }: QueryFunctionContext<CitiesListKey>): Promise<CitiesListResponse> {
+  const [, , page = 1, limit = 10, search = ''] = queryKey
   try {
-    return await apiClient.get<{ data: CityWithCountry[], pagination: any }>(`/api/cities?page=${page}&limit=${limit}`)
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    })
+    if (search.trim()) {
+      params.set('search', search.trim())
+    }
+    return await apiClient.get<CitiesListResponse>(`/api/cities?${params.toString()}`)
   } catch (error) {
     console.error('Error fetching cities:', error)
     if (error instanceof ApiClientError) {
@@ -76,12 +91,12 @@ async function deleteCity(id: string): Promise<void> {
   }
 }
 
-export function useAdminCities(page: number = 1, limit: number = 10) {
+export function useAdminCities(page: number = 1, limit: number = 10, search: string = '') {
   const queryClient = useQueryClient()
-  const listKey = [...cityKeys.lists(), page, limit] as const
+  const listKey = [...cityKeys.lists(), page, limit, search] as const
 
   const {
-    data: response = { data: [], pagination: { page, limit, total: 0, totalPages: 0 } },
+    data: response = { data: [], pagination: emptyPagination(page, limit) },
     isLoading,
     error,
     refetch,
@@ -104,7 +119,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
-      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+      queryClient.setQueryData(listKey, (old: CitiesListResponse | undefined) => {
         if (!old) return old
         return {
           ...old,
@@ -116,7 +131,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     },
     onSuccess: (newCity, _vars, context) => {
       toast.success('City created successfully')
-      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+      queryClient.setQueryData(listKey, (old: CitiesListResponse | undefined) => {
         if (!old) return old
         return {
           ...old,
@@ -139,7 +154,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: cityKeys.lists() })
       const previous = queryClient.getQueryData(listKey)
-      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+      queryClient.setQueryData(listKey, (old: CitiesListResponse | undefined) => {
         if (!old) return old
         return {
           ...old,
@@ -150,7 +165,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     },
     onSuccess: (updatedCity) => {
       toast.success('City updated successfully')
-      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+      queryClient.setQueryData(listKey, (old: CitiesListResponse | undefined) => {
         if (!old) return old
         return {
           ...old,
@@ -173,7 +188,7 @@ export function useAdminCities(page: number = 1, limit: number = 10) {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: cityKeys.lists() })
       const previous = queryClient.getQueryData(listKey)
-      queryClient.setQueryData(listKey, (old: { data: CityWithCountry[]; pagination: any } | undefined) => {
+      queryClient.setQueryData(listKey, (old: CitiesListResponse | undefined) => {
         if (!old) return old
         return {
           ...old,

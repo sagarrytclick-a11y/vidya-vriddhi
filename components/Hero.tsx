@@ -28,9 +28,15 @@ const slides = [
   },
 ]
 
+const TITLE_TYPE_MS = 55
+const SUBTITLE_TYPE_MS = 40
+
 const Hero = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [displayedTitle, setDisplayedTitle] = useState('')
+  const [displayedSubtitle, setDisplayedSubtitle] = useState('')
+  const [isTyping, setIsTyping] = useState(true)
   const { openModal } = useAdmissionModal()
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -42,9 +48,42 @@ const Hero = () => {
   ]
 
   useEffect(() => {
+    const fullTitle = slides[currentSlide].title
+    const fullSubtitle = slides[currentSlide].subtitle
+    let titleIndex = 0
+    let subtitleIndex = 0
+    let subtitleInterval: ReturnType<typeof setInterval> | null = null
+
+    setDisplayedTitle('')
+    setDisplayedSubtitle('')
+    setIsTyping(true)
+
+    const titleInterval = setInterval(() => {
+      titleIndex += 1
+      setDisplayedTitle(fullTitle.slice(0, titleIndex))
+      if (titleIndex < fullTitle.length) return
+
+      clearInterval(titleInterval)
+      subtitleInterval = setInterval(() => {
+        subtitleIndex += 1
+        setDisplayedSubtitle(fullSubtitle.slice(0, subtitleIndex))
+        if (subtitleIndex >= fullSubtitle.length) {
+          if (subtitleInterval) clearInterval(subtitleInterval)
+          setIsTyping(false)
+        }
+      }, SUBTITLE_TYPE_MS)
+    }, TITLE_TYPE_MS)
+
+    return () => {
+      clearInterval(titleInterval)
+      if (subtitleInterval) clearInterval(subtitleInterval)
+    }
+  }, [currentSlide])
+
+  useEffect(() => {
     intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 7000)
+    }, 6500)
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
@@ -98,12 +137,13 @@ const Hero = () => {
       </button>
 
       <div className="relative z-10 w-full max-w-5xl px-6 text-center text-white">
-        <h1 className="mb-2 text-2xl font-bold drop-shadow-lg sm:mb-3 sm:text-3xl md:text-5xl">
-          {active.title}
+        <h1 className="mb-2 min-h-[2.5rem] text-2xl font-bold drop-shadow-lg sm:mb-3 sm:min-h-[3.5rem] sm:text-3xl md:min-h-[4rem] md:text-5xl">
+          {displayedTitle}
+          {isTyping && <span className="animate-pulse text-[#F27121]">|</span>}
         </h1>
 
-        <p className="mb-4 text-sm text-gray-100 sm:mb-8 sm:text-base md:text-xl">
-          {active.subtitle}
+        <p className="mb-4 min-h-[1.25rem] text-sm text-gray-100 sm:mb-8 sm:min-h-[1.75rem] sm:text-base md:text-xl">
+          {displayedSubtitle}
         </p>
 
         <div className="mb-4 flex flex-wrap justify-center gap-2 sm:mb-8 sm:gap-3 md:gap-4">

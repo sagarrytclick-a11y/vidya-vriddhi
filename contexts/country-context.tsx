@@ -1,12 +1,15 @@
 'use client'
 
-import { createContext, useContext, ReactNode, useState } from 'react'
+import { createContext, useContext, ReactNode, useMemo, useState } from 'react'
 import { useAdminCountries } from '@/hooks/useAdminCountries'
 import { Country, CreateCountryData, UpdateCountryData } from '@/hooks/useAdminCountries'
 
 interface CountryContextType {
   // Data
   countries: Country[]
+  allCountriesCount: number
+  search: string
+  setSearch: (search: string) => void
   isLoading: boolean
   error: Error | null
 
@@ -62,6 +65,16 @@ export function CountryProvider({ children }: CountryProviderProps) {
     isDeleting,
   } = useAdminCountries()
 
+  const [search, setSearch] = useState('')
+  const filteredCountries = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return countries
+    return countries.filter((country) => {
+      const hay = `${country.name} ${country.slug} ${country.description || ''}`.toLowerCase()
+      return hay.includes(q)
+    })
+  }, [countries, search])
+
   // Modal state
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
@@ -110,7 +123,10 @@ export function CountryProvider({ children }: CountryProviderProps) {
 
   const value: CountryContextType = {
     // Data
-    countries,
+    countries: filteredCountries,
+    allCountriesCount: countries.length,
+    search,
+    setSearch,
     isLoading,
     error,
 

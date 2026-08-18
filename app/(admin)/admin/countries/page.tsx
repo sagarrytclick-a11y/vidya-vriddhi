@@ -48,6 +48,9 @@ export default function CountriesPage() {
     closeDeleteModal,
     openAddModal,
     closeAddModal,
+    search,
+    setSearch,
+    allCountriesCount,
   } = useCountryContext()
 
   if (isLoading) {
@@ -97,7 +100,7 @@ export default function CountriesPage() {
       <div className={adminPagePadClass}>
         <AdminPageHeader
           title="All Countries"
-          subtitle={`${countries.length} countries`}
+          subtitle={`${allCountriesCount} countries`}
           action={
             <Button onClick={openAddModal} className={adminPageActionClass}>
               <Plus className="mr-2 h-4 w-4" />
@@ -107,16 +110,26 @@ export default function CountriesPage() {
         />
 
         <AdminSearch
-          value=""
-          onChange={() => {}}
+          value={search}
+          onChange={setSearch}
           placeholder="Search countries..."
         />
 
         <Card className={adminCardClass}>
           <CardHeader>
-            <CardTitle className={adminCardTitleClass}>All Countries ({countries.length})</CardTitle>
+            <CardTitle className={adminCardTitleClass}>
+              All Countries ({countries.length}
+              {search.trim() ? ` of ${allCountriesCount}` : ''})
+            </CardTitle>
           </CardHeader>
           <CardContent>
+            {countries.length === 0 ? (
+              <div className="py-8 text-center text-gray-400">
+                {search.trim()
+                  ? 'No countries found matching your search.'
+                  : 'No countries found. Create your first country!'}
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -167,6 +180,7 @@ export default function CountriesPage() {
                 </tbody>
               </table>
             </div>
+            )}
           </CardContent>
         </Card>
       </div>
