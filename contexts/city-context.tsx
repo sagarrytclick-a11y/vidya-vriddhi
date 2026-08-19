@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, ReactNode, useState } from 'react'
+import { createContext, useContext, ReactNode, useEffect, useState } from 'react'
 import { useAdminCities } from '@/hooks/useAdminCities'
 import { CityWithCountry as City, CreateCityData, UpdateCityData } from '@/types/domain'
 
@@ -19,6 +19,8 @@ interface CityContextType {
   // Pagination actions
   setPage: (page: number) => void
   setLimit: (limit: number) => void
+  setSearch: (search: string) => void
+  search: string
   limit: number
   page: number
 
@@ -64,6 +66,13 @@ interface CityProviderProps {
 export function CityProvider({ children }: CityProviderProps) {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearch(search), 300)
+    return () => clearTimeout(timeout)
+  }, [search])
 
   const {
     cities,
@@ -76,7 +85,7 @@ export function CityProvider({ children }: CityProviderProps) {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useAdminCities(page, limit)
+  } = useAdminCities(page, limit, debouncedSearch)
 
   // Modal state
   const [selectedCity, setSelectedCity] = useState<City | null>(null)
@@ -134,6 +143,8 @@ export function CityProvider({ children }: CityProviderProps) {
     // Pagination actions
     setPage,
     setLimit,
+    setSearch,
+    search,
     limit,
     page,
 

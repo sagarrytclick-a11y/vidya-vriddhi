@@ -46,9 +46,11 @@ export default function CitiesPage() {
     closeAddModal,
     setPage,
     setLimit,
+    setSearch,
+    search,
   } = useCityContext()
 
-  if (isLoading) {
+  if (isLoading && cities.length === 0 && !search) {
     return (
       <AdminLayout>
         <AdminPageSkeleton rows={6} columns={6} />
@@ -99,8 +101,11 @@ export default function CitiesPage() {
         />
 
         <AdminSearch
-          value=""
-          onChange={() => {}}
+          value={search}
+          onChange={(value) => {
+            setSearch(value)
+            setPage(1)
+          }}
           placeholder="Search cities..."
         />
 
@@ -111,6 +116,13 @@ export default function CitiesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {cities.length === 0 ? (
+              <div className="py-8 text-center text-gray-400">
+                {search.trim()
+                  ? 'No cities found matching your search.'
+                  : 'No cities found. Create your first city!'}
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -164,6 +176,7 @@ export default function CitiesPage() {
                 </tbody>
               </table>
             </div>
+            )}
           </CardContent>
         </Card>
 
