@@ -2,37 +2,21 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ArrowUp, ArrowDown, Calendar, DollarSign, Info, ChevronLeft, ChevronRight, Building, ExternalLink, Search, X } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  ExternalLink,
+  Search,
+  X,
+  MapPin,
+  BookOpen,
+  ArrowRight,
+} from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
 import { useCollegesFilters } from '@/hooks/useCollegesFilters'
 import { TableSkeleton } from '@/components/ui/skeletons'
 import Link from 'next/link'
-
-interface College {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  establishment_year: number | null
-  Countryranking: string | null
-  Internationalranking: string | null
-  logoURL: string | null
-  imageURL: string | null
-  city: {
-    name: string
-    slug: string
-  }
-  country: {
-    name: string
-    flagEmoji: string | null
-  }
-  courses: {
-    name: string
-  }[]
-  _count: {
-    courses: number
-  }
-}
 
 const TopColleges: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -43,10 +27,8 @@ const TopColleges: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState('')
   const itemsPerPage = 10
 
-  // Fetch filter options
-  const { categories, courses, cities, isLoading: filtersLoading } = useCollegesFilters()
+  const { categories, courses, cities } = useCollegesFilters()
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput)
@@ -54,13 +36,18 @@ const TopColleges: React.FC = () => {
     return () => clearTimeout(timer)
   }, [searchInput])
 
-  // Reset to page 1 when any filter changes
   useEffect(() => {
     setCurrentPage(1)
   }, [debouncedSearch, selectedCategory, selectedCourse, selectedCity])
 
-  // Fetch Indian colleges using custom hook
-  const { data, isLoading, error } = useIndianColleges(currentPage, itemsPerPage, debouncedSearch || undefined, selectedCategory || undefined, selectedCourse || undefined, selectedCity || undefined)
+  const { data, isLoading, error } = useIndianColleges(
+    currentPage,
+    itemsPerPage,
+    debouncedSearch || undefined,
+    selectedCategory || undefined,
+    selectedCourse || undefined,
+    selectedCity || undefined
+  )
 
   const colleges = data?.colleges || []
   const pagination = data?.pagination
@@ -81,207 +68,258 @@ const TopColleges: React.FC = () => {
 
   const hasActiveFilters = debouncedSearch || selectedCategory || selectedCourse || selectedCity
 
-
   return (
-    <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="bg-white px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Top Indian Colleges</h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">Ranked by national performance</p>
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Top Indian Colleges</h2>
+            <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+              Ranked by national performance
+            </p>
           </div>
-          <Link href="/colleges" className="flex items-center space-x-1 sm:space-x-2 text-orange-500 hover:text-orange-600 font-medium text-xs sm:text-sm">
+          <Link
+            href="/colleges"
+            className="flex items-center gap-1 text-xs font-medium text-orange-500 hover:text-orange-600 sm:gap-2 sm:text-sm"
+          >
             <span>Explore all colleges</span>
-            <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
           </Link>
         </div>
 
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+          <div className="relative max-w-md flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search colleges..."
-              className="w-full pl-10 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-8 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
             {searchInput && (
-              <button onClick={clearSearch} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
               </button>
             )}
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.slug}>{cat.name}</option>
+              <option key={cat.id} value={cat.slug}>
+                {cat.name}
+              </option>
             ))}
           </select>
           <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             <option value="">All Courses</option>
             {courses.map((c) => (
-              <option key={c.id} value={c.slug}>{c.name}</option>
+              <option key={c.id} value={c.slug}>
+                {c.name}
+              </option>
             ))}
           </select>
           <select
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             <option value="">All Cities</option>
             {cities.map((c) => (
-              <option key={c.id} value={c.slug}>{c.name}</option>
+              <option key={c.id} value={c.slug}>
+                {c.name}
+              </option>
             ))}
           </select>
           {hasActiveFilters && (
             <button
+              type="button"
               onClick={clearFilters}
-              className="px-3 py-2 text-sm text-red-500 hover:text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors whitespace-nowrap"
+              className="whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-sm text-red-500 transition-colors hover:bg-red-50 hover:text-red-600"
             >
               Clear All
             </button>
           )}
         </div>
 
-        {/* Loading State */}
         {isLoading && (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <TableSkeleton rows={6} columns={6} />
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <TableSkeleton rows={6} columns={7} />
           </div>
         )}
 
-        {/* Error State */}
         {error && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
-            <Building className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-            <p className="text-gray-700 font-medium">Unable to load colleges</p>
-            <p className="text-gray-500 text-sm mt-1">Please try again later</p>
+          <div className="rounded-xl border border-orange-200 bg-orange-50 p-8 text-center">
+            <Building2 className="mx-auto mb-4 h-12 w-12 text-orange-500" />
+            <p className="font-medium text-gray-700">Unable to load colleges</p>
+            <p className="mt-1 text-sm text-gray-500">Please try again later</p>
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && !error && colleges.length === 0 && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <Building className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-700 font-medium">No Indian colleges found</p>
-            <p className="text-gray-500 text-sm mt-1">Colleges will appear here once added to the database</p>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-8 text-center">
+            <Building2 className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+            <p className="font-medium text-gray-700">No Indian colleges found</p>
+            <p className="mt-1 text-sm text-gray-500">
+              {hasActiveFilters
+                ? 'Try clearing filters or searching a different name'
+                : 'Colleges will appear here once added to the database'}
+            </p>
           </div>
         )}
 
-        {/* Colleges Table */}
         {!isLoading && !error && colleges.length > 0 && (
           <>
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                <table className="w-full min-w-[640px]">
+                  <thead className="border-b border-gray-200 bg-gray-50">
                     <tr>
-                      <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
                         Rank
                       </th>
-                      <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        College Name
+                      <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
+                        College
                       </th>
-                      <th className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
-                      <th className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="hidden px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 md:table-cell sm:px-4 sm:py-4 sm:text-xs">
                         Courses
                       </th>
-                      <th className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="hidden px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 lg:table-cell sm:px-4 sm:py-4 sm:text-xs">
                         Established
                       </th>
-                      <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
                         National Rank
+                      </th>
+                      <th className="px-3 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
+                        Action
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {colleges.map((college, index) => (
-                      <tr key={college.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <span className="text-base sm:text-lg font-bold text-orange-600">
-                            #{(currentPage - 1) * itemsPerPage + index + 1}
-                          </span>
-                        </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap max-w-[120px] sm:max-w-none">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            {college.logoURL && (
-                              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 overflow-hidden">
-                                <Image
-                                  src={college.logoURL}
-                                  alt={college.name}
-                                  fill
-                                  className="object-contain"
-                                  sizes="40px"
-                                />
+                  <tbody className="divide-y divide-gray-100 bg-white">
+                    {colleges.map((college, index) => {
+                      const displayRank = (currentPage - 1) * itemsPerPage + index + 1
+                      const courseCount = college._count?.courses || 0
+
+                      return (
+                        <tr
+                          key={college.id}
+                          className="transition-colors hover:bg-orange-50/40"
+                        >
+                          <td className="px-3 py-3 whitespace-nowrap sm:px-4 sm:py-4">
+                            <span className="text-base font-bold text-orange-600 sm:text-lg">
+                              #{displayRank}
+                            </span>
+                          </td>
+
+                          <td className="px-3 py-3 sm:px-4 sm:py-4">
+                            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50 sm:h-11 sm:w-11">
+                                {college.logoURL ? (
+                                  <Image
+                                    src={college.logoURL}
+                                    alt={college.name}
+                                    fill
+                                    className="object-contain p-1"
+                                    sizes="44px"
+                                  />
+                                ) : (
+                                  <Building2 className="h-5 w-5 text-gray-400" />
+                                )}
                               </div>
+                              <div className="min-w-0">
+                                <Link
+                                  href={`/colleges/${college.slug}`}
+                                  className="line-clamp-2 text-[12px] font-semibold text-gray-900 hover:text-orange-600 sm:text-sm"
+                                >
+                                  {college.name}
+                                </Link>
+                                <div className="mt-1 flex items-center gap-1 text-[11px] text-gray-500 sm:text-xs">
+                                  <MapPin className="h-3 w-3 shrink-0 text-orange-500" />
+                                  <span className="truncate">
+                                    {college.city?.name || 'India'}
+                                    {college.country?.flagEmoji
+                                      ? ` ${college.country.flagEmoji}`
+                                      : ''}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="hidden px-3 py-3 md:table-cell sm:px-4 sm:py-4">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-800 sm:text-sm">
+                              <BookOpen className="h-3.5 w-3.5 text-orange-500" />
+                              <span>
+                                {courseCount} {courseCount === 1 ? 'course' : 'courses'}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="hidden px-3 py-3 lg:table-cell sm:px-4 sm:py-4">
+                            <span className="text-xs font-medium text-gray-700 sm:text-sm">
+                              {college.establishment_year
+                                ? `Est. ${college.establishment_year}`
+                                : '—'}
+                            </span>
+                          </td>
+
+                          <td className="px-3 py-3 sm:px-4 sm:py-4">
+                            {college.Countryranking ? (
+                              <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700 sm:px-3 sm:py-1 sm:text-xs">
+                                #{college.Countryranking}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">N/A</span>
                             )}
+                          </td>
+
+                          <td className="px-3 py-3 text-right sm:px-4 sm:py-4">
                             <Link
                               href={`/colleges/${college.slug}`}
-                              className="text-[11px] sm:text-sm font-semibold text-black hover:text-orange-500 cursor-pointer line-clamp-2"
+                              className="inline-flex items-center gap-1 rounded-lg bg-[#F27121] px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#E05A1B] sm:px-3 sm:text-xs"
                             >
-                              {college.name}
+                              View
+                              <ArrowRight className="h-3 w-3" />
                             </Link>
-                          </div>
-                        </td>
-                        <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <div className="text-xs sm:text-sm font-semibold text-black">
-                            {college.city.name}, {college.country.flagEmoji}
-                          </div>
-                        </td>
-                        <td className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <div className="text-xs sm:text-sm font-semibold text-black">
-                            {college._count.courses} courses
-                          </div>
-                        </td>
-                        <td className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <div className="text-xs sm:text-sm font-semibold text-black">
-                            {college.establishment_year || 'N/A'}
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          {college.Countryranking ? (
-                            <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-50 text-green-700 text-[10px] sm:text-xs font-semibold rounded-full">
-                              #{college.Countryranking}
-                            </span>
-                          ) : (
-                            <span className="text-xs sm:text-sm text-gray-400">N/A</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* Pagination */}
             {pagination && pagination.totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-3 sm:gap-0">
-                <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-                  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, pagination.total)} of {pagination.total} colleges
+              <div className="mt-6 flex flex-col items-center justify-between gap-3 sm:flex-row sm:gap-0">
+                <div className="text-center text-xs text-gray-600 sm:text-left sm:text-sm">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                  {Math.min(currentPage * itemsPerPage, pagination.total)} of{' '}
+                  {pagination.total} colleges
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={!pagination.hasPrev}
-                    className="flex items-center gap-1 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-2 sm:text-sm"
                   >
-                    <ChevronLeft size={14} className="sm:w-4 sm:h-4" />
+                    <ChevronLeft size={14} className="sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline">Previous</span>
                   </button>
-                  
+
                   <div className="flex items-center gap-1">
                     {Array.from({ length: Math.min(3, pagination.totalPages) }, (_, i) => {
                       let pageNum
@@ -294,12 +332,13 @@ const TopColleges: React.FC = () => {
                       } else {
                         pageNum = currentPage - 1 + i
                       }
-                      
+
                       return (
                         <button
+                          type="button"
                           key={pageNum}
                           onClick={() => setCurrentPage(pageNum)}
-                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                          className={`h-8 w-8 rounded-lg text-xs font-medium transition-colors sm:h-10 sm:w-10 sm:text-sm ${
                             currentPage === pageNum
                               ? 'bg-orange-500 text-white'
                               : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -310,14 +349,17 @@ const TopColleges: React.FC = () => {
                       )
                     })}
                   </div>
-                  
+
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                    type="button"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(pagination.totalPages, prev + 1))
+                    }
                     disabled={!pagination.hasNext}
-                    className="flex items-center gap-1 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-2 sm:text-sm"
                   >
                     <span className="hidden sm:inline">Next</span>
-                    <ChevronRight size={14} className="sm:w-4 sm:h-4" />
+                    <ChevronRight size={14} className="sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
