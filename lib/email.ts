@@ -158,3 +158,80 @@ export async function sendEnquiryEmail(data: {
     return { success: false, error: 'Failed to send email' }
   }
 }
+
+export async function sendServiceEnquiryEmail(data: {
+  name: string
+  email: string
+  phone: string
+  message: string
+}) {
+  try {
+    const resend = getResend()
+    if (!resend) {
+      console.warn('RESEND_API_KEY is not set; skipping service enquiry email')
+      return { success: false, error: 'Email is not configured' }
+    }
+
+    const name = escapeHtml(data.name)
+    const email = escapeHtml(data.email)
+    const phone = escapeHtml(data.phone)
+    const message = escapeHtml(data.message).replace(/\n/g, '<br>')
+    const mailto = escapeHtmlAttr(data.email)
+    const safeSubjectName = data.name.replace(/[\r\n]/g, ' ').slice(0, 100)
+
+    const { error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'noreply@vidyavriddhi.com',
+      to: [process.env.ADMIN_EMAIL || 'admin@vidyavriddhi.com'],
+      replyTo: data.email,
+      subject: `New Service Enquiry from ${safeSubjectName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Service Enquiry</title>
+        </head>
+        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+          <div style="background-color: #ffffff; padding: 30px; border-radius: 10px;">
+            <div style="background: linear-gradient(135deg, #F27121, #E05A1B); color: white; padding: 20px; border-radius: 10px 10px 0 0; margin: -30px -30px 20px -30px; text-align: center;">
+              <h1 style="margin: 0; font-size: 22px;">New Service Enquiry</h1>
+              <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">Website / Leads / Social Media</p>
+            </div>
+            <p style="margin-bottom: 20px;">Someone requested a callback from the Services page.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; width: 110px; color: #555;">Name</td>
+                <td style="padding: 8px 0;">${name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #555;">Email</td>
+                <td style="padding: 8px 0;"><a href="mailto:${mailto}">${email}</a></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #555;">Phone</td>
+                <td style="padding: 8px 0;">${phone}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #555; vertical-align: top;">Message</td>
+                <td style="padding: 8px 0;">${message}</td>
+              </tr>
+            </table>
+            <p style="font-size: 13px; color: #777; margin: 0;">This enquiry was emailed directly and is not saved in admin.</p>
+          </div>
+        </body>
+        </html>
+      `,
+    })
+
+    if (error) {
+      console.error('Resend service enquiry error:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to send service enquiry email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}

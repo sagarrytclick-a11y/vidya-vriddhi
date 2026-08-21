@@ -10,8 +10,6 @@ interface College {
   Internationalranking: string | null
   logoURL: string | null
   imageURL: string | null
-  createdAt: string
-  updatedAt: string
   city: {
     id: string
     name: string
@@ -23,15 +21,17 @@ interface College {
     slug: string
     flagEmoji: string | null
   }
-  courses: {
+  categories: {
     id: string
     name: string
     slug: string
   }[]
+  courses: {
+    id: string
+    name: string
+  }[]
   _count: {
-    categories: number
     courses: number
-    exams: number
   }
 }
 
