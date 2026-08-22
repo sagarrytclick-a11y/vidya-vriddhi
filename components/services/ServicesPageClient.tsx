@@ -56,7 +56,7 @@ const partners = [
   },
   {
     name: 'Himalayan Education',
-    url: 'http://himalyaneducation.com/',
+    url: 'https://www.himalyaneducation.com/',
     image: 'https://ik.imagekit.io/neyanvn5i/cms-uploads/upload-469680e4-c72f-47d2-9c07-2923849f5be2.png',
   },
   {
