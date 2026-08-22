@@ -217,7 +217,7 @@ export async function sendServiceEnquiryEmail(data: {
                 <td style="padding: 8px 0;">${message}</td>
               </tr>
             </table>
-            <p style="font-size: 13px; color: #777; margin: 0;">This enquiry was emailed directly and is not saved in admin.</p>
+            <p style="font-size: 13px; color: #777; margin: 0;">Also saved in Admin → Service Leads.</p>
           </div>
         </body>
         </html>

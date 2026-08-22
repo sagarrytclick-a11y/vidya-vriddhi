@@ -429,8 +429,8 @@ export default function ServicesPageClient() {
               Ready to grow your education consultancy?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-white/75 sm:text-base">
-              Share your name, email, number and message — we reply by email. Nothing is saved in
-              admin.
+              Share your name, email, number and message — we&apos;ll email you back and save it for
+              our team.
             </p>
             <button
               type="button"

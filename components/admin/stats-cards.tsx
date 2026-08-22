@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Library,
   Newspaper,
+  Laptop,
   TrendingDown,
   TrendingUp,
   Minus,
@@ -24,6 +25,7 @@ import { useAdminExams } from '@/hooks/useAdminExams'
 import { useBlogContext } from '@/contexts/blog-context'
 import { useAdminNews } from '@/hooks/useAdminNews'
 import { useEnquiryStats } from '@/hooks/useEnquiries'
+import { useServiceLeadStats } from '@/hooks/useServiceLeads'
 import { useRouter } from 'next/navigation'
 
 interface StatCard {
@@ -56,6 +58,7 @@ export function StatsCards() {
   const { total: blogTotal, loading: blogsLoading } = useBlogContext()
   const { total: newsTotal, isLoading: newsLoading } = useAdminNews()
   const { stats, isLoading: enquiriesLoading } = useEnquiryStats()
+  const { stats: serviceStats, isLoading: serviceLeadsLoading } = useServiceLeadStats()
 
   const statsData: StatCard[] = [
     {
@@ -166,6 +169,42 @@ export function StatsCards() {
       href: '/admin/enquiries?status=FOLLOW_UP',
       trend: 'flat',
     },
+    {
+      title: 'Service Leads',
+      value: serviceStats.total,
+      description: 'Website / marketing',
+      icon: Laptop,
+      accent: 'coral',
+      href: '/admin/service-leads',
+      trend: 'up',
+    },
+    {
+      title: 'Svc Pending',
+      value: serviceStats.pending,
+      description: 'Service awaiting',
+      icon: Laptop,
+      accent: 'rose',
+      href: '/admin/service-leads?status=PENDING',
+      trend: 'down',
+    },
+    {
+      title: 'Svc Resolved',
+      value: serviceStats.resolved,
+      description: 'Service completed',
+      icon: Laptop,
+      accent: 'emerald',
+      href: '/admin/service-leads?status=RESOLVED',
+      trend: 'up',
+    },
+    {
+      title: 'Svc Follow Up',
+      value: serviceStats.followUp,
+      description: 'Service follow-up',
+      icon: Laptop,
+      accent: 'amber',
+      href: '/admin/service-leads?status=FOLLOW_UP',
+      trend: 'flat',
+    },
   ]
 
   const isLoading =
@@ -177,7 +216,8 @@ export function StatsCards() {
     examsLoading ||
     blogsLoading ||
     newsLoading ||
-    enquiriesLoading
+    enquiriesLoading ||
+    serviceLeadsLoading
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

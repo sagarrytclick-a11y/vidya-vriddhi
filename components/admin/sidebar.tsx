@@ -15,6 +15,7 @@ import {
   Newspaper,
   Briefcase,
   Users,
+  Laptop,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useEnquiryStats } from '@/hooks/useEnquiries'
@@ -37,6 +38,7 @@ const contentItems = [
 
 const accountItems = [
   { href: '/admin/enquiries', label: 'Enquiries', icon: MessageSquare },
+  { href: '/admin/service-leads', label: 'Service Leads', icon: Laptop },
   { href: '/admin/job-applications', label: 'Job Applications', icon: Briefcase },
 ]
 

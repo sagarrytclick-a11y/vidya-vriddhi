@@ -130,6 +130,24 @@ model Enquiry {
   @@index([city])
 }
 
+/// Leads from /services popup (website / social / leads enquiry)
+model ServiceEnquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  message   String
+  status    EnquiryStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+  @@index([name])
+  @@index([phone])
+}
+
 model CareerApplication {
   id           String   @id @default(cuid())
   name         String
