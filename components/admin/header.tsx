@@ -46,6 +46,7 @@ const pageTitles: Record<string, { title: string; subtitle?: string }> = {
   '/admin/courses': { title: 'Courses', subtitle: 'Available programs' },
   '/admin/news': { title: 'News', subtitle: 'Latest updates' },
   '/admin/enquiries': { title: 'Enquiries', subtitle: 'Student inquiries' },
+  '/admin/service-leads': { title: 'Service Leads', subtitle: 'Website & marketing enquiries' },
   '/admin/job-applications': { title: 'Job Applications', subtitle: 'Career applications' },
   '/admin/staff': { title: 'Staff accounts', subtitle: 'Create and manage admin logins' },
 }
@@ -61,6 +62,10 @@ const searchTargets = [
   { label: 'Countries', href: '/admin/countries', keywords: 'destination abroad', icon: Globe },
   { label: 'Cities', href: '/admin/cities', keywords: 'location', icon: Building },
   { label: 'Enquiries', href: '/admin/enquiries', keywords: 'leads contacts students', icon: MessageSquare },
+  { label: 'Service Leads', href: '/admin/service-leads', keywords: 'website social media marketing consultancy leads', icon: MessageSquare },
+  { label: 'Pending Service Leads', href: '/admin/service-leads?status=PENDING', keywords: 'service pending', icon: MessageSquare },
+  { label: 'Follow Up Service Leads', href: '/admin/service-leads?status=FOLLOW_UP', keywords: 'service followup', icon: MessageSquare },
+  { label: 'Resolved Service Leads', href: '/admin/service-leads?status=RESOLVED', keywords: 'service resolved fulfilled', icon: MessageSquare },
   { label: 'Pending Enquiries', href: '/admin/enquiries?status=PENDING', keywords: 'pending awaiting', icon: MessageSquare },
   { label: 'Follow Up Enquiries', href: '/admin/enquiries?status=FOLLOW_UP', keywords: 'followup follow-up', icon: MessageSquare },
   { label: 'Resolved Enquiries', href: '/admin/enquiries?status=RESOLVED', keywords: 'done completed', icon: MessageSquare },
@@ -100,7 +105,12 @@ export function Header() {
 
   const results = useMemo(() => {
     const allowed = searchTargets.filter((item) => {
-      if (!canViewLeads && (item.href.startsWith('/admin/enquiries') || item.href.startsWith('/admin/job-applications'))) {
+      if (
+        !canViewLeads &&
+        (item.href.startsWith('/admin/enquiries') ||
+          item.href.startsWith('/admin/service-leads') ||
+          item.href.startsWith('/admin/job-applications'))
+      ) {
         return false
       }
       if (role !== 'superadmin' && item.href.startsWith('/admin/staff')) return false
