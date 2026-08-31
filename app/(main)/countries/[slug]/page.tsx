@@ -90,9 +90,11 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
     description:
       country.description?.slice(0, 160) ||
       `Explore educational opportunities in ${country.name}. Find top colleges, courses, and admission guidance.`,
+    alternates: { canonical: `/countries/${slug}` },
     openGraph: {
-      title: `Study in ${country.name} - VidyaVriddhi`,
+      title: `Study in ${country.name}`,
       description: country.description?.slice(0, 160),
+      url: `/countries/${slug}`,
     },
   }
 }

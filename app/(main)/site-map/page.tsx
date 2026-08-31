@@ -21,8 +21,9 @@ import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export const metadata: Metadata = {
-  title: `Sitemap | ${SITE_IDENTITY.name}`,
+  title: 'Sitemap',
   description: `Browse all pages on ${SITE_IDENTITY.name} — colleges, courses, exams, cities, countries, blogs, news, and more.`,
+  alternates: { canonical: '/site-map' },
 }
 
 export const revalidate = 3600

@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
 type Bucket = { count: number; resetAt: number }
 
 const memoryBuckets = new Map<string, Bucket>()
 
+/** Drop expired buckets so warm isolates don't grow unbounded. */
+function pruneExpiredBuckets(now: number) {
+  if (memoryBuckets.size < 200) return
+  for (const [key, entry] of memoryBuckets) {
+    if (now >= entry.resetAt) memoryBuckets.delete(key)
+  }
+}
+
 /**
- * In-memory fallback (dev / DB outage only).
+ * In-memory fixed window.
+ * Avoids Neon round-trips that kept compute awake (CU-hrs).
+ * On serverless this is per-instance — still effective against abuse spikes.
  */
 function checkMemoryRateLimit(
   key: string,
@@ -14,6 +23,7 @@ function checkMemoryRateLimit(
   windowMs: number
 ): { ok: true } | { ok: false; retryAfterSec: number } {
   const now = Date.now()
+  pruneExpiredBuckets(now)
   const entry = memoryBuckets.get(key)
 
   if (!entry || now >= entry.resetAt) {
@@ -27,55 +37,6 @@ function checkMemoryRateLimit(
 
   entry.count += 1
   return { ok: true }
-}
-
-/**
- * Neon-backed fixed window — shared across all Vercel instances (no Redis cost).
- */
-async function checkDbRateLimit(
-  key: string,
-  limit: number,
-  windowMs: number
-): Promise<{ ok: true } | { ok: false; retryAfterSec: number }> {
-  const now = new Date()
-  const resetAt = new Date(now.getTime() + windowMs)
-
-  const existing = await db.rateLimitBucket.findUnique({ where: { id: key } })
-
-  if (!existing || existing.resetAt.getTime() <= now.getTime()) {
-    await db.rateLimitBucket.upsert({
-      where: { id: key },
-      create: { id: key, count: 1, resetAt },
-      update: { count: 1, resetAt },
-    })
-    return { ok: true }
-  }
-
-  if (existing.count >= limit) {
-    return {
-      ok: false,
-      retryAfterSec: Math.max(1, Math.ceil((existing.resetAt.getTime() - now.getTime()) / 1000)),
-    }
-  }
-
-  await db.rateLimitBucket.update({
-    where: { id: key },
-    data: { count: { increment: 1 } },
-  })
-  return { ok: true }
-}
-
-async function checkRateLimit(
-  key: string,
-  limit: number,
-  windowMs: number
-): Promise<{ ok: true } | { ok: false; retryAfterSec: number }> {
-  try {
-    return await checkDbRateLimit(key, limit, windowMs)
-  } catch (error) {
-    console.error('DB rate limit failed, using memory fallback:', error)
-    return checkMemoryRateLimit(key, limit, windowMs)
-  }
 }
 
 function firstIp(value: string | null): string | null {
@@ -124,7 +85,7 @@ function rateLimitResponse(retryAfterSec: number): NextResponse {
 }
 
 /**
- * Enforce IP-based limit (+ optional identity keys) via Neon.
+ * Enforce IP-based limit (+ optional identity keys) in memory.
  * Returns a 429 response when any bucket is exhausted, otherwise null.
  */
 export async function enforceRateLimit(
@@ -151,7 +112,7 @@ export async function enforceRateLimit(
   ]
 
   for (const key of keys) {
-    const result = await checkRateLimit(key, options.limit, options.windowMs)
+    const result = checkMemoryRateLimit(key, options.limit, options.windowMs)
     if (!result.ok) {
       return rateLimitResponse(result.retryAfterSec)
     }

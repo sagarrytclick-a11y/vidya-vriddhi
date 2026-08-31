@@ -5,8 +5,9 @@ import { CareerForm } from '@/components/CareerForm'
 import { SITE_IDENTITY } from '../site-identity'
 
 export const metadata: Metadata = {
-  title: 'Careers at VidyaVriddhi | Join Our Team',
+  title: 'Careers | Join Our Team',
   description: 'Explore career opportunities at VidyaVriddhi. Join a team passionate about transforming education and guiding students toward their dreams.',
+  alternates: { canonical: '/career' },
   openGraph: {
     title: 'Careers at VidyaVriddhi - Join Our Mission',
     description: 'Build your career while helping students build theirs. Explore openings at VidyaVriddhi.',

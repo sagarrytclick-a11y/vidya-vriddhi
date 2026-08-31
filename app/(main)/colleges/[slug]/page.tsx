@@ -6,6 +6,8 @@ import { CollegeTabs } from '@/components/college/CollegeTabs'
 import { HeroSection } from '@/components/college/sections/HeroSection'
 import { ContentSections } from '@/components/college/sections/ContentSections'
 import { CollegeSidebar } from '@/components/college/sections/CollegeSidebar'
+import { CollegeJsonLd } from '@/components/seo/json-ld'
+import { stripForMeta } from '@/lib/seo'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -18,16 +20,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const college = await getCollegeBySlug(slug)
 
   if (!college) {
-    return { title: 'College Not Found | VidyaVriddhi' }
+    return { title: 'College Not Found' }
   }
+
+  const description = college.description
+    ? stripForMeta(college.description)
+    : `Explore ${college.name} — admission process, courses offered, fees structure, placements, rankings, and more.`
 
   return {
     title: `${college.name} | Admission, Fees, Courses, Placements, Rankings`,
-    description: college.description ? college.description.slice(0, 160) : `Explore ${college.name} — admission process, courses offered, fees structure, placements, rankings, and more.`,
+    description,
+    alternates: { canonical: `/colleges/${slug}` },
     openGraph: {
-      title: `${college.name} - College Details | VidyaVriddhi`,
-      description: college.description?.slice(0, 160),
+      title: `${college.name} - College Details`,
+      description,
       images: college.imageURL ? [{ url: college.imageURL }] : [],
+      url: `/colleges/${slug}`,
     },
   }
 }
@@ -84,9 +92,29 @@ function SectionFallback() {
 
 export default async function CollegeDetailPage({ params }: PageProps) {
   const { slug } = await params
+  const college = await getCollegeBySlug(slug)
+
+  const description = college?.description
+    ? stripForMeta(college.description)
+    : college
+      ? `Explore ${college.name} admissions, fees, courses, and placements.`
+      : undefined
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {college && description && (
+        <CollegeJsonLd
+          name={college.name}
+          description={description}
+          url={`/colleges/${college.slug}`}
+          image={college.imageURL || college.logoURL}
+          address={{
+            city: college.city?.name || 'India',
+            country: college.country?.name || 'IN',
+          }}
+        />
+      )}
+
       <Suspense fallback={<BreadcrumbFallback />}>
         <HeroSectionWrapper slug={slug} />
       </Suspense>

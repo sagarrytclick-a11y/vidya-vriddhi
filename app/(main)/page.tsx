@@ -24,7 +24,9 @@ const FAQ = dynamic(() => import('@/components/FAQ'))
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'VidyaVriddhi | Best College Guidance, Exam Help, Study Abroad, and Admissions Support',
+  title: {
+    absolute: 'VidyaVriddhi | Best College Guidance, Exam Help, Study Abroad, and Admissions Support',
+  },
   description: 'VidyaVriddhi helps students find top colleges in India and abroad, offers NEET rank prediction, exam guidance, career counseling, and admission support for engineering, medical, law, MBA and more.',
   keywords: [
     'college guidance',

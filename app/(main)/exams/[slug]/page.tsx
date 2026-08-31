@@ -20,6 +20,7 @@ import { Suspense, cloneElement } from 'react'
 import { cn } from "@/lib/utils"
 import { AdmissionButton } from '@/components/ui/AdmissionButton'
 import { ExamHeroActions } from '@/components/exam/ExamHeroActions'
+import { ExamJsonLd } from '@/components/seo/json-ld'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -79,13 +80,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params
   const exam = await getExamBySlug(slug)
   if (!exam) return { title: 'Exam Not Found' }
+  const description = exam.description
+    ? exam.description.slice(0, 160)
+    : `Complete guide for ${exam.name} 2026 — exam dates, pattern, syllabus, registration, and preparation tips.`
   return {
     title: `${exam.name} 2026 | Exam Dates, Pattern, Registration`,
-    description: exam.description ? exam.description.slice(0, 160) : `Complete guide for ${exam.name} 2026 — exam dates, pattern, syllabus, registration, and preparation tips.`,
+    description,
+    alternates: { canonical: `/exams/${slug}` },
     openGraph: {
-      title: `${exam.name} 2026 - Complete Exam Guide | VidyaVriddhi`,
-      description: exam.description?.slice(0, 160),
+      title: `${exam.name} 2026 - Complete Exam Guide`,
+      description,
       images: exam.examImageurl ? [{ url: exam.examImageurl }] : [],
+      url: `/exams/${slug}`,
     },
   }
 }
@@ -107,6 +113,11 @@ export default async function ExamDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
+      <ExamJsonLd
+        name={exam.name}
+        description={exam.description?.slice(0, 300) || `${exam.name} exam guide`}
+        url={`/exams/${exam.slug}`}
+      />
       {/* Premium Hero Section */}
       <div className="relative bg-slate-950 pt-12 pb-20 overflow-hidden">
         {/* Abstract Background Elements */}

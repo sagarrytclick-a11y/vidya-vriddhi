@@ -6,8 +6,9 @@ import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone
 import { SITE_IDENTITY, getFullAddress } from '../site-identity'
 
 export const metadata: Metadata = {
-  title: 'About Us | VidyaVriddhi',
+  title: 'About Us',
   description: 'Learn about VidyaVriddhi — our mission to help students find top colleges, get career counseling, exam guidance, and admission support across India and abroad.',
+  alternates: { canonical: '/about' },
   openGraph: {
     title: 'About VidyaVriddhi - College Guidance & Career Counseling',
     description: 'Comprehensive education services helping students secure admissions to their dream universities across India and abroad.',

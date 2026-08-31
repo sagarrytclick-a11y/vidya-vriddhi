@@ -12,8 +12,9 @@ export const revalidate = 3600
 export const metadata: Metadata = {
   title: 'Study Abroad Programs | International Colleges & Universities',
   description: 'Explore study abroad opportunities — international colleges and universities across the globe. Get expert guidance for overseas education, visa support, and admissions.',
+  alternates: { canonical: '/study-abroad' },
   openGraph: {
-    title: 'Study Abroad - International Education with VidyaVriddhi',
+    title: 'Study Abroad Programs',
     description: 'Discover world-class universities and get expert guidance for studying abroad.',
   },
 }

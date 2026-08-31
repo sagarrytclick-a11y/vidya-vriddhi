@@ -56,7 +56,7 @@ export function WebSiteJsonLd() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `https://${domain}/search?q={search_term_string}`,
+        urlTemplate: `https://${domain}/colleges?search={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -95,13 +95,18 @@ export function CollegeJsonLd({
   aggregateRating?: { ratingValue: number; ratingCount: number; bestRating?: number };
 }) {
   const { domain } = SITE_IDENTITY;
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `https://${domain}${image.startsWith("/") ? image : `/${image}`}`
+    : undefined;
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "CollegeOrUniversity",
     name,
     description,
     url: `https://${domain}${url}`,
-    ...(image && { image: `https://${domain}${image.startsWith("http") ? "" : "/"}${image}` }),
+    ...(imageUrl && { image: imageUrl }),
     address: {
       "@type": "PostalAddress",
       addressLocality: address.city,

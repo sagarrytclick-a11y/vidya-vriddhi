@@ -4,8 +4,9 @@ import type { Metadata } from 'next'
 import { ArrowLeft, FileText, Shield, Users, AlertTriangle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | VidyaVriddhi',
+  title: 'Terms & Conditions',
   description: 'VidyaVriddhi Terms and Conditions — governs use of our educational platform, services, and user responsibilities.',
+  alternates: { canonical: '/terms' },
 }
 
 const TermsPage = () => {

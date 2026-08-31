@@ -1,168 +1,148 @@
-'use client'
-
-import React, { useState } from 'react'
 import Image from 'next/image'
-import { Calendar, ArrowLeft, Newspaper, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useNews } from '@/hooks/useNews'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import type { Metadata } from 'next'
+import { Calendar, ArrowLeft, Newspaper, ChevronLeft, ChevronRight } from 'lucide-react'
+import { db } from '@/lib/db'
 
-const NewsPage: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(0)
+export const revalidate = 3600
+
+interface NewsListPageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function NewsPage({ searchParams }: NewsListPageProps) {
+  const { page: pageStr } = await searchParams
+  const currentPage = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
   const itemsPerPage = 10
-  const { data: newsData, isLoading, error } = useNews(itemsPerPage, currentPage * itemsPerPage)
-  const router = useRouter()
+  const skip = (currentPage - 1) * itemsPerPage
 
-  const handleBack = () => {
-    router.back()
-  }
+  const [newsItems, total] = await Promise.all([
+    db.news.findMany({
+      where: { active: true },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: itemsPerPage,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        imageUrl: true,
+        createdAt: true,
+      },
+    }),
+    db.news.count({ where: { active: true } }),
+  ])
 
-  const handleNewsClick = (slug: string) => {
-    router.push(`/news/${slug}`)
-  }
+  const totalPages = Math.max(1, Math.ceil(total / itemsPerPage))
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const newsItems = newsData?.data || []
-  const totalPages = newsData ? Math.ceil(newsData.pagination.total / itemsPerPage) : 0
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleBack}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">All News</h1>
-            </div>
-            {totalPages > 0 && (
-              <div className="text-sm text-gray-500">
-                Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, newsData?.pagination?.total || 0)} of {newsData?.pagination?.total || 0}
-              </div>
-            )}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-orange-100 hover:text-white text-sm mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Link>
+          <div className="flex items-center gap-3">
+            <Newspaper className="w-8 h-8" />
+            <h1 className="text-3xl sm:text-4xl font-bold">Education News</h1>
           </div>
+          <p className="mt-3 text-orange-100 max-w-2xl">
+            Latest updates on colleges, exams, admissions, and study abroad.
+          </p>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {newsItems.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
+            <Newspaper className="w-14 h-14 text-gray-300 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900">No news yet</h2>
+            <p className="text-gray-600 mt-2">Check back soon for education updates.</p>
           </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
-            <Newspaper className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-            <p className="text-gray-700 font-medium">Unable to load news</p>
-            <p className="text-gray-500 text-sm mt-1">Please try again later</p>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && !error && newsItems.length === 0 && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <Newspaper className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-700 font-medium">No news found</p>
-            <p className="text-gray-500 text-sm mt-1">News will appear here once added to the database</p>
-          </div>
-        )}
-
-        {/* News Grid */}
-        {!isLoading && !error && newsItems.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newsItems.map((news) => (
-                <button
-                  key={news.id}
-                  onClick={() => handleNewsClick(news.slug)}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all text-left group"
-                >
-                  {news.imageUrl && (
-                    <div className="relative w-full h-48 overflow-hidden rounded-lg mb-4">
-                      <Image
-                        src={news.imageUrl}
-                        alt={news.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-2 text-sm text-gray-500 mb-3">
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {newsItems.map((item) => (
+              <Link
+                key={item.id}
+                href={`/news/${item.slug}`}
+                className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+              >
+                {item.imageUrl ? (
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full h-48 bg-orange-50 flex items-center justify-center">
+                    <Newspaper className="w-12 h-12 text-orange-300" />
+                  </div>
+                )}
+                <div className="p-5">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                     <Calendar className="w-4 h-4" />
-                    <span>{new Date(news.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}</span>
+                    <span>{formatDate(item.createdAt)}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-orange-600 transition-colors">
-                    {news.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    {news.content}
-                  </p>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <span className="text-orange-500 text-sm font-medium group-hover:text-orange-600">
-                      Read more →
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+                  <h2 className="text-xl font-bold text-gray-900 line-clamp-2">{item.title}</h2>
+                  <p className="mt-2 text-gray-600 line-clamp-3">{item.content}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2 mt-8">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 0}
-                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      currentPage === i
-                        ? 'bg-orange-500 text-white'
-                        : 'border border-gray-300 hover:bg-gray-100'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages - 1}
-                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+        {totalPages > 1 && (
+          <nav className="mt-10 flex items-center justify-center gap-3" aria-label="News pagination">
+            {currentPage > 1 ? (
+              <Link
+                href={currentPage === 2 ? '/news' : `/news?page=${currentPage - 1}`}
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-100 text-gray-300">
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </span>
             )}
-          </>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            {currentPage < totalPages ? (
+              <Link
+                href={`/news?page=${currentPage + 1}`}
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-100 text-gray-300">
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </span>
+            )}
+          </nav>
         )}
       </div>
     </div>
   )
 }
-
-export default NewsPage
