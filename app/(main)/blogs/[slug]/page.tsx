@@ -8,25 +8,37 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { db } from '@/lib/db'
+import { ArticleJsonLd } from '@/components/seo/json-ld'
+import { stripForMeta } from '@/lib/seo'
+import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 
 interface BlogPageProps {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 3600
+
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { slug } = await params
   const blog = await db.blog.findFirst({ where: { slug, active: true } })
   if (!blog) return { title: 'Blog Not Found' }
+
+  const description =
+    stripForMeta(blog.content) ||
+    'Read expert insights on education, college admissions, and career guidance.'
+
   return {
-    title: `${blog.title} | VidyaVriddhi Blogs`,
-    description: blog.content?.slice(0, 160) || 'Read expert insights on education, college admissions, and career guidance.',
+    title: blog.title,
+    description,
+    alternates: { canonical: `/blogs/${slug}` },
     openGraph: {
-      title: `${blog.title} - VidyaVriddhi`,
-      description: blog.content?.slice(0, 160),
+      title: blog.title,
+      description,
       type: 'article',
       publishedTime: blog.createdAt.toISOString(),
       modifiedTime: blog.updatedAt.toISOString(),
       images: blog.imageUrl ? [{ url: blog.imageUrl }] : [],
+      url: `/blogs/${slug}`,
     },
   }
 }
@@ -47,6 +59,15 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/20 to-white">
+      <ArticleJsonLd
+        title={blog.title}
+        description={stripForMeta(blog.content) || blog.title}
+        url={`/blogs/${blog.slug}`}
+        image={blog.imageUrl}
+        datePublished={blog.createdAt.toISOString()}
+        dateModified={blog.updatedAt.toISOString()}
+        author={SITE_IDENTITY.meta.author}
+      />
       {/* Header */}
       <header className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">

@@ -5,8 +5,9 @@ import { ArrowLeft, Mail, Phone, MapPin, Clock, GraduationCap, Users, Sparkles, 
 import { SITE_IDENTITY, getFullAddress } from '../site-identity'
 
 export const metadata: Metadata = {
-  title: 'Contact Us | VidyaVriddhi',
+  title: 'Contact Us',
   description: 'Get in touch with VidyaVriddhi for college admissions, career counseling, exam guidance, and study abroad support. Call, email, or visit our office.',
+  alternates: { canonical: '/contact' },
   openGraph: {
     title: 'Contact VidyaVriddhi - Education Counseling & Admissions',
     description: 'Reach out to VidyaVriddhi for personalized educational guidance and admission support.',

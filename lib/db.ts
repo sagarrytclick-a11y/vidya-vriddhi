@@ -13,14 +13,14 @@ const createPrismaClient = () => {
     throw new Error("DATABASE_URL is not set in environment variables");
   }
 
-  // Neon (serverless): keep pool tiny. Prefer a pooled connection string
-  // (host contains "-pooler") from the Neon dashboard to cut connection churn.
+  // Neon (serverless): keep pool tiny + release idle sockets fast so
+  // compute can autosuspend (CU-hrs). Prefer a pooled URL ("-pooler").
   const pool =
     globalForPrisma.pgPool ??
     new Pool({
       connectionString,
-      max: 3,
-      idleTimeoutMillis: 10000,
+      max: 2,
+      idleTimeoutMillis: 3000,
       connectionTimeoutMillis: 10000,
       maxUses: 7500,
     });

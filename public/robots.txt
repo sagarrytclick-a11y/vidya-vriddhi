@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://vidyavriddhi.com/sitemap.xml
-Host: vidyavriddhi.com

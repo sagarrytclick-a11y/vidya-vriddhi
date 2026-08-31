@@ -28,7 +28,7 @@ export function useCourses(category?: string, page: number = 1, limit: number = 
     queryKey: ['courses', category, page, limit],
     queryFn: fetchCourses,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   })
 }
 

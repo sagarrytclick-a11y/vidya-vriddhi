@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { createPaginationParams, createPaginationResponse } from '@/lib/pagination-utils'
-import { requireAdmin, activeContentFilter } from '@/lib/auth'
+import { requireAdmin, activeContentFilter, isAdminRequest } from '@/lib/auth'
 
 const createBlogSchema = z.object({
   title: z.string().min(1, 'Blog title is required'),
@@ -56,7 +56,16 @@ export async function GET(request: NextRequest) {
       db.blog.count({ where: filteredWhere })
     ])
 
-    return NextResponse.json(createPaginationResponse(blogs, total, page, limit))
+    const isAdmin = isAdminRequest(request)
+    return NextResponse.json(createPaginationResponse(blogs, total, page, limit), {
+      headers: {
+        'Cache-Control': isAdmin
+          ? 'private, no-store'
+          : search
+            ? 'public, s-maxage=60, stale-while-revalidate=120'
+            : 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    })
   } catch (error) {
     console.error('Error fetching blogs:', error)
     return NextResponse.json(

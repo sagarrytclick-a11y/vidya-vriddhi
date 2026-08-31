@@ -4,8 +4,9 @@ import type { Metadata } from 'next'
 import { ArrowLeft, Shield, Eye, Database, UserCheck, Lock } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | VidyaVriddhi',
+  title: 'Privacy Policy',
   description: 'VidyaVriddhi Privacy Policy — how we collect, use, and protect your personal information when using our educational platform.',
+  alternates: { canonical: '/privacy' },
 }
 
 const PrivacyPage = () => {

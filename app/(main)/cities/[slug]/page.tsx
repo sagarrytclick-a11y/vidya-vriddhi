@@ -83,10 +83,12 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     description:
       city.description?.slice(0, 160) ||
       `Explore colleges and educational opportunities in ${city.name}, ${city.country.name}.`,
+    alternates: { canonical: `/cities/${slug}` },
     openGraph: {
-      title: `Study in ${city.name} - VidyaVriddhi`,
+      title: `Study in ${city.name}`,
       description: city.description?.slice(0, 160),
       ...(city.cityImageURL ? { images: [{ url: city.cityImageURL }] } : {}),
+      url: `/cities/${slug}`,
     },
   }
 }

@@ -1,73 +1,97 @@
-'use client'
-
-import React from 'react'
-import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Newspaper } from 'lucide-react'
-import { useNews } from '@/hooks/useNews'
+import { db } from '@/lib/db'
+import { ArticleJsonLd } from '@/components/seo/json-ld'
+import { stripForMeta } from '@/lib/seo'
+import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 
-export default function NewsSlugPage() {
-  const params = useParams()
-  const router = useRouter()
-  const slug = params?.slug as string
+interface NewsPageProps {
+  params: Promise<{ slug: string }>
+}
 
-  const { data, isLoading, error } = useNews(100, 0)
+export const revalidate = 3600
 
-  const newsItem = data?.data.find((item) => item.slug === slug) || null
-  const relatedNews = data?.data.filter((item) => item.id !== newsItem?.id).slice(0, 3) || []
+export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const item = await db.news.findFirst({ where: { slug, active: true } })
+  if (!item) return { title: 'News Not Found' }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const description = stripForMeta(item.content) || 'Latest education news and updates from VidyaVriddhi.'
+  return {
+    title: item.title,
+    description,
+    alternates: { canonical: `/news/${slug}` },
+    openGraph: {
+      title: item.title,
+      description,
+      type: 'article',
+      publishedTime: item.createdAt.toISOString(),
+      modifiedTime: item.updatedAt.toISOString(),
+      images: item.imageUrl ? [{ url: item.imageUrl }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: item.title,
+      description,
+      images: item.imageUrl ? [item.imageUrl] : [],
+    },
+  }
+}
+
+export default async function NewsSlugPage({ params }: NewsPageProps) {
+  const { slug } = await params
+
+  const newsItem = await db.news.findFirst({
+    where: { slug, active: true },
+  })
+
+  if (!newsItem) notFound()
+
+  const relatedNews = await db.news.findMany({
+    where: { active: true, id: { not: newsItem.id } },
+    orderBy: { createdAt: 'desc' },
+    take: 3,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      imageUrl: true,
+      createdAt: true,
+    },
+  })
+
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
-  }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-4">
-          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-          <div className="h-12 w-3/4 bg-gray-200 rounded animate-pulse" />
-          <div className="h-5 w-1/3 bg-gray-200 rounded animate-pulse" />
-          <div className="h-96 w-full bg-gray-200 rounded-2xl animate-pulse" />
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !newsItem) {
-    return (
-      <div className="min-h-screen bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm">
-            <Newspaper className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">News not found</h2>
-            <p className="text-gray-600 mb-6">The article you are looking for does not exist or may have been removed.</p>
-            <button
-              onClick={() => router.push('/news')}
-              className="inline-flex items-center justify-center px-5 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
-            >
-              Back to news
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const description = stripForMeta(newsItem.content) || newsItem.title
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <ArticleJsonLd
+        title={newsItem.title}
+        description={description}
+        url={`/news/${newsItem.slug}`}
+        image={newsItem.imageUrl}
+        datePublished={newsItem.createdAt.toISOString()}
+        dateModified={newsItem.updatedAt.toISOString()}
+        author={SITE_IDENTITY.meta.author}
+      />
+
       <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <button
-          onClick={() => router.back()}
+        <Link
+          href="/news"
           className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
+          Back to news
+        </Link>
 
         <article className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {newsItem.imageUrl && (
@@ -78,6 +102,7 @@ export default function NewsSlugPage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 1024px"
+                priority
               />
             </div>
           )}
@@ -110,7 +135,7 @@ export default function NewsSlugPage() {
                   href={`/news/${item.slug}`}
                   className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow"
                 >
-                  {item.imageUrl && (
+                  {item.imageUrl ? (
                     <div className="relative w-full h-40 overflow-hidden rounded-lg mb-4">
                       <Image
                         src={item.imageUrl}
@@ -119,6 +144,10 @@ export default function NewsSlugPage() {
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
+                    </div>
+                  ) : (
+                    <div className="w-full h-40 rounded-lg mb-4 bg-gray-100 flex items-center justify-center">
+                      <Newspaper className="w-10 h-10 text-gray-300" />
                     </div>
                   )}
                   <p className="text-sm text-gray-500 mb-2">{formatDate(item.createdAt)}</p>

@@ -17,7 +17,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Use search hook with debounced query
   const { data: searchResults, isLoading } = useSearch(searchQuery, 10)
 
   const popularSearches = [
