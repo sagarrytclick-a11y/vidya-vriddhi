@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const uniqueFilename = `upload-${randomUUID()}.${detected.ext}`
 
-    const uploadResponse = await imagekit.upload({
+    const uploadResponse = await getImageKit().upload({
       file: buffer,
       fileName: uniqueFilename,
       folder: '/cms-uploads',

@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ImageKit from 'imagekit'
 import { db } from '@/lib/db'
 import { requireCanViewLeads, requireCanDelete } from '@/lib/auth'
-
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-})
+import { getImageKit } from '@/lib/imagekit'
 
 export async function GET(
   request: NextRequest,
@@ -65,7 +59,7 @@ export async function DELETE(
 
     if (existing.resumeFileId) {
       try {
-        await imagekit.deleteFile(existing.resumeFileId)
+        await getImageKit().deleteFile(existing.resumeFileId)
       } catch (error) {
         console.error('ImageKit resume delete failed:', error)
       }

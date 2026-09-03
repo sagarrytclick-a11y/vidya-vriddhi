@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ImageKit from 'imagekit'
 import { db } from '@/lib/db'
 import { requireCanViewLeads } from '@/lib/auth'
-
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-})
+import { getImageKit } from '@/lib/imagekit'
 
 /**
  * Auth-only resume download. New uploads are ImageKit private files + short-lived signed URL.
@@ -45,7 +39,7 @@ export async function GET(
     }
 
     // Private ImageKit path
-    const signedUrl = imagekit.url({
+    const signedUrl = getImageKit().url({
       path: stored.startsWith('/') ? stored : `/${stored}`,
       signed: true,
       expireSeconds: 120,
