@@ -64,18 +64,49 @@ const collegeCategories = [
   },
 ];
 
+function validateNeetScore(raw: string): string | null {
+  const value = raw.trim()
+
+  if (!value) return 'Please enter your NEET score.'
+  if (!/^\d+$/.test(value)) return 'Score must be a whole number (no decimals or letters).'
+  if (value.length > 1 && value.startsWith('0')) return 'Please enter a valid score without leading zeros.'
+
+  const num = Number(value)
+  if (num < 0 || num > 720) return 'NEET score must be between 0 and 720.'
+
+  return null
+}
+
 const NeetRankPredictorPage: React.FC = () => {
   const [score, setScore] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
   const [prediction, setPrediction] = useState<RankEntry | null>(null);
   const [showPrediction, setShowPrediction] = useState(false);
 
-  const handlePredict = () => {
-    const numScore = parseInt(score);
-    if (isNaN(numScore) || numScore < 0 || numScore > 720) return;
+  const applyScoreChange = (next: string) => {
+    const sanitized = next.replace(/[^\d]/g, '').slice(0, 3)
+    setScore(sanitized)
+    setShowPrediction(false)
+    setPrediction(null)
+    if (touched) setError(validateNeetScore(sanitized))
+  }
 
-    const matched = rankData.find((r) => numScore >= r.minScore && numScore <= r.maxScore);
-    setPrediction(matched || null);
-    setShowPrediction(true);
+  const handlePredict = () => {
+    setTouched(true)
+    const validationError = validateNeetScore(score)
+    if (validationError) {
+      setError(validationError)
+      setShowPrediction(false)
+      setPrediction(null)
+      return
+    }
+
+    const numScore = Number(score)
+    const matched = rankData.find((r) => numScore >= r.minScore && numScore <= r.maxScore) || null
+    setError(null)
+    setPrediction(matched)
+    setShowPrediction(true)
   };
 
   const formatRank = (rank: number) => {
@@ -163,24 +194,51 @@ const NeetRankPredictorPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative w-full sm:w-72">
                   <input
-                    type="number"
-                    min="0"
-                    max="720"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={3}
                     value={score}
-                    onChange={(e) => { setScore(e.target.value); setShowPrediction(false); }}
-                    onKeyDown={(e) => e.key === "Enter" && handlePredict()}
+                    onChange={(e) => applyScoreChange(e.target.value)}
+                    onBlur={() => {
+                      setTouched(true)
+                      setError(validateNeetScore(score))
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handlePredict()
+                      }
+                    }}
                     placeholder="e.g. 650"
-                    className="w-full h-14 pl-12 pr-5 rounded-xl border border-gray-200 bg-gray-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-500/10 outline-none transition-all text-lg font-bold"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'neet-score-error' : 'neet-score-hint'}
+                    className={`w-full h-14 pl-12 pr-5 rounded-xl border bg-gray-50 outline-none transition-all text-lg font-bold ${
+                      error
+                        ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/10'
+                        : 'border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-500/10'
+                    }`}
                   />
                   <GraduationCap size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
-                <button onClick={handlePredict}
-                  className="w-full sm:w-auto h-14 px-8 rounded-xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePredict}
+                  className="w-full sm:w-auto h-14 px-8 rounded-xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
+                >
                   Predict Rank
                   <ArrowRight size={16} />
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Score between 0 — 720</p>
+              {error ? (
+                <p id="neet-score-error" className="text-xs font-medium text-red-600 mt-2" role="alert">
+                  {error}
+                </p>
+              ) : (
+                <p id="neet-score-hint" className="text-xs text-gray-400 mt-2">
+                  Enter a whole number between 0 and 720
+                </p>
+              )}
             </div>
           </div>
 

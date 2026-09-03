@@ -60,10 +60,12 @@ async function getCityBySlug(slug: string) {
               logoURL: true,
               imageURL: true,
               description: true,
+              establishment_year: true,
               Countryranking: true,
               Internationalranking: true,
               categories: { select: { name: true, slug: true }, take: 3 },
               courses: { select: { name: true, slug: true }, take: 3 },
+              _count: { select: { courses: true } },
             },
           },
         },
@@ -291,24 +293,20 @@ export default async function CityPage({ params }: CityPageProps) {
                                 <h3 className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-2">
                                   {college.name}
                                 </h3>
-                                {(college.Countryranking || college.Internationalranking) && (
+                                {college.establishment_year && (
                                   <div className="flex flex-wrap gap-1.5 mt-2">
-                                    {college.Countryranking && (
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-xs bg-orange-50 text-orange-700 border border-orange-100"
-                                      >
-                                        <Star className="w-3 h-3 mr-1" />
-                                        #{college.Countryranking} National
-                                      </Badge>
-                                    )}
-                                    {college.Internationalranking && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs bg-orange-50 text-orange-700 border border-orange-100"
+                                    >
+                                      Est. {college.establishment_year}
+                                    </Badge>
+                                    {college._count?.courses > 0 && (
                                       <Badge
                                         variant="secondary"
                                         className="text-xs bg-slate-50 text-slate-700 border border-slate-100"
                                       >
-                                        <Star className="w-3 h-3 mr-1" />
-                                        #{college.Internationalranking} World
+                                        {college._count.courses} Courses
                                       </Badge>
                                     )}
                                   </div>

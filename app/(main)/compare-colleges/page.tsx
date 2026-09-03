@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Plus, ArrowRight, MapPin, Star, GraduationCap, FileText, IndianRupee, CheckCircle, Calendar, Loader2 } from 'lucide-react'
+import { X, Plus, ArrowRight, MapPin, GraduationCap, FileText, IndianRupee, CheckCircle, Calendar, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { CompareCollegesSkeleton } from '@/components/ui/skeletons'
@@ -15,6 +15,7 @@ interface College {
   establishment_year?: number
   Countryranking?: string
   Internationalranking?: string
+  _count?: { courses: number }
   features: string[]
   keyHighlights?: {
     title: string
@@ -250,8 +251,8 @@ export default function CompareCollegesPage() {
                           Established {college.establishment_year || 'N/A'}
                         </div>
                         <div className="flex items-center text-sm text-gray-600 font-bold">
-                          <Star className="w-4 h-4 mr-2 text-yellow-500 fill-yellow-500" />
-                          Rank: #{college.Countryranking || 'NR'} (India)
+                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
+                          {college._count?.courses || 0} Courses Available
                         </div>
                       </div>
                     </td>

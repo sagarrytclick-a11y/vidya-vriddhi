@@ -41,7 +41,7 @@ export const useSearch = (query: string, limit: number = 10) => {
   return useQuery({
     queryKey: ['search', debouncedQuery, limit],
     queryFn: () => fetchSearch(debouncedQuery, limit),
-    enabled: debouncedQuery.trim().length > 2,
+    enabled: debouncedQuery.trim().length >= 1,
     staleTime: 2 * 60 * 1000,
   })
 }

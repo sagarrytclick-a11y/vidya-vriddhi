@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ImageKit from 'imagekit'
 import { randomUUID } from 'crypto'
 import { requireAdmin } from '@/lib/auth'
 import { detectImageType } from '@/lib/file-magic'
-
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-})
+import { getImageKit } from '@/lib/imagekit'
 
 export async function POST(request: NextRequest) {
   try {

@@ -15,21 +15,10 @@ const Navbar = () => {
   const { user, isSignedIn } = useUser()
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null)
-  const [showSearchBar, setShowSearchBar] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { openModal } = useAdmissionModal()
   const { toggle: toggleSaarthi } = useVVSaarthi()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Show search bar after scrolling past hero section (approx 500px)
-      setShowSearchBar(window.scrollY > 30)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
@@ -128,8 +117,8 @@ const Navbar = () => {
             </div>
 
 
-            {/* Desktop Search Bar - appears on scroll */}
-            <div className={`hidden cursor-pointer lg:flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
+            {/* Desktop Search Bar */}
+            <div className="hidden cursor-pointer lg:flex items-center">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="flex items-center cursor-pointer space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-4 py-2.5 rounded-lg transition-all mr-3 w-96 xl:w-125"

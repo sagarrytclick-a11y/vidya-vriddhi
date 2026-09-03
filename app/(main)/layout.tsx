@@ -15,7 +15,8 @@ export default function MainLayout({
       <AdmissionModalProvider>
         <VVSaarthiProvider>
           <Navbar />
-          <div className="pt-28">{children}</div>
+          {/* Fixed navbar: top bar (~4rem) + desktop secondary nav (~3rem). Keep clear of content. */}
+          <div className="pt-20 lg:pt-[7.5rem]">{children}</div>
           <Footer />
           <DeferredWidgets />
         </VVSaarthiProvider>

@@ -75,7 +75,7 @@ const TopColleges: React.FC = () => {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Top Indian Colleges</h2>
             <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-              Ranked by national performance
+              Browse colleges by courses, city & streams
             </p>
           </div>
           <Link
@@ -188,10 +188,10 @@ const TopColleges: React.FC = () => {
                   <thead className="border-b border-gray-200 bg-gray-50">
                     <tr>
                       <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
-                        Rank
+                        College
                       </th>
                       <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
-                        College
+                        City
                       </th>
                       <th className="hidden px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 md:table-cell sm:px-4 sm:py-4 sm:text-xs">
                         Courses
@@ -200,7 +200,10 @@ const TopColleges: React.FC = () => {
                         Established
                       </th>
                       <th className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
-                        National Rank
+                        Streams
+                      </th>
+                      <th className="px-3 py-3 text-center text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
+                        NIRF Rank
                       </th>
                       <th className="px-3 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-gray-500 sm:px-4 sm:py-4 sm:text-xs">
                         Action
@@ -208,8 +211,7 @@ const TopColleges: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 bg-white">
-                    {colleges.map((college, index) => {
-                      const displayRank = (currentPage - 1) * itemsPerPage + index + 1
+                    {colleges.map((college) => {
                       const courseCount = college._count?.courses || 0
 
                       return (
@@ -217,12 +219,6 @@ const TopColleges: React.FC = () => {
                           key={college.id}
                           className="transition-colors hover:bg-orange-50/40"
                         >
-                          <td className="px-3 py-3 whitespace-nowrap sm:px-4 sm:py-4">
-                            <span className="text-base font-bold text-orange-600 sm:text-lg">
-                              #{displayRank}
-                            </span>
-                          </td>
-
                           <td className="px-3 py-3 sm:px-4 sm:py-4">
                             <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                               <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50 sm:h-11 sm:w-11">
@@ -245,16 +241,16 @@ const TopColleges: React.FC = () => {
                                 >
                                   {college.name}
                                 </Link>
-                                <div className="mt-1 flex items-center gap-1 text-[11px] text-gray-500 sm:text-xs">
-                                  <MapPin className="h-3 w-3 shrink-0 text-orange-500" />
-                                  <span className="truncate">
-                                    {college.city?.name || 'India'}
-                                    {college.country?.flagEmoji
-                                      ? ` ${college.country.flagEmoji}`
-                                      : ''}
-                                  </span>
-                                </div>
                               </div>
+                            </div>
+                          </td>
+
+                          <td className="px-3 py-3 sm:px-4 sm:py-4">
+                            <div className="flex min-w-0 items-center gap-1.5 text-xs text-gray-700 sm:text-sm">
+                              <MapPin className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+                              <span className="truncate font-medium">
+                                {college.city?.name || '—'}
+                              </span>
                             </div>
                           </td>
 
@@ -276,12 +272,29 @@ const TopColleges: React.FC = () => {
                           </td>
 
                           <td className="px-3 py-3 sm:px-4 sm:py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {college.categories && college.categories.length > 0 ? (
+                                college.categories.slice(0, 2).map((cat: { id: string; name: string }) => (
+                                  <span
+                                    key={cat.id}
+                                    className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700 sm:text-xs"
+                                  >
+                                    {cat.name}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-xs text-gray-400">—</span>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="px-3 py-3 text-center sm:px-4 sm:py-4">
                             {college.Countryranking ? (
-                              <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700 sm:px-3 sm:py-1 sm:text-xs">
+                              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200 sm:text-xs">
                                 #{college.Countryranking}
                               </span>
                             ) : (
-                              <span className="text-xs text-gray-400">N/A</span>
+                              <span className="text-xs text-gray-400">—</span>
                             )}
                           </td>
 

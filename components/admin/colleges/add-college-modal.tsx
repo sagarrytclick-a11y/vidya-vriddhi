@@ -704,30 +704,33 @@ export function AddCollegeModal({ isOpen, onClose, onSubmit, isSubmitting = fals
           </div>
 
           {/* Courses Section */}
-          <div>
+          <div className="w-full">
             <Label htmlFor="courses" className={adminLabelClass}>Courses</Label>
-            <div className="space-y-2 max-h-40 overflow-y-auto rounded-xl border border-white/6 bg-[#0c0f14] p-3">
-              {courses.map((course) => (
-                <div key={course.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`course-${course.id}`}
-                    checked={formData.courses?.includes(course.id) || false}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleInputChange('courses', [...(formData.courses || []), course.id])
-                      } else {
-                        handleInputChange('courses', formData.courses?.filter(id => id !== course.id) || [])
-                      }
-                    }}
-                  className={adminCheckboxClass}
-                />
-                  <Label htmlFor={`course-${course.id}`} className="text-sm text-white">
-                    {course.name}
-                  </Label>
-                </div>
-              ))}
-              {courses.length === 0 && (
+            <div className="w-full max-h-48 overflow-y-auto rounded-xl border border-white/6 bg-[#0c0f14] p-3">
+              {courses.length === 0 ? (
                 <p className="text-sm text-[#6b7280]">No courses available</p>
+              ) : (
+                <div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3 md:grid-cols-4">
+                  {courses.map((course) => (
+                    <div key={course.id} className="flex min-w-0 items-center gap-2">
+                      <Checkbox
+                        id={`course-${course.id}`}
+                        checked={formData.courses?.includes(course.id) || false}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleInputChange('courses', [...(formData.courses || []), course.id])
+                          } else {
+                            handleInputChange('courses', formData.courses?.filter(id => id !== course.id) || [])
+                          }
+                        }}
+                        className={adminCheckboxClass}
+                      />
+                      <Label htmlFor={`course-${course.id}`} className="truncate text-sm text-white">
+                        {course.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
