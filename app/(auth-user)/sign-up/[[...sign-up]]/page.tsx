@@ -1,5 +1,6 @@
 import { SignUp } from '@clerk/nextjs'
 import Image from 'next/image'
+import { clerkAuthAppearance } from '@/lib/clerk-appearance'
 
 export default function SignUpPage() {
   return (
@@ -12,29 +13,12 @@ export default function SignUpPage() {
         </div>
 
         <SignUp
-            path="/sign-up"
-            routing="path"
-            signInUrl="/sign-in"
-            forceRedirectUrl="/"
-            appearance={{
-              elements: {
-                rootBox: "w-full",
-                card: "bg-white shadow-sm border border-gray-200 rounded-2xl p-8 w-full",
-                headerTitle: "text-xl font-bold text-gray-900",
-                headerSubtitle: "text-gray-500 text-sm mb-6",
-                socialButtonsBlockButton: "border-gray-300 hover:bg-gray-50 rounded-xl py-3 text-sm font-medium text-gray-700",
-                socialButtonsBlockButtonText: "font-medium text-gray-700",
-                dividerLine: "bg-gray-200",
-                dividerText: "text-gray-400 text-xs",
-                formFieldInput: "border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 py-3 text-sm",
-                formFieldLabel: "text-gray-700 text-sm font-medium mb-1.5",
-                formButtonPrimary: "bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold normal-case py-3 rounded-xl w-full",
-                footerActionLink: "text-orange-600 hover:text-orange-700 font-semibold text-sm",
-                identityPreviewText: "text-sm text-gray-600",
-                identityPreviewEditButton: "text-orange-600 text-sm",
-              }
-            }}
-          />
+          path="/sign-up"
+          routing="path"
+          signInUrl="/sign-in"
+          forceRedirectUrl="/"
+          appearance={clerkAuthAppearance}
+        />
       </div>
     </div>
   )

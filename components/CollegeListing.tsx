@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { GraduationCap, MapPin, Award, Building2, ChevronRight, Globe } from 'lucide-react'
+import { GraduationCap, MapPin, Building2, ChevronRight, Globe } from 'lucide-react'
 import { useIndianColleges } from '@/hooks/useIndianColleges'
 import { CardSkeleton } from '@/components/ui/skeletons'
 import Link from 'next/link'
@@ -68,10 +68,10 @@ const CollegeListing: React.FC = () => {
                       <Building2 className="h-12 w-12 text-slate-400" />
                     </div>
                   )}
-                  {college.Countryranking && (
-                    <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Award className="w-3 h-3" />
-                      Rank #{college.Countryranking}
+                  {college.establishment_year && (
+                    <div className="absolute top-3 right-3 bg-slate-800 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Building2 className="w-3 h-3" />
+                      Est. {college.establishment_year}
                     </div>
                   )}
                 </div>

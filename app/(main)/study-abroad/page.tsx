@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { MapPin, Globe, Building2, Star, GraduationCap, ArrowRight } from 'lucide-react'
+import { MapPin, Globe, Building2, GraduationCap, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -60,6 +60,8 @@ export default async function StudyAbroadPage() {
         },
         take: 6,
       },
+      establishment_year: true,
+      _count: { select: { courses: true } },
     },
     orderBy: {
       createdAt: 'desc'
@@ -105,9 +107,9 @@ export default async function StudyAbroadPage() {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {colleges.filter(c => c.Internationalranking).length}
+                {colleges.reduce((sum, c) => sum + (c._count?.courses || 0), 0)}
               </div>
-              <div className="text-sm text-slate-600">Top Ranked</div>
+              <div className="text-sm text-slate-600">Programs Offered</div>
             </div>
           </div>
         </div>
@@ -174,19 +176,17 @@ export default async function StudyAbroadPage() {
                         </div>
                       </div>
 
-                      {/* Rankings */}
-                      {(college.Countryranking || college.Internationalranking) && (
+                      {/* Info */}
+                      {(college.establishment_year || college._count?.courses) && (
                         <div className="flex flex-wrap gap-2">
-                          {college.Countryranking && (
+                          {college.establishment_year && (
                             <Badge variant="secondary" className="flex items-center gap-1">
-                              <Star className="w-3 h-3" />
-                              #{college.Countryranking} National
+                              Est. {college.establishment_year}
                             </Badge>
                           )}
-                          {college.Internationalranking && (
+                          {college._count?.courses > 0 && (
                             <Badge className="flex items-center gap-1 bg-purple-100 text-purple-700 hover:bg-purple-200">
-                              <Star className="w-3 h-3" />
-                              #{college.Internationalranking} International
+                              {college._count.courses} Courses
                             </Badge>
                           )}
                         </div>

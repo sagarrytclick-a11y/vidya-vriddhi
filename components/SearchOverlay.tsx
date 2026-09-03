@@ -58,17 +58,15 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen, onClose])
 
-  const handleItemClick = (result: any) => {
-    // Navigate based on type
-    if (result.type === 'College') {
-      router.push(`/colleges/${result.slug}`)
-    } else if (result.type === 'Exam') {
-      router.push(`/exams/${result.slug}`)
-    } else if (result.type === 'News') {
-      router.push(`/news/${result.slug}`)
-    } else if (result.type === 'Course') {
-      router.push(`/courses/${result.slug}`)
+  const handleItemClick = (result: { type: string; slug: string }) => {
+    const routeMap: Record<string, string> = {
+      College: '/colleges/',
+      Exam: '/exams/',
+      News: '/news/',
+      Course: '/courses/',
     }
+    const prefix = routeMap[result.type] || '/colleges/'
+    router.push(`${prefix}${result.slug}`)
     onClose()
   }
 
@@ -206,7 +204,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
             ) : (
               <div className="p-8 text-center">
                 <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600">No results found for "{searchQuery}"</p>
+                <p className="text-gray-600">No results found for &ldquo;{searchQuery}&rdquo;</p>
+                <p className="mt-1 text-sm text-gray-400">Try different keywords or check spelling</p>
               </div>
             )}
           </div>

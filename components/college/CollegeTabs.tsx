@@ -25,7 +25,7 @@ const ALL_TABS: Tab[] = [
   { id: 'courses', label: 'Courses & Fees', icon: <BookOpen className="w-4 h-4" /> },
   { id: 'admission', label: 'Admissions', icon: <GraduationCap className="w-4 h-4" /> },
   { id: 'scholarship', label: 'Scholarships', icon: <Award className="w-4 h-4" /> },
-  { id: 'ranking', label: 'Rankings', icon: <Trophy className="w-4 h-4" /> },
+  { id: 'ranking', label: 'Snapshot', icon: <Trophy className="w-4 h-4" /> },
   { id: 'hostel', label: 'Hostel', icon: <Building2 className="w-4 h-4" /> },
   { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="w-4 h-4" /> },
 ]
@@ -86,7 +86,7 @@ export function CollegeTabs() {
   const scrollToTab = (id: string) => {
     const element = document.getElementById(id)
     if (!element) return
-    const offset = 150
+    const offset = 180
     const elementPosition = element.getBoundingClientRect().top + window.scrollY
     window.scrollTo({
       top: elementPosition - offset,
@@ -124,7 +124,7 @@ export function CollegeTabs() {
   }, [tabs])
 
   return (
-    <div className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:top-[4.5rem]">
+    <div className="sticky top-20 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 lg:top-[7.5rem]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-1 sm:gap-2">
           <button

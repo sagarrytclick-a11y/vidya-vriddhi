@@ -82,9 +82,9 @@ const CollegeCards = () => {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
-              {college.Countryranking && (
-                <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                  #{college.Countryranking} in India
+              {college.establishment_year && (
+                <div className="absolute top-4 left-4 bg-slate-800 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  Est. {college.establishment_year}
                 </div>
               )}
               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -101,8 +101,8 @@ const CollegeCards = () => {
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="bg-blue-50 p-3 rounded-lg">
-                  <div className="text-blue-600 font-semibold">{college.Countryranking ? `#${college.Countryranking}` : 'N/A'}</div>
-                  <div className="text-gray-600 text-xs">Rank</div>
+                  <div className="text-blue-600 font-semibold">{college.establishment_year || 'N/A'}</div>
+                  <div className="text-gray-600 text-xs">Established</div>
                 </div>
                 <div className="bg-green-50 p-3 rounded-lg">
                   <div className="text-green-600 font-semibold">{college._count?.courses || 0} Courses</div>

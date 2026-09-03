@@ -9,7 +9,7 @@ interface CollegeSidebarProps {
 
 export function CollegeSidebar({ collegeName, relatedColleges }: CollegeSidebarProps) {
   return (
-    <div className="sticky top-[140px] space-y-6">
+    <div className="sticky top-[11rem] space-y-6 lg:top-[12.5rem]">
       <ContactSidebar />
       <NewsSidebar collegeName={collegeName} />
       <RecommendedColleges colleges={relatedColleges} />

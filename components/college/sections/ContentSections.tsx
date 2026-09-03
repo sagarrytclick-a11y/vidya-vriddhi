@@ -16,8 +16,6 @@ import {
   BookOpen,
   Utensils,
   Home,
-  Globe2,
-  Flag,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -168,7 +166,7 @@ export function ContentSections({
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-px border-t border-slate-200 bg-slate-200">
+          <div className="grid grid-cols-2 gap-px border-t border-slate-200 bg-slate-200 sm:grid-cols-4">
             {[
               {
                 value: college.establishment_year || '—',
@@ -176,11 +174,15 @@ export function ContentSections({
               },
               {
                 value: `${college.courses.length || 0}+`,
-                label: 'Courses',
+                label: 'Programs',
               },
               {
-                value: college.Countryranking ? `#${college.Countryranking}` : '—',
-                label: 'Country Rank',
+                value: `${college.categories.length || 0}+`,
+                label: 'Streams',
+              },
+              {
+                value: `${college.exams.length || 0}+`,
+                label: 'Exams Accepted',
               },
             ].map((stat) => (
               <div key={stat.label} className="bg-slate-50 px-3 py-5 text-center sm:px-4">
@@ -209,8 +211,8 @@ export function ContentSections({
                 key={idx}
                 className="flex gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-sm font-bold text-orange-600">
-                  {String(idx + 1).padStart(2, '0')}
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+                  <CheckCircle2 className="h-4 w-4" />
                 </span>
                 <p className="pt-1.5 text-sm leading-relaxed text-slate-700">{feature}</p>
               </div>
@@ -398,8 +400,8 @@ export function ContentSections({
                 className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md"
               >
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-400 to-amber-400" />
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-sm font-bold text-orange-600 transition-colors group-hover:bg-orange-500 group-hover:text-white">
-                  {String(idx + 1).padStart(2, '0')}
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600 transition-colors group-hover:bg-orange-500 group-hover:text-white">
+                  <Star className="h-4 w-4" />
                 </div>
                 <h3 className="mb-2 font-semibold text-slate-900">{feature.title}</h3>
                 <p className="text-sm leading-relaxed text-slate-600">
@@ -423,8 +425,8 @@ export function ContentSections({
           {[
             {
               title: 'Merit Scholarship',
-              desc: '100% tuition waiver for top 10 rank holders',
-              tag: 'Upto 100%',
+              desc: 'Fee waiver for students with strong academic performance in qualifying exams',
+              tag: 'Merit-based',
             },
             {
               title: 'Need-Based Financial Aid',
@@ -466,40 +468,69 @@ export function ContentSections({
         </div>
       </section>
 
-      {/* Rankings */}
-      <section id="ranking" className="scroll-mt-24">
+      {/* College snapshot — factual college info, not official ranking claims */}
+      <section id="ranking" className="scroll-mt-28">
         <SectionHeading
           icon={Trophy}
-          title="Rankings"
-          subtitle="National & international recognition"
+          title="College Snapshot"
+          subtitle="Quick facts to help you evaluate this campus"
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-3">
-              <Flag className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-semibold text-slate-700">NIRF Ranking</span>
+              <GraduationCap className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-semibold text-slate-700">Programs Offered</span>
             </div>
-            <div className="px-5 py-6 text-center">
-              <p className="text-4xl font-bold tracking-tight text-orange-600 sm:text-5xl">
-                #{college.Countryranking || '—'}
+            <div className="px-5 py-6">
+              <p className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                {college.courses.length || 0}+
               </p>
-              <p className="mt-2 text-sm font-medium text-slate-700">National ranking</p>
-              <p className="mt-1 text-xs text-slate-500">Among top institutes in India</p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Active courses listed</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {college.categories.length > 0
+                  ? `Across ${college.categories.map((c) => c.name).slice(0, 3).join(', ')}${college.categories.length > 3 ? ' & more' : ''}`
+                  : 'Undergraduate & postgraduate options'}
+              </p>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-3">
-              <Globe2 className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-semibold text-slate-700">QS World Ranking</span>
+              <FileText className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-semibold text-slate-700">Entrance Exams</span>
             </div>
-            <div className="px-5 py-6 text-center">
-              <p className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                #{college.Internationalranking || '—'}
+            <div className="px-5 py-6">
+              <p className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                {college.exams.length || 0}+
               </p>
-              <p className="mt-2 text-sm font-medium text-slate-700">International ranking</p>
-              <p className="mt-1 text-xs text-slate-500">Global recognition</p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Accepted / considered</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {college.exams.length > 0
+                  ? college.exams
+                      .slice(0, 3)
+                      .map((e) => e.name)
+                      .join(', ') + (college.exams.length > 3 ? '…' : '')
+                  : 'Check admissions section for eligibility'}
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-3">
+              <Building2 className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-semibold text-slate-700">Campus Profile</span>
+            </div>
+            <div className="px-5 py-6">
+              <p className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                {college.establishment_year || '—'}
+              </p>
+              <p className="mt-2 text-sm font-medium text-slate-700">Year established</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {features.length > 0
+                  ? `${features.length} campus highlights listed on this page`
+                  : 'Explore facilities, hostel & gallery below'}
+              </p>
             </div>
           </div>
         </div>

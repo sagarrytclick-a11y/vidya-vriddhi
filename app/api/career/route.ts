@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ImageKit from 'imagekit'
 import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { requireCanViewLeads } from '@/lib/auth'
 import { enforceRateLimit } from '@/lib/rate-limit'
 import { detectPdf } from '@/lib/file-magic'
-
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-})
+import { getImageKit } from '@/lib/imagekit'
 
 const careerApplicationSchema = z.object({
   name: z.string().min(2).max(100).trim(),
@@ -84,7 +78,7 @@ export async function POST(request: NextRequest) {
     const uniqueFilename = `resume-${safeName}-${randomUUID()}.pdf`
 
     // Private file — not publicly listable/guessable on CDN (ImageKit free tier)
-    const uploadResponse = await imagekit.upload({
+    const uploadResponse = await getImageKit().upload({
       file: buffer,
       fileName: uniqueFilename,
       folder: '/career-resumes',

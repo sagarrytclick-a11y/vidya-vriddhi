@@ -25,6 +25,7 @@ interface College {
   Internationalranking: string | null;
   logoURL: string | null;
   imageURL: string | null;
+  categories?: { id: string; name: string }[];
   city: {
     name: string;
     slug: string;
@@ -121,19 +122,14 @@ const CollegeCard: React.FC<CollegeCardProps> = ({ college }) => {
             )}
           </div>
 
-          {/* Rankings */}
-          {(college.Countryranking || college.Internationalranking) && (
+          {/* Streams */}
+          {college.categories && college.categories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {college.Countryranking && (
-                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wide rounded-lg border border-emerald-100">
-                  #{college.Countryranking} National
+              {college.categories.slice(0, 3).map((cat: { id: string; name: string }) => (
+                <span key={cat.id} className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wide rounded-lg border border-emerald-100">
+                  {cat.name}
                 </span>
-              )}
-              {college.Internationalranking && (
-                <span className="px-2.5 py-1 bg-violet-50 text-violet-700 text-[10px] font-bold uppercase tracking-wide rounded-lg border border-violet-100">
-                  #{college.Internationalranking} Global
-                </span>
-              )}
+              ))}
             </div>
           )}
 

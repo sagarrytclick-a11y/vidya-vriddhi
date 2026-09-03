@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { MapPin, Award, Building2, BookOpen } from 'lucide-react'
+import { MapPin, Building2, BookOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollegeActions } from '@/components/college/CollegeActions'
@@ -33,10 +33,12 @@ export function HeroSection({ college }: HeroSectionProps) {
   return (
     <>
       <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           <Breadcrumbs items={[
             { label: 'Colleges', href: '/colleges' },
-            ...(college.categories[0] ? [{ label: college.categories[0].name }] : []),
+            ...(college.categories[0]
+              ? [{ label: college.categories[0].name, href: `/colleges?category=${encodeURIComponent(college.categories[0].name)}` }]
+              : []),
             { label: college.name },
           ]} />
         </div>
@@ -77,12 +79,6 @@ export function HeroSection({ college }: HeroSectionProps) {
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
                         <BookOpen className="h-3.5 w-3.5 text-slate-400" />
                         {college.courses.length} Courses
-                      </span>
-                    )}
-                    {college.Countryranking && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700 shadow-sm">
-                        <Award className="h-3.5 w-3.5" />
-                        Rank #{college.Countryranking}
                       </span>
                     )}
                   </div>

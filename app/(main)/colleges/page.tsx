@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, MapPin, Building2, Award, BookOpen, Loader2, Globe2 } from 'lucide-react'
+import { ChevronRight, MapPin, Building2, BookOpen, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -388,16 +388,10 @@ function CollegesPageContent() {
                                 <BookOpen className="h-4 w-4 text-orange-500" />
                                 <span>{college._count.courses} Courses</span>
                               </div>
-                              {college.Countryranking && (
+                              {college.categories && college.categories.length > 0 && (
                                 <div className="flex items-center gap-1">
-                                  <Award className="h-4 w-4 text-orange-500" />
-                                  <span>Rank #{college.Countryranking}</span>
-                                </div>
-                              )}
-                              {college.Internationalranking && (
-                                <div className="flex items-center gap-1">
-                                  <Globe2 className="h-4 w-4 text-orange-500" />
-                                  <span>QS #{college.Internationalranking}</span>
+                                  <Building2 className="h-4 w-4 text-orange-500" />
+                                  <span>{college.categories.map((c: any) => c.name).slice(0, 2).join(', ')}</span>
                                 </div>
                               )}
                             </div>
