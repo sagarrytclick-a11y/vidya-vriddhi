@@ -19,6 +19,7 @@ import {
 import { db } from '@/lib/db'
 import { SITE_IDENTITY } from '@/app/(main)/site-identity'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { SitemapInfiniteLinks } from '@/components/sitemap/SitemapInfiniteLinks'
 
 export const metadata: Metadata = {
   title: 'Sitemap',
@@ -28,10 +29,14 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600
 
+const INITIAL_LINKS = 24
+
 type SitemapLink = {
   href: string
   label: string
 }
+
+type InfiniteType = 'colleges' | 'courses' | 'exams' | 'cities' | 'blogs' | 'news'
 
 type SitemapSection = {
   title: string
@@ -39,57 +44,103 @@ type SitemapSection = {
   icon: ReactNode
   links: SitemapLink[]
   viewAllHref?: string
+  infiniteType?: InfiniteType
+  total?: number
 }
 
 async function getSitemapData() {
   return unstable_cache(
     async () => {
-      const [colleges, exams, countries, cities, blogs, news, courses] = await Promise.all([
+      const where = { active: true }
+      const [
+        colleges,
+        collegeTotal,
+        exams,
+        examTotal,
+        countries,
+        cities,
+        cityTotal,
+        blogs,
+        blogTotal,
+        news,
+        newsTotal,
+        courses,
+        courseTotal,
+      ] = await Promise.all([
         db.college.findMany({
-          where: { active: true },
+          where,
           select: { name: true, slug: true },
           orderBy: { name: 'asc' },
+          take: INITIAL_LINKS,
         }),
+        db.college.count({ where }),
         db.exam.findMany({
-          where: { active: true },
+          where,
           select: { name: true, slug: true },
           orderBy: { name: 'asc' },
+          take: INITIAL_LINKS,
         }),
+        db.exam.count({ where }),
         db.country.findMany({
-          where: { active: true },
+          where,
           select: { name: true, slug: true, flagEmoji: true },
           orderBy: { name: 'asc' },
         }),
         db.city.findMany({
-          where: { active: true },
+          where,
           select: { name: true, slug: true },
           orderBy: { name: 'asc' },
+          take: INITIAL_LINKS,
         }),
+        db.city.count({ where }),
         db.blog.findMany({
-          where: { active: true },
+          where,
           select: { title: true, slug: true },
           orderBy: { createdAt: 'desc' },
+          take: INITIAL_LINKS,
         }),
+        db.blog.count({ where }),
         db.news.findMany({
-          where: { active: true },
+          where,
           select: { title: true, slug: true },
           orderBy: { createdAt: 'desc' },
+          take: INITIAL_LINKS,
         }),
+        db.news.count({ where }),
         db.course.findMany({
-          where: { active: true },
+          where,
           select: { name: true, slug: true },
           orderBy: { name: 'asc' },
+          take: INITIAL_LINKS,
         }),
+        db.course.count({ where }),
       ])
 
-      return { colleges, exams, countries, cities, blogs, news, courses }
+      return {
+        colleges,
+        collegeTotal,
+        exams,
+        examTotal,
+        countries,
+        cities,
+        cityTotal,
+        blogs,
+        blogTotal,
+        news,
+        newsTotal,
+        courses,
+        courseTotal,
+      }
     },
-    ['html-sitemap'],
+    ['html-sitemap-v2'],
     { revalidate: 3600 }
   )()
 }
 
 function SectionCard({ section }: { section: SitemapSection }) {
+  const useInfinite =
+    Boolean(section.infiniteType) && (section.total ?? 0) > (section.links.length || 0)
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="flex items-start justify-between gap-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50/40 px-5 py-4 sm:px-6">
@@ -114,19 +165,28 @@ function SectionCard({ section }: { section: SitemapSection }) {
       </div>
 
       {section.links.length > 0 ? (
-        <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 p-4 sm:p-5">
-          {section.links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0 group-hover:scale-125 transition-transform" />
-                <span className="truncate">{link.label}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        useInfinite && section.infiniteType ? (
+          <SitemapInfiniteLinks
+            type={section.infiniteType}
+            initialLinks={section.links}
+            total={section.total || section.links.length}
+            pageSize={INITIAL_LINKS}
+          />
+        ) : (
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 p-4 sm:p-5">
+            {section.links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0 group-hover:scale-125 transition-transform" />
+                  <span className="truncate">{link.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )
       ) : (
         <p className="px-5 py-6 text-sm text-slate-500">No pages listed yet.</p>
       )}
@@ -147,7 +207,21 @@ function SectionCard({ section }: { section: SitemapSection }) {
 }
 
 export default async function SitemapPage() {
-  const { colleges, exams, countries, cities, blogs, news, courses } = await getSitemapData()
+  const {
+    colleges,
+    collegeTotal,
+    exams,
+    examTotal,
+    countries,
+    cities,
+    cityTotal,
+    blogs,
+    blogTotal,
+    news,
+    newsTotal,
+    courses,
+    courseTotal,
+  } = await getSitemapData()
 
   const mainPages: SitemapLink[] = [
     { href: '/', label: 'Home' },
@@ -196,24 +270,30 @@ export default async function SitemapPage() {
     },
     {
       title: 'Colleges',
-      description: `${colleges.length} college pages`,
+      description: `${collegeTotal} college pages — scroll inside to load more`,
       icon: <Building2 className="w-5 h-5" />,
       links: colleges.map((c) => ({ href: `/colleges/${c.slug}`, label: c.name })),
       viewAllHref: '/colleges',
+      infiniteType: 'colleges',
+      total: collegeTotal,
     },
     {
       title: 'Courses',
-      description: `${courses.length} course pages`,
+      description: `${courseTotal} course pages — scroll inside to load more`,
       icon: <BookOpen className="w-5 h-5" />,
-      links: courses.map((c) => ({ href: `/colleges?course=${c.slug}`, label: c.name })),
+      links: courses.map((c) => ({ href: `/courses/${c.slug}`, label: c.name })),
       viewAllHref: '/courses',
+      infiniteType: 'courses',
+      total: courseTotal,
     },
     {
       title: 'Exams',
-      description: `${exams.length} exam pages`,
+      description: `${examTotal} exam pages — scroll inside to load more`,
       icon: <FileText className="w-5 h-5" />,
       links: exams.map((e) => ({ href: `/exams/${e.slug}`, label: e.name })),
       viewAllHref: '/exams',
+      infiniteType: 'exams',
+      total: examTotal,
     },
     {
       title: 'Countries',
@@ -227,24 +307,30 @@ export default async function SitemapPage() {
     },
     {
       title: 'Cities',
-      description: `${cities.length} city pages`,
+      description: `${cityTotal} city pages — scroll inside to load more`,
       icon: <MapPin className="w-5 h-5" />,
       links: cities.map((c) => ({ href: `/cities/${c.slug}`, label: c.name })),
       viewAllHref: '/cities',
+      infiniteType: 'cities',
+      total: cityTotal,
     },
     {
       title: 'Blogs',
-      description: `${blogs.length} blog posts`,
+      description: `${blogTotal} blog posts — scroll inside to load more`,
       icon: <BookOpen className="w-5 h-5" />,
       links: blogs.map((b) => ({ href: `/blogs/${b.slug}`, label: b.title })),
       viewAllHref: '/blogs',
+      infiniteType: 'blogs',
+      total: blogTotal,
     },
     {
       title: 'News',
-      description: `${news.length} news articles`,
+      description: `${newsTotal} news articles — scroll inside to load more`,
       icon: <Newspaper className="w-5 h-5" />,
       links: news.map((n) => ({ href: `/news/${n.slug}`, label: n.title })),
       viewAllHref: '/news',
+      infiniteType: 'news',
+      total: newsTotal,
     },
     {
       title: 'Company & Legal',
@@ -263,13 +349,13 @@ export default async function SitemapPage() {
     mainPages.length +
     explorePages.length +
     legalPages.length +
-    colleges.length +
-    courses.length +
-    exams.length +
+    collegeTotal +
+    courseTotal +
+    examTotal +
     countries.length +
-    cities.length +
-    blogs.length +
-    news.length
+    cityTotal +
+    blogTotal +
+    newsTotal
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/25 to-white">

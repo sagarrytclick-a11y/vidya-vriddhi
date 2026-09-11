@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         active: true
       },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 12,
       select: {
         id: true,
         name: true,

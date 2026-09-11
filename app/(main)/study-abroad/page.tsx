@@ -1,13 +1,22 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { MapPin, Globe, Building2, GraduationCap, ArrowRight } from 'lucide-react'
+import { MapPin, Globe, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { db } from '@/lib/db'
 
 export const revalidate = 3600
+
+const PAGE_SIZE = 9
+
+const abroadWhere = {
+  active: true,
+  country: {
+    name: { not: 'INDIA' },
+  },
+} as const
 
 export const metadata: Metadata = {
   title: 'Study Abroad Programs | International Colleges & Universities',
@@ -19,55 +28,78 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function StudyAbroadPage() {
-  const colleges = await db.college.findMany({
-    where: {
-      active: true,
-      country: {
-        name: {
-          not: 'INDIA'
-        }
-      }
-    },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      description: true,
-      imageURL: true,
-      logoURL: true,
-      Countryranking: true,
-      Internationalranking: true,
-      country: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          flagEmoji: true,
-        }
-      },
-      city: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-        }
-      },
-      categories: {
-        select: {
-          name: true,
-          slug: true,
+interface StudyAbroadPageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageProps) {
+  const { page: pageStr } = await searchParams
+  const currentPage = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
+  const skip = (currentPage - 1) * PAGE_SIZE
+
+  const [colleges, total, countryCount, cityCount, programCount] = await Promise.all([
+    db.college.findMany({
+      where: abroadWhere,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        imageURL: true,
+        logoURL: true,
+        country: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            flagEmoji: true,
+          },
         },
-        take: 6,
+        city: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        categories: {
+          select: {
+            name: true,
+            slug: true,
+          },
+          take: 3,
+        },
+        establishment_year: true,
+        _count: { select: { courses: true } },
       },
-      establishment_year: true,
-      _count: { select: { courses: true } },
-    },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    take: 24,
-  })
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: PAGE_SIZE,
+    }),
+    db.college.count({ where: abroadWhere }),
+    db.country.count({
+      where: {
+        name: { not: 'INDIA' },
+        colleges: { some: { active: true } },
+      },
+    }),
+    db.city.count({
+      where: {
+        country: { name: { not: 'INDIA' } },
+        colleges: { some: { active: true } },
+      },
+    }),
+    db.course.count({
+      where: {
+        active: true,
+        colleges: { some: abroadWhere },
+      },
+    }),
+  ])
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const from = total === 0 ? 0 : skip + 1
+  const to = Math.min(skip + colleges.length, total)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/20 to-white">
@@ -90,24 +122,24 @@ export default async function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">{colleges.length}</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">{total}</div>
               <div className="text-sm text-slate-600">International Colleges</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {new Set(colleges.map(c => c.country.name)).size}
+                {countryCount}
               </div>
               <div className="text-sm text-slate-600">Countries</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {new Set(colleges.map(c => c.city.name)).size}
+                {cityCount}
               </div>
               <div className="text-sm text-slate-600">Cities</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">
-                {colleges.reduce((sum, c) => sum + (c._count?.courses || 0), 0)}
+                {programCount}
               </div>
               <div className="text-sm text-slate-600">Programs Offered</div>
             </div>
@@ -118,7 +150,12 @@ export default async function StudyAbroadPage() {
       {/* Colleges Grid */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">International Colleges</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">International Colleges</h2>
+          {total > 0 && (
+            <p className="text-sm text-slate-500 mb-6">
+              Showing {from}–{to} of {total} colleges
+            </p>
+          )}
           
           {colleges.length === 0 ? (
             <div className="text-center py-12">
@@ -226,6 +263,30 @@ export default async function StudyAbroadPage() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="mt-10 flex items-center justify-center gap-2">
+              {currentPage > 1 && (
+                <Link
+                  href={currentPage === 2 ? '/study-abroad' : `/study-abroad?page=${currentPage - 1}`}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50"
+                >
+                  Previous
+                </Link>
+              )}
+              <span className="px-3 text-sm text-slate-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              {currentPage < totalPages && (
+                <Link
+                  href={`/study-abroad?page=${currentPage + 1}`}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50"
+                >
+                  Next
+                </Link>
+              )}
             </div>
           )}
         </div>

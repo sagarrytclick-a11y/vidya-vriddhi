@@ -1,8 +1,10 @@
 import Image from 'next/image'
-import { MapPin, Building2, BookOpen } from 'lucide-react'
+import { MapPin, Building2, BookOpen, Trophy, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollegeActions } from '@/components/college/CollegeActions'
+
+const VISIBLE_LIMIT = 2
 
 interface HeroSectionProps {
   college: {
@@ -26,10 +28,18 @@ interface HeroSectionProps {
     country: { name: string } | null
     categories: { id: string; name: string }[]
     courses: { id: string; name?: string }[]
+    exams?: { id: string; name: string; shortName?: string }[]
   }
 }
 
 export function HeroSection({ college }: HeroSectionProps) {
+  const nirf = college.Countryranking?.trim()
+  const exams = college.exams || []
+  const courseNames = college.courses.map((c) => c.name).filter(Boolean) as string[]
+  const examNames = exams.map((e) => e.shortName || e.name).filter(Boolean)
+  const extraCourses = Math.max(0, courseNames.length - VISIBLE_LIMIT)
+  const extraExams = Math.max(0, examNames.length - VISIBLE_LIMIT)
+
   return (
     <>
       <div className="border-b border-slate-200 bg-white">
@@ -75,10 +85,22 @@ export function HeroSection({ college }: HeroSectionProps) {
                       <MapPin className="h-3.5 w-3.5 text-orange-500" />
                       {college.city?.name}, {college.country?.name}
                     </span>
-                    {college.courses.length > 0 && (
+                    {courseNames.length > 0 && (
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
                         <BookOpen className="h-3.5 w-3.5 text-slate-400" />
-                        {college.courses.length} Courses
+                        {courseNames.slice(0, VISIBLE_LIMIT).join(', ')}
+                        {extraCourses > 0 && (
+                          <span className="font-medium text-slate-500"> +{extraCourses} more</span>
+                        )}
+                      </span>
+                    )}
+                    {examNames.length > 0 && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
+                        <FileText className="h-3.5 w-3.5 text-slate-400" />
+                        {examNames.slice(0, VISIBLE_LIMIT).join(', ')}
+                        {extraExams > 0 && (
+                          <span className="font-medium text-slate-500"> +{extraExams} more</span>
+                        )}
                       </span>
                     )}
                   </div>
@@ -87,6 +109,12 @@ export function HeroSection({ college }: HeroSectionProps) {
                     <Badge variant="secondary" className="px-3 py-1 text-sm">
                       {college.establishment_year ? `Est. ${college.establishment_year}` : 'Established'}
                     </Badge>
+                    {nirf && (
+                      <Badge variant="outline" className="bg-white px-3 py-1 text-sm">
+                        <Trophy className="mr-1 h-3.5 w-3.5 text-amber-500" />
+                        NIRF #{nirf}
+                      </Badge>
+                    )}
                     {college.categories.slice(0, 3).map((cat) => (
                       <Badge key={cat.id} variant="outline" className="bg-white px-3 py-1 text-sm">
                         {cat.name}
