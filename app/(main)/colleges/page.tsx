@@ -233,7 +233,7 @@ function CollegesPageContent() {
                 <div className="mb-6">
                   <h3 className="mb-3 text-sm font-medium text-gray-700">Cities</h3>
                   <div className="max-h-48 space-y-1 overflow-y-auto">
-                    {cities.slice(0, 15).map((city) => {
+                    {cities.map((city) => {
                       const isActive = cityParam === city.slug
                       return (
                         <Link

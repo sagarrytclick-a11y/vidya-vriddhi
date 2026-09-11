@@ -8,6 +8,12 @@ import { ContentSections } from '@/components/college/sections/ContentSections'
 import { CollegeSidebar } from '@/components/college/sections/CollegeSidebar'
 import { CollegeJsonLd } from '@/components/seo/json-ld'
 import { stripForMeta } from '@/lib/seo'
+import {
+  CollegeContentSkeleton,
+  CollegeHeroSkeleton,
+  CollegeSidebarSkeleton,
+  CollegeTabsSkeleton,
+} from '@/components/college/CollegeDetailSkeleton'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -81,15 +87,6 @@ async function SidebarWrapper({ slug }: { slug: string }) {
   return <CollegeSidebar collegeName={college.name} relatedColleges={relatedColleges} />
 }
 
-function SectionFallback() {
-  return (
-    <div className="space-y-4 animate-pulse">
-      <div className="h-8 bg-gray-200 rounded w-1/3" />
-      <div className="h-48 bg-gray-100 rounded-xl" />
-    </div>
-  )
-}
-
 export default async function CollegeDetailPage({ params }: PageProps) {
   const { slug } = await params
   const college = await getCollegeBySlug(slug)
@@ -115,50 +112,26 @@ export default async function CollegeDetailPage({ params }: PageProps) {
         />
       )}
 
-      <Suspense fallback={<BreadcrumbFallback />}>
+      <Suspense fallback={<CollegeHeroSkeleton />}>
         <HeroSectionWrapper slug={slug} />
       </Suspense>
 
-      <Suspense fallback={null}>
+      <Suspense fallback={<CollegeTabsSkeleton />}>
         <CollegeTabs />
       </Suspense>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
-            <Suspense fallback={<SectionFallback />}>
+            <Suspense fallback={<CollegeContentSkeleton />}>
               <ContentSectionWrapper slug={slug} />
             </Suspense>
           </div>
 
           <div className="w-full lg:w-80 shrink-0">
-            <Suspense fallback={<div className="h-64 bg-gray-100 rounded-xl animate-pulse" />}>
+            <Suspense fallback={<CollegeSidebarSkeleton />}>
               <SidebarWrapper slug={slug} />
             </Suspense>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function BreadcrumbFallback() {
-  return (
-    <div className="animate-pulse">
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="h-4 bg-gray-200 rounded w-64" />
-        </div>
-      </div>
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex gap-6">
-            <div className="w-24 h-24 bg-gray-200 rounded-lg" />
-            <div className="flex-1 space-y-3">
-              <div className="h-8 bg-gray-200 rounded w-3/4" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-              <div className="h-6 bg-gray-200 rounded w-1/3" />
-            </div>
           </div>
         </div>
       </div>

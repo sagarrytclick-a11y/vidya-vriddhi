@@ -15,7 +15,7 @@ const fetchFiltersData = async (): Promise<FilterData> => {
 
 export function useCollegesFilters() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['colleges-filters'],
+    queryKey: ['colleges-filters', 'india-cities'],
     queryFn: fetchFiltersData,
     staleTime: 60 * 60 * 1000,
     gcTime: 2 * 60 * 60 * 1000,

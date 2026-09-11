@@ -12,9 +12,11 @@ import { AdmissionButton } from '@/components/ui/AdmissionButton'
 
 interface CoursePageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ page?: string }>
 }
 
 export const revalidate = 3600
+const COURSE_COLLEGE_PAGE_SIZE = 9
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
   const { slug } = await params
@@ -37,15 +39,19 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
   }
 }
 
-export default async function CourseDetailPage({ params }: CoursePageProps) {
+export default async function CourseDetailPage({ params, searchParams }: CoursePageProps) {
   const { slug } = await params
+  const { page: pageStr } = await searchParams
+  const currentPage = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
+  const skip = (currentPage - 1) * COURSE_COLLEGE_PAGE_SIZE
 
   const course = await db.course.findFirst({
     where: { slug, active: true },
     include: {
       colleges: {
         where: { active: true },
-        take: 24,
+        skip,
+        take: COURSE_COLLEGE_PAGE_SIZE,
         orderBy: { name: 'asc' },
         select: {
           id: true,
@@ -57,11 +63,16 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
           country: { select: { name: true } },
         },
       },
+      _count: {
+        select: { colleges: { where: { active: true } } },
+      },
     },
   })
 
   if (!course) notFound()
 
+  const collegeTotal = course._count.colleges
+  const totalPages = Math.max(1, Math.ceil(collegeTotal / COURSE_COLLEGE_PAGE_SIZE))
   const description =
     stripForMeta(course.description) ||
     `Find top colleges offering ${course.name}. Compare admissions, fees, and placements.`
@@ -100,9 +111,14 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
       </header>
 
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Colleges offering {course.name}
         </h2>
+        {collegeTotal > 0 && (
+          <p className="text-sm text-gray-500 mb-6">
+            Showing {skip + 1}–{skip + course.colleges.length} of {collegeTotal}
+          </p>
+        )}
 
         {course.colleges.length === 0 ? (
           <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center">
@@ -150,6 +166,34 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
               </Link>
             ))}
           </div>
+        )}
+
+        {totalPages > 1 && course.colleges.length > 0 && (
+            <div className="mt-8 flex items-center justify-center gap-2">
+              {currentPage > 1 && (
+                <Link
+                  href={
+                    currentPage === 2
+                      ? `/courses/${course.slug}`
+                      : `/courses/${course.slug}?page=${currentPage - 1}`
+                  }
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Previous
+                </Link>
+              )}
+              <span className="px-3 text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              {currentPage < totalPages && (
+                <Link
+                  href={`/courses/${course.slug}?page=${currentPage + 1}`}
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Next
+                </Link>
+              )}
+            </div>
         )}
       </section>
     </main>

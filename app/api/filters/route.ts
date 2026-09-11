@@ -20,10 +20,12 @@ const fetchFiltersFromDb = unstable_cache(
         take: SIDEBAR_LIMIT,
       }),
       db.city.findMany({
-        where: { active: true },
+        where: {
+          active: true,
+          country: { name: { equals: 'India', mode: 'insensitive' } },
+        },
         select: { id: true, name: true, slug: true },
         orderBy: { name: 'asc' },
-        take: SIDEBAR_LIMIT,
       }),
       db.exam.findMany({
         where: { active: true },
@@ -35,13 +37,13 @@ const fetchFiltersFromDb = unstable_cache(
 
     return { categories, courses, cities, exams }
   },
-  ['filters-data-v2'],
+  ['filters-data-v3-india-cities'],
   { revalidate: 3600 }
 )
 
 export async function GET() {
   try {
-    const cacheKey = 'filters-data-v2'
+    const cacheKey = 'filters-data-v3-india-cities'
     const cached = get<{
       categories: unknown[]
       courses: unknown[]
