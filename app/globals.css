@@ -149,6 +149,14 @@
   }
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Admin panel polish — UI only */
 .admin-panel {
   --admin-bg: #080a0e;

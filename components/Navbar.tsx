@@ -118,18 +118,18 @@ const Navbar = () => {
 
 
             {/* Desktop Search Bar */}
-            <div className="hidden cursor-pointer lg:flex items-center">
+            <div className="hidden lg:flex items-center flex-1 min-w-0 mx-3 xl:mx-4">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center cursor-pointer space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-4 py-2.5 rounded-lg transition-all mr-3 w-96 xl:w-125"
+                className="flex items-center cursor-pointer space-x-3 bg-white hover:bg-gray-50 text-gray-600 px-4 py-2.5 rounded-lg transition-all w-full max-w-sm xl:max-w-md 2xl:max-w-xl"
               >
-                <Search className="w-5 h-5 text-gray-400" />
-                <span className="text-sm">Search colleges, exams...</span>
+                <Search className="w-5 h-5 shrink-0 text-gray-400" />
+                <span className="text-sm truncate">Search colleges, exams...</span>
               </button>
             </div>
 
             {/* Right Side Actions */}
-            <div className="flex cursor-pointer items-center space-x-2 sm:space-x-3">
+            <div className="flex cursor-pointer items-center gap-2 sm:gap-3 shrink-0">
               {/* Mobile Search Button */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -138,30 +138,30 @@ const Navbar = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              <div className="hidden lg:flex items-center space-x-4 ml-8">
-                <Link href="/compare-colleges" className="text-white hover:text-orange-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-                  <PencilLine className="w-4 h-4" />
+              <div className="hidden lg:flex items-center gap-3 xl:gap-4 xl:ml-6">
+                <Link href="/compare-colleges" className="hidden xl:flex text-white hover:text-orange-300 px-3 py-1.5 rounded-lg text-sm font-medium items-center gap-2 transition-colors">
+                  <PencilLine className="w-4 h-4 shrink-0" />
                   <div>
-                    <p>Compare Colleges</p>
-                    <p className='bg-orange-500 text-[10px] flex items-center justify-center p-1 rounded'>Upto 4 Colleges</p>
+                    <p className="whitespace-nowrap">Compare Colleges</p>
+                    <p className='bg-orange-500 text-[10px] flex items-center justify-center p-1 rounded whitespace-nowrap'>Upto 4 Colleges</p>
                   </div>
                 </Link>
                 <button
                   onClick={toggleSaarthi}
-                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-3 xl:px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm whitespace-nowrap"
                 >
-                  <Bot className="w-4 h-4" />
+                  <Bot className="w-4 h-4 shrink-0" />
                   <span>VV Saarthi</span>
-                  <Sparkles className="w-3 h-3 text-yellow-200" />
+                  <Sparkles className="hidden xl:block w-3 h-3 text-yellow-200" />
                 </button>
               </div>
 
               {/* User Auth Section */}
               {isSignedIn ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => openModal()}
-                    className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                    className="hidden sm:flex items-center bg-orange-500 hover:bg-orange-600 text-white px-3 xl:px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm whitespace-nowrap"
                   >
                     <span>Get Guidance</span>
                   </button>
@@ -172,7 +172,7 @@ const Navbar = () => {
                   {/* Get Guidance Button */}
                   <button
                     onClick={() => openModal()}
-                    className="hidden sm:flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm"
+                    className="hidden sm:flex items-center bg-orange-500 hover:bg-orange-600 text-white px-3 xl:px-4 py-2 rounded-lg font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-sm whitespace-nowrap"
                   >
                     <span>Get Guidance</span>
                   </button>
@@ -186,7 +186,7 @@ const Navbar = () => {
                   </button>
 
                   {/* Login Button */}
-                  <Link href="/sign-in" className="hidden sm:flex items-center space-x-2 bg-white hover:bg-gray-50 text-slate-900 px-4 py-2 rounded-lg font-semibold transition-all text-sm">
+                  <Link href="/sign-in" className="hidden sm:flex items-center bg-white hover:bg-gray-50 text-slate-900 px-3 xl:px-4 py-2 rounded-lg font-semibold transition-all text-sm whitespace-nowrap">
                     <span>Login</span>
                   </Link>
                 </>
@@ -210,11 +210,12 @@ const Navbar = () => {
 
         {/* Desktop Secondary Navigation */}
         <div className="hidden lg:block bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto flex items-center justify-center space-x-6 xl:space-x-8 px-4">
-            {mainNavItems.map((item) => (
+          <div className="max-w-7xl mx-auto overflow-x-auto no-scrollbar">
+            <div className="flex items-center justify-start xl:justify-center gap-4 xl:gap-8 px-4 w-max min-w-full mx-auto">
+              {mainNavItems.map((item) => (
               <div
                 key={item.name}
-                className="relative py-3 xl:py-4 group"
+                className="relative py-3 xl:py-4 group shrink-0"
                 onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.name)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
@@ -271,7 +272,8 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
