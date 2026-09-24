@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     const exam = searchParams.get('exam')?.trim() || ''
     const search = searchParams.get('search')?.trim() || ''
 
-    const cacheKey = `indian-colleges:v5:${page}:${limit}:${category}:${course}:${city}:${exam}:${search}`
+    const cacheKey = `indian-colleges:v6:${page}:${limit}:${category}:${course}:${city}:${exam}:${search}`
     const cached = get<{
       colleges: unknown[]
       pagination: {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
       whereClause.name = { contains: search, mode: 'insensitive' }
     }
     if (category) {
-      whereClause.categories = { some: { slug: category } }
+      whereClause.categories = { some: { slug: { equals: category, mode: 'insensitive' } } }
     }
     if (course) {
       whereClause.courses = { some: { slug: course } }

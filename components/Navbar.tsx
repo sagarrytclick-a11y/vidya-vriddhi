@@ -14,7 +14,6 @@ import { UserButton, useUser } from '@clerk/nextjs'
 const Navbar = () => {
   const { user, isSignedIn } = useUser()
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { openModal } = useAdmissionModal()
@@ -50,6 +49,7 @@ const Navbar = () => {
   const mainNavItems = [
     {
       name: "All colleges",
+      href: '/colleges',
       hasDropdown: true,
       dropdownContent: {
         colleges: ['Indian Institute of Technology Delhi (IIT Delhi)', 'Xavier School of Management', 'Lady Shri Ram College for Women (LSR), Delhi', 'Christian Medical College (CMC)', 'Maulana Azad Medical College (MAMC), Delhi', 'Hansraj College, Delhi', 'St. Stephens College, Delhi', 'Vardhman Mahavir Medical College (VMMC)', 'Vellore Institute of Technology (VIT)'],
@@ -58,6 +58,7 @@ const Navbar = () => {
     },
     {
       name: 'Engineering',
+      href: '/colleges?category=engineering',
       hasDropdown: true,
       dropdownContent: {
         colleges: ['National Law School of India University, Bangalore', 'Indian Institute of Technology Delhi (IIT Delhi)', 'Indian Institute of Technology Bombay (IITB)', 'Vellore Institute of Technology (VIT)', 'SRM Institute of Science and Technology (SRMIST)', 'Birla Institute of Technology and Science (BITS), Pilani', 'Thapar Institute of Engineering and Technology (TIET)' , 'Delhi Technological University (DTU), Delhi'],
@@ -66,6 +67,7 @@ const Navbar = () => {
     },
     {
       name: 'Management',
+      href: '/colleges?category=management',
       hasDropdown: true,
       dropdownContent: {
         colleges: ['IIM Ahmedabad (Indian Institute of Management)', 'Indian Institute of Management Calcutta (IIMC)', 'Indian Institute of Management Bangalore', 'Indian Institute of Technology Bombay (IITB)', 'The Institute of Hotel Management, Bangalore', 'Faculty of Management Studies, University of Delhi (FMS Delhi)' , 'Xavier School of Management (XLRI), Jamshedpur', 'Indian Institute of Foreign Trade (IIFT), Delhi' , 'Xavier School of Management' , 'SRM Institute of Science and Technology (SRMIST)' , 'Symbiosis Institute of Business Management (SIBM)'],
@@ -74,6 +76,7 @@ const Navbar = () => {
     },
     {
       name: 'Medical',
+      href: '/colleges?category=medical',
       hasDropdown: true,
       dropdownContent: {
         colleges: ['Maulana Azad Medical College (MAMC)', 'All India Institute of Medical Sciences (AIIMS)', 'Maulana Azad Medical College (MAMC), Delhi', 'Christian Medical College (CMC)', 'Kasturba Medical College (KMC), Manipal' , 'Grant Government Medical College & Sir J.J. Group of Hospitals (GMC Mumbai)' , 'King Georges Medical University (KGMU), Lucknow' , 'SRM Institute of Science and Technology (SRMIST)' , 'St. Johns Medical College' , 'Vardhman Mahavir Medical College (VMMC)' ],
@@ -82,6 +85,7 @@ const Navbar = () => {
     },
     {
       name: 'Commerce',
+      href: '/colleges?category=commerce',
       hasDropdown: true,
       dropdownContent: {
         colleges: ['Miranda House, Delhi', 'Shri Ram College of Commerce (SRCC)', 'Indian Institute of Management Bangalore', 'Loyola College, Chennai', 'Lady Shri Ram College for Women (LSR), Delhi' , 'Vellore Institute of Technology (VIT)' , 'Hansraj College, Delhi' , 'SRM Institute of Science and Technology (SRMIST)' , 'St. Stephens College, Delhi'],
@@ -220,24 +224,21 @@ const Navbar = () => {
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 {/* Trigger Button */}
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap text-gray-600 hover:text-orange-500"
-                  >
-                    <span>{item.name}</span>
-                  </Link>
-                ) : (
-                  <button
-                    className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap ${activeDropdown === item.name ? 'text-orange-500' : 'text-gray-600 hover:text-orange-500'
-                      }`}
-                  >
-                    <span>{item.name}</span>
-                    {item.hasDropdown && (
-                      <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
-                    )}
-                  </button>
-                )}
+                <Link
+                  href={item.href ?? '/'}
+                  className={`flex items-center space-x-1 text-sm font-semibold transition-colors outline-none whitespace-nowrap ${
+                    item.hasDropdown
+                      ? activeDropdown === item.name
+                        ? 'text-orange-500'
+                        : 'text-gray-600 hover:text-orange-500'
+                      : 'text-gray-600 hover:text-orange-500'
+                  }`}
+                >
+                  <span>{item.name}</span>
+                  {item.hasDropdown && (
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
+                  )}
+                </Link>
 
                 {/* Desktop Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
@@ -320,53 +321,19 @@ const Navbar = () => {
 
             {mainNavItems.map((item) => (
               <div key={item.name} className="border-b border-gray-100">
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
-                  >
-                    <span className="font-semibold text-gray-800">{item.name}</span>
-                    <ArrowRight size={16} className="text-gray-500" />
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => setMobileOpenDropdown(mobileOpenDropdown === item.name ? null : item.name)}
-                    className="w-full flex items-center justify-between px-4 py-4 text-left"
-                  >
-                    <span className="font-semibold text-gray-800">{item.name}</span>
+                <Link
+                  href={item.href ?? '/'}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-1.5 font-semibold text-gray-800">
+                    {item.name}
                     {item.hasDropdown && (
-                      <ChevronDown size={20} className={`text-gray-500 transition-transform duration-200 ${mobileOpenDropdown === item.name ? 'rotate-180' : ''}`} />
+                      <ChevronDown size={16} className="text-gray-400" />
                     )}
-                  </button>
-                )}
-
-                {/* Mobile Dropdown Content */}
-                {item.hasDropdown && mobileOpenDropdown === item.name && (
-                  <div className="bg-gray-50 px-4 py-4 space-y-4">
-                    {item.dropdownContent.colleges && (
-                      <div>
-                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Colleges</h3>
-                        <ul className="space-y-2">
-                          {item.dropdownContent.colleges.map((college, i) => (
-                            <li key={i}>
-                              <Link href={`/colleges/${getSlug(college)}`} className="text-sm text-gray-600 py-1 block hover:text-orange-500">
-                                {college}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {item.dropdownContent.viewAllLink && (
-                      <Link href={getViewAllHref(item.name)} className="flex items-center text-orange-500 font-bold text-sm pt-2">
-                        {item.dropdownContent.viewAllLink}
-                        <ArrowRight size={16} className="ml-1" />
-                      </Link>
-                    )}
-                  </div>
-                )}
+                  </span>
+                  <ArrowRight size={16} className="text-gray-500" />
+                </Link>
               </div>
             ))}
           </div>
