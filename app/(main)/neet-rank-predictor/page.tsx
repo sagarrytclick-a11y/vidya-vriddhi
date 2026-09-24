@@ -25,6 +25,32 @@ interface RankEntry {
   label: string;
 }
 
+type CategoryKey = 'general' | 'obc' | 'ews' | 'sc' | 'st';
+
+interface CategoryInfo {
+  key: CategoryKey;
+  label: string;
+  factor: number;
+  note: string;
+}
+
+interface PredictionResult {
+  air: RankEntry;
+  categoryRank: { min: number; max: number } | null;
+  categoryKey: CategoryKey;
+}
+
+// Category-wise rank is estimated as a fraction of the General (UR) AIR based on
+// previous-year NEET reservation trends. Reserved categories have far fewer
+// candidates, so the category rank for the same score is typically much better.
+const categories: CategoryInfo[] = [
+  { key: 'general', label: 'General', factor: 1, note: 'General / UR — shows the standard All India Rank.' },
+  { key: 'obc', label: 'OBC-NCL', factor: 0.4, note: 'OBC (Non-Creamy Layer) — benefits from reserved seats.' },
+  { key: 'ews', label: 'EWS', factor: 0.45, note: 'Economically Weaker Section — benefits from reserved seats.' },
+  { key: 'sc', label: 'SC', factor: 0.22, note: 'Scheduled Caste — benefits from reserved seats.' },
+  { key: 'st', label: 'ST', factor: 0.12, note: 'Scheduled Tribe — benefits from reserved seats.' },
+];
+
 const rankData: RankEntry[] = [
   { minScore: 720, maxScore: 720, minRank: 1, maxRank: 1, label: "AIR 1 (Top of India)" },
   { minScore: 700, maxScore: 719, minRank: 2, maxRank: 800, label: "Top 800 — Premier colleges" },
@@ -44,6 +70,8 @@ const collegeCategories = [
   {
     title: "Top Government Colleges",
     rankRange: "1 - 20,000",
+    minRank: 1,
+    maxRank: 20000,
     gradient: "from-emerald-500 to-green-600",
     icon: "🏛️",
     colleges: ["AIIMS Delhi", "Maulana Azad Medical College", "SMS Medical College Jaipur", "Gandhi Medical College Bhopal", "King George's Medical University"],
@@ -51,6 +79,8 @@ const collegeCategories = [
   {
     title: "Good Government / Top Private",
     rankRange: "20,000 - 1,80,000",
+    minRank: 20001,
+    maxRank: 180000,
     gradient: "from-blue-500 to-cyan-500",
     icon: "🏥",
     colleges: ["Hamdard Institute of Medical Sciences", "JSS Medical College Mysore", "Christian Medical College Vellore", "Kasturba Medical College Manipal"],
@@ -58,6 +88,8 @@ const collegeCategories = [
   {
     title: "Private / Deemed Colleges",
     rankRange: "1,80,000+",
+    minRank: 180001,
+    maxRank: 2400000,
     gradient: "from-purple-500 to-pink-500",
     icon: "🎓",
     colleges: ["DY Patil Medical College", "SRM Medical College", "Sharda University", "Teerthanker Mahaveer Medical College"],
@@ -81,7 +113,8 @@ const NeetRankPredictorPage: React.FC = () => {
   const [score, setScore] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
-  const [prediction, setPrediction] = useState<RankEntry | null>(null);
+  const [category, setCategory] = useState<CategoryKey>('general');
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [showPrediction, setShowPrediction] = useState(false);
 
   const applyScoreChange = (next: string) => {
@@ -104,8 +137,24 @@ const NeetRankPredictorPage: React.FC = () => {
 
     const numScore = Number(score)
     const matched = rankData.find((r) => numScore >= r.minScore && numScore <= r.maxScore) || null
+
+    if (!matched) {
+      setError('Could not estimate a rank for this score.')
+      setShowPrediction(false)
+      setPrediction(null)
+      return
+    }
+
+    const selected = categories.find((c) => c.key === category) || categories[0]
+    let categoryRank: { min: number; max: number } | null = null
+    if (selected.factor < 1) {
+      const min = Math.max(1, Math.round(matched.minRank * selected.factor))
+      const max = Math.max(min, Math.round(matched.maxRank * selected.factor))
+      categoryRank = { min, max }
+    }
+
     setError(null)
-    setPrediction(matched)
+    setPrediction({ air: matched, categoryRank, categoryKey: selected.key })
     setShowPrediction(true)
   };
 
@@ -115,6 +164,16 @@ const NeetRankPredictorPage: React.FC = () => {
     if (rank >= 1000) return `${(rank / 1000).toFixed(1)}K`;
     return rank.toString();
   };
+
+  const selectedCategory = categories.find((c) => c.key === category) || categories[0];
+
+  const targetTier = prediction
+    ? (() => {
+        const effMin = prediction.categoryRank ? prediction.categoryRank.min : prediction.air.minRank;
+        const effMax = prediction.categoryRank ? prediction.categoryRank.max : prediction.air.maxRank;
+        return collegeCategories.find((c) => effMax >= c.minRank && effMin <= c.maxRank) || null;
+      })()
+    : null;
 
   return (
     <div className="bg-white min-h-screen">
@@ -143,8 +202,8 @@ const NeetRankPredictorPage: React.FC = () => {
                 <span className="block text-orange-400">NEET Rank</span>
               </h1>
               <p className="text-slate-300 text-base lg:text-lg leading-relaxed max-w-xl">
-                Estimate your All India Rank based on your NEET UG score using previous year trends.
-                This is an approximate prediction — actual rank may vary based on exam difficulty and number of candidates.
+                Estimate your All India Rank and category-wise rank (General / OBC / EWS / SC / ST) using previous year trends.
+                This is an approximate prediction — actual rank may vary based on exam difficulty, number of candidates, and your category.
               </p>
 
               <div className="flex flex-wrap gap-4 mt-8">
@@ -184,7 +243,7 @@ const NeetRankPredictorPage: React.FC = () => {
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900">NEET Rank Predictor</h2>
-              <p className="text-sm text-gray-500">Enter your score to estimate your rank</p>
+              <p className="text-sm text-gray-500">Enter your score to estimate your All India &amp; category-wise rank</p>
             </div>
           </div>
 
@@ -242,24 +301,92 @@ const NeetRankPredictorPage: React.FC = () => {
             </div>
           </div>
 
-          {showPrediction && (
-            <div className={`mt-8 p-6 rounded-xl border ${prediction ? 'bg-orange-50 border-orange-200' : 'bg-red-50 border-red-200'}`}>
-              {prediction ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold tracking-wider text-orange-500 uppercase mb-1">Estimated All India Rank</p>
-                    <p className="text-4xl sm:text-5xl font-black text-gray-900">
-                      {formatRank(prediction.minRank)} — {formatRank(prediction.maxRank)}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">{prediction.label}</p>
-                  </div>
-                  <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl px-5 py-3 text-center">
-                    <p className="text-xs text-gray-400 mb-1">Score</p>
-                    <p className="text-2xl font-black text-orange-500">{score}/720</p>
-                  </div>
+            {/* Category selector */}
+            <div className="mt-7 pt-6 border-t border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Sliders size={14} className="text-orange-500" />
+                <span className="text-sm font-semibold text-gray-700">Your Category</span>
+                <span className="text-xs text-gray-400 font-normal">(for category-wise rank)</span>
+              </div>
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Category">
+                {categories.map((c) => {
+                  const active = category === c.key
+                  return (
+                    <button
+                      key={c.key}
+                      type="button"
+                      onClick={() => {
+                        setCategory(c.key)
+                        setShowPrediction(false)
+                        setPrediction(null)
+                      }}
+                      aria-pressed={active}
+                      className={`px-4 py-2 rounded-full border text-sm font-semibold transition-all ${
+                        active
+                          ? 'bg-orange-500 border-orange-500 text-white shadow-md shadow-orange-500/20'
+                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                {selectedCategory.note} Category rank is usually far better than the General AIR for reserved categories.
+              </p>
+            </div>
+
+          {showPrediction && prediction && (
+            <div className="mt-8 p-6 rounded-xl border bg-orange-50 border-orange-200">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-xs font-bold tracking-wider text-orange-500 uppercase mb-1">
+                    {prediction.categoryRank ? `${selectedCategory.label} Category Rank` : 'Estimated All India Rank'}
+                  </p>
+                  <p className="text-4xl sm:text-5xl font-black text-gray-900">
+                    {prediction.categoryRank
+                      ? `${formatRank(prediction.categoryRank.min)} — ${formatRank(prediction.categoryRank.max)}`
+                      : `${formatRank(prediction.air.minRank)} — ${formatRank(prediction.air.maxRank)}`}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">{prediction.air.label}</p>
                 </div>
-              ) : (
-                <p className="text-red-600 font-semibold">Invalid score. Please enter a score between 0 and 720.</p>
+                <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl px-5 py-3 text-center">
+                  <p className="text-xs text-gray-400 mb-1">Score</p>
+                  <p className="text-2xl font-black text-orange-500">{score}/720</p>
+                </div>
+              </div>
+
+              {prediction.categoryRank && (
+                <>
+                  <div className="mt-5 grid sm:grid-cols-2 gap-4">
+                    <div className="bg-white/70 border border-orange-100 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">All India Rank (General)</p>
+                      <p className="text-xl font-black text-gray-900">
+                        {formatRank(prediction.air.minRank)} — {formatRank(prediction.air.maxRank)}
+                      </p>
+                    </div>
+                    <div className="bg-white border border-orange-300 rounded-xl p-4 shadow-sm">
+                      <p className="text-xs font-bold mb-1 text-orange-500">{selectedCategory.label} Category Rank</p>
+                      <p className="text-xl font-black text-orange-600">
+                        {formatRank(prediction.categoryRank.min)} — {formatRank(prediction.categoryRank.max)}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-4">
+                    * Category rank is an approximate estimate based on previous-year NEET reservation trends. Your actual
+                    category rank depends on the total number of candidates in your category in the current year.
+                  </p>
+                </>
+              )}
+
+              {targetTier && (
+                <div className="mt-5 inline-flex items-center gap-2 bg-white border border-orange-200 rounded-full px-4 py-2">
+                  <Target size={14} className="text-orange-500" />
+                  <span className="text-xs font-semibold text-gray-700">
+                    With this rank you can target: <span className="text-orange-600">{targetTier.title}</span>
+                  </span>
+                </div>
               )}
             </div>
           )}
@@ -298,7 +425,7 @@ const NeetRankPredictorPage: React.FC = () => {
           </table>
         </div>
         <p className="text-xs text-gray-400 mt-4 text-center">
-          * These are approximate ranges based on previous year NEET UG data. Actual ranks depend on exam difficulty and total candidates.
+          * The table shows General (UR) All India ranks. For reserved categories (OBC / EWS / SC / ST), the category-wise rank for the same score is significantly better — select your category in the predictor above.
         </p>
       </section>
 
@@ -311,27 +438,44 @@ const NeetRankPredictorPage: React.FC = () => {
               <span className="text-xs font-bold tracking-wider text-orange-500 uppercase">College Categories</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900">Colleges You Can Target</h2>
-            <p className="text-gray-500 text-sm mt-2">Based on your predicted rank range</p>
+            <p className="text-gray-500 text-sm mt-2">
+              Based on your predicted rank — the best-matching tier is highlighted after you predict
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {collegeCategories.map((cat, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-4 text-white text-lg`}>
-                  {cat.icon}
+            {collegeCategories.map((cat, i) => {
+              const isTarget = targetTier?.title === cat.title
+              return (
+                <div
+                  key={i}
+                  className={`bg-white rounded-2xl p-6 shadow-md border transition-all duration-300 ${
+                    isTarget ? 'border-orange-300 ring-2 ring-orange-200 shadow-lg' : 'border-gray-100 hover:shadow-lg hover:-translate-y-1'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center text-white text-lg`}>
+                      {cat.icon}
+                    </div>
+                    {isTarget && (
+                      <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-600 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full">
+                        <Target size={11} /> Best match
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">{cat.title}</h3>
+                  <p className="text-xs font-semibold text-orange-500 mb-4">Rank range: {cat.rankRange}</p>
+                  <ul className="space-y-2">
+                    {cat.colleges.map((c, ci) => (
+                      <li key={ci} className="flex items-start gap-2">
+                        <CheckCircle size={14} className="text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-600">{c}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{cat.title}</h3>
-                <p className="text-xs font-semibold text-orange-500 mb-4">Rank range: {cat.rankRange}</p>
-                <ul className="space-y-2">
-                  {cat.colleges.map((c, ci) => (
-                    <li key={ci} className="flex items-start gap-2">
-                      <CheckCircle size={14} className="text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-600">{c}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
