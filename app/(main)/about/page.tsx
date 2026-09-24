@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
-import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone, Mail, Globe, Quote, Sparkles, Building2 } from 'lucide-react'
+import { ArrowLeft, GraduationCap, Users, Award, Target, BookOpen, MapPin, Phone, Mail, Globe, Quote, Sparkles, Building2, Check } from 'lucide-react'
 import { SITE_IDENTITY, getFullAddress } from '../site-identity'
 
 export const metadata: Metadata = {
@@ -95,14 +95,14 @@ const AboutPage = () => {
                 <p>
                   What started as a small counseling center in Noida has grown into a nationally
                   recognized educational consultancy. We have successfully guided over 50,000 students
-                  through the complex admission processes of India's top universities and international
+                  through the complex admission processes of India&apos;s top universities and international
                   institutions. Our comprehensive services include career assessment, college selection,
                   application assistance, interview preparation, and scholarship guidance.
                 </p>
                 <p>
                   Our team of certified counselors combines deep industry knowledge with genuine empathy
-                  for each student's unique situation. We understand that choosing the right educational
-                  path is one of life's most significant decisions, and we take that responsibility seriously.
+                  for each student&apos;s unique situation. We understand that choosing the right educational
+                  path is one of life&apos;s most significant decisions, and we take that responsibility seriously.
                 </p>
               </div>
             </div>
@@ -117,36 +117,44 @@ const AboutPage = () => {
             </span>
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">The Minds Behind {SITE_IDENTITY.name}</h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              A tight-knit team of counselors and mentors, working from a space built for focused, student-first guidance.
+              A tight-knit team of engineers, working from a space built for focused, student-first guidance.
             </p>
           </div>
 
-          {/* Team — photo placeholders (icons) until real photos are added */}
+          {/* Team */}
           <div className="mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              {
-                name: 'Gaurav Rathore',
-                role: 'Senior Software Developer',
-                bio: 'Leads our product engineering with deep experience building reliable platforms for counseling and student support.',
-              },
               {
                 name: 'Sagar Bisht',
                 role: 'Full Stack Developer',
                 bio: 'Builds end-to-end features across web and backend, keeping the student experience fast and seamless.',
+                image: '/about/team-sagar.png',
+              },
+              {
+                name: 'Gaurav Rathore',
+                role: 'Senior Software Developer',
+                bio: 'Leads our product engineering with deep experience building reliable platforms for counseling and student support.',
+                image: '/about/team-gaurav.png',
               },
               {
                 name: 'Arun Rathore',
                 role: 'Junior Software Developer',
                 bio: 'Supports new feature development and bug fixes, learning quickly while shipping quality work with the team.',
+                image: '/about/team-arun.png',
               },
-            ].map((member, i) => (
+            ].map((member) => (
               <article
-                key={i}
+                key={member.name}
                 className="group flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-100/50"
               >
-                {/* Placeholder avatar — swap User icon for <Image> when photos are ready */}
-                <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 ring-4 ring-white shadow-md transition-transform duration-300 group-hover:scale-105">
-                  <Users className="h-10 w-10 text-orange-500" />
+                <div className="mb-5 flex h-44 w-44 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-orange-50 to-white ring-4 ring-white shadow-md transition-transform duration-300 group-hover:scale-105">
+                  <Image
+                    src={member.image}
+                    alt={`${member.name} profile`}
+                    width={240}
+                    height={240}
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">{member.name}</h3>
                 <p className="mb-3 mt-1 text-sm font-medium text-orange-600">{member.role}</p>
@@ -155,37 +163,45 @@ const AboutPage = () => {
             ))}
           </div>
 
-          {/* Office photos */}
+          {/* Office */}
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 md:p-8">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100">
-                <Building2 className="h-5 w-5 text-orange-500" />
+            <div className="grid items-center gap-8 md:grid-cols-2">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 shadow-sm">
+                <Image
+                  src="/about/office.png"
+                  alt="Inside the VidyaVriddhi office"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900">Inside Our Office</h3>
-                <p className="text-sm text-slate-600">Where counseling sessions, planning, and student support happen every day.</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {[
-                { src: '/about/image-1.jpg', alt: 'Counseling area at our office' },
-                { src: '/about/image-2.jpg', alt: 'Team workspace' },
-                { src: '/about/image-3.jpg', alt: 'Student discussion corner' },
-                { src: '/about/image-4.jpg', alt: 'Office reception and lounge' },
-              ].map((photo, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200 bg-slate-200 shadow-sm transition-transform duration-300 hover:scale-[1.02]"
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                  />
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100">
+                    <Building2 className="h-5 w-5 text-orange-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 md:text-2xl">Inside Our Office</h3>
                 </div>
-              ))}
+                <p className="leading-relaxed text-slate-600">
+                  Where counselling sessions, planning, and student support happen every day — a calm,
+                  student-first space built for focused, personal guidance.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {[
+                    'One-on-one counselling sessions',
+                    'Career and admission planning',
+                    'A welcoming student support space',
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-sm font-medium text-slate-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -267,9 +283,13 @@ const AboutPage = () => {
                 my strengths and guided me every step of the way.&rdquo;
               </blockquote>
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
-                  RS
-                </div>
+                <Image
+                  src="https://i.pinimg.com/1200x/8e/0a/ad/8e0aadff615d1db3d75d10566c8f2883.jpg"
+                  alt="Rahul Sharma"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-orange-100"
+                />
                 <div className="text-left">
                   <p className="font-bold text-slate-900">Rahul Sharma</p>
                   <p className="text-sm text-slate-500">MBA, IIM Ahmedabad (Batch 2025)</p>
