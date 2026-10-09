@@ -250,10 +250,17 @@ export default function CompareCollegesPage() {
                           <Calendar className="w-4 h-4 mr-2 text-orange-500" />
                           Established {college.establishment_year || 'N/A'}
                         </div>
-                        <div className="flex items-center text-sm text-gray-600 font-bold">
-                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
-                          {college._count?.courses || 0} Courses Available
-                        </div>
+                        {(college._count?.courses || college.courses?.length) ? (
+                          <div className="flex items-center text-sm text-gray-600 font-bold">
+                            <Calendar className="w-4 h-4 mr-2 text-orange-500" />
+                            {college._count?.courses || college.courses?.length} Courses Available
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-sm text-gray-600 font-bold">
+                            <Calendar className="w-4 h-4 mr-2 text-orange-500" />
+                            Courses Available: Not Disclosed
+                          </div>
+                        )}
                       </div>
                     </td>
                   ))}
