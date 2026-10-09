@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, User, Mail, Phone, MapPin, BookOpen, ChevronDown, Check, Send } from 'lucide-react'
+import { X, User, Mail, Phone, MapPin, BookOpen, CheckCircle2 } from 'lucide-react'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SuccessModal } from '@/components/ui/success-modal'
-import { CongratulationsModal } from '@/components/ui/congratulations-modal'
 import { z } from 'zod'
 import {
   Select,
@@ -142,26 +141,8 @@ export function AdmissionModal() {
       const data = await response.json()
 
       if (response.ok) {
-        // Store current form data for congratulations modal
         setCurrentFormData({ ...formData })
-        
         setShowCongratulations(true)
-        // Don't close modal yet - let congratulations show on top
-        
-        // Reset form after showing congratulations
-        setTimeout(() => {
-          setFormData({
-            fullName: '',
-            email: '',
-            phone: '',
-            city: '',
-            course: selectedCourse || '',
-            courseType: 'regular',
-            agreedToTerms: false,
-          })
-          setCurrentFormData(null)
-          closeModal() // Close admission modal after congratulations
-        }, 3000) // Close after 3 seconds or when user closes congratulations
       } else {
         setModalState({
           isOpen: true,
@@ -196,6 +177,21 @@ export function AdmissionModal() {
         })
       }, 500)
     }
+  }
+
+  const handleCongratulationsClose = () => {
+    setShowCongratulations(false)
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      city: '',
+      course: selectedCourse || '',
+      courseType: 'regular',
+      agreedToTerms: false,
+    })
+    setCurrentFormData(null)
+    closeModal()
   }
 
   return (
@@ -323,12 +319,20 @@ export function AdmissionModal() {
                 value={formData.city}
                 onValueChange={(value) => setFormData({ ...formData, city: value })}
               >
-                <SelectTrigger className="w-full pl-12 pr-4 py-4 h-14 bg-white border-2 border-orange-100 rounded-xl text-base focus:border-orange-400 focus:ring-orange-400">
+                <SelectTrigger className="h-14 w-full rounded-xl border-2 border-orange-100 bg-white py-4 pl-12 pr-4 text-base text-gray-800 shadow-sm transition-colors data-[placeholder]:text-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 [&>svg]:text-orange-500">
                   <SelectValue placeholder="City *" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  position="popper"
+                  sideOffset={6}
+                  className="max-h-64 rounded-xl border border-orange-100 bg-white p-1.5 text-gray-800 shadow-xl shadow-orange-950/10"
+                >
                   {cities.map((city) => (
-                    <SelectItem key={city} value={city}>
+                    <SelectItem
+                      key={city}
+                      value={city}
+                      className="rounded-lg py-2.5 pl-9 pr-3 text-sm text-gray-700 focus:bg-orange-50 focus:text-orange-950 data-[state=checked]:bg-orange-100 data-[state=checked]:font-semibold"
+                    >
                       {city}
                     </SelectItem>
                   ))}
@@ -353,12 +357,20 @@ export function AdmissionModal() {
                 value={formData.course}
                 onValueChange={(value) => setFormData({ ...formData, course: value })}
               >
-                <SelectTrigger className="w-full pl-12 pr-4 py-4 h-14 bg-white border-2 border-orange-100 rounded-xl text-base focus:border-orange-400 focus:ring-orange-400">
+                <SelectTrigger className="h-14 w-full rounded-xl border-2 border-orange-100 bg-white py-4 pl-12 pr-4 text-base text-gray-800 shadow-sm transition-colors data-[placeholder]:text-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 [&>svg]:text-orange-500">
                   <SelectValue placeholder="Course *" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  position="popper"
+                  sideOffset={6}
+                  className="max-h-64 rounded-xl border border-orange-100 bg-white p-1.5 text-gray-800 shadow-xl shadow-orange-950/10"
+                >
                   {courses.map((course) => (
-                    <SelectItem key={course} value={course}>
+                    <SelectItem
+                      key={course}
+                      value={course}
+                      className="rounded-lg py-2.5 pl-9 pr-3 text-sm text-gray-700 focus:bg-orange-50 focus:text-orange-950 data-[state=checked]:bg-orange-100 data-[state=checked]:font-semibold"
+                    >
                       {course}
                     </SelectItem>
                   ))}
@@ -427,16 +439,52 @@ export function AdmissionModal() {
       />
       
       {/* Congratulations Modal */}
-      <CongratulationsModal
-        isOpen={showCongratulations}
-        onClose={() => {
-          setShowCongratulations(false)
-          closeModal()
-          setCurrentFormData(null)
-        }}
-        studentName={currentFormData?.fullName || formData.fullName}
-        course={currentFormData?.course || formData.course || selectedCourse || 'Selected Course'}
-      />
+      {showCongratulations && (
+        <div className="fixed inset-0 z-[220] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close confirmation"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={handleCongratulationsClose}
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admission-confirmation-title"
+            className="relative w-full max-w-md rounded-2xl border border-orange-100 bg-white p-7 text-center shadow-2xl sm:p-8"
+          >
+            <button
+              type="button"
+              aria-label="Close confirmation"
+              onClick={handleCongratulationsClose}
+              className="absolute right-3 top-3 rounded-lg p-2 text-gray-500 transition-colors hover:bg-orange-50 hover:text-gray-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+              <CheckCircle2 className="h-7 w-7" />
+            </div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-orange-600">Enquiry received</p>
+            <h2 id="admission-confirmation-title" className="text-xl font-bold text-gray-900">
+              Thank you, {currentFormData?.fullName || formData.fullName}!
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-gray-600">
+              Your enquiry for{' '}
+              <span className="font-semibold text-gray-800">
+                {currentFormData?.course || formData.course || selectedCourse || 'your selected course'}
+              </span>{' '}
+              has been received. Our admissions team will get back to you soon.
+            </p>
+            <Button
+              type="button"
+              onClick={handleCongratulationsClose}
+              className="mt-6 h-11 w-full rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-600"
+            >
+              Done
+            </Button>
+          </section>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
-import { AdmissionModal } from '@/components/AdmissionModal'
 
 interface FAQItem {
   question: string
@@ -179,7 +178,6 @@ const FAQ: React.FC = () => {
           </div>
         </div>
       </div>
-      <AdmissionModal />
     </div>
   )
 }

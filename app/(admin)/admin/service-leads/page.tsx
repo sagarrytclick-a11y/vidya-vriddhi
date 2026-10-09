@@ -230,10 +230,14 @@ function ServiceLeadsPageContent() {
   }
 
   const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString('en-US', {
+    new Date(dateString).toLocaleDateString('en-IN', {
       day: '2-digit',
-      month: '2-digit',
+      month: 'short',
       year: 'numeric',
+    })
+
+  const formatTime = (dateString: string) =>
+    new Date(dateString).toLocaleTimeString('en-IN', {
       hour: '2-digit',
       minute: '2-digit',
     })
@@ -246,9 +250,10 @@ function ServiceLeadsPageContent() {
           subtitle="Manage website, leads & social media enquiries"
           action={
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-400">
-                Total: <span className="font-semibold text-white">{total}</span>
-              </span>
+              <div className="flex items-center gap-2 rounded-xl border border-white/6 bg-[#12161e] px-3 py-2 text-sm">
+                <span className="font-semibold tabular-nums text-white">{total}</span>
+                <span className="text-[#9ca3af]">total leads</span>
+              </div>
               <Select
                 disabled={exporting}
                 onValueChange={(value) => handleExport(value as 'csv' | 'xlsx' | 'pdf')}
@@ -273,19 +278,20 @@ function ServiceLeadsPageContent() {
           }
         />
 
-        <div className="mb-6 flex flex-col gap-4 md:flex-row">
+        <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#12161e] p-3 sm:flex-row">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]" />
             <Input
               type="text"
               placeholder="Search by name, email, phone, or message..."
+              aria-label="Search service leads"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className={adminSearchClass}
             />
           </div>
           <Select value={statusFilter || 'all'} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger className={cn('w-48', adminFilterClass)}>
+            <SelectTrigger aria-label="Filter service leads by status" className={cn('w-full sm:w-48', adminFilterClass)}>
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent className={adminSelectContentClass}>
@@ -312,75 +318,91 @@ function ServiceLeadsPageContent() {
         </div>
 
         <Card className={adminCardClass}>
-          <CardHeader>
-            <CardTitle className={adminCardTitleClass}>All Service Leads</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-white/5 px-5 py-4">
+            <div>
+              <CardTitle className={adminCardTitleClass}>Lead inbox</CardTitle>
+              <p className="mt-1 text-xs text-[#6b7280]">Review contact details and update each lead&apos;s status.</p>
+            </div>
+            <span className="shrink-0 text-xs tabular-nums text-[#9ca3af]">{leads.length} shown</span>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {loading ? (
-              <div className="flex justify-center py-8">
+              <div className="flex justify-center py-14">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ea580c] border-t-transparent" />
               </div>
             ) : leads.length === 0 ? (
-              <div className="py-8 text-center text-gray-400">No service leads found</div>
+              <div className="px-5 py-14 text-center">
+                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/6 bg-white/[0.03]">
+                  <MessageSquareText className="h-5 w-5 text-[#9ca3af]" />
+                </div>
+                <p className="text-sm font-medium text-white">No service leads found</p>
+                <p className="mt-1 text-xs text-[#6b7280]">Try changing your search or status filter.</p>
+              </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[850px]">
                   <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Contact</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Details</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Message</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Created</th>
-                      <th className="px-4 py-3 text-left font-medium text-gray-300">Actions</th>
+                    <tr className="border-b border-white/5 bg-white/[0.02]">
+                      <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">Lead</th>
+                      <th scope="col" className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">Message</th>
+                      <th scope="col" className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">Status</th>
+                      <th scope="col" className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">Received</th>
+                      <th scope="col" className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {leads.map((lead) => (
-                      <tr key={lead.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ea580c]">
-                              <User className="h-4 w-4 text-white" />
+                      <tr key={lead.id} className="border-b border-white/5 transition-colors hover:bg-white/[0.025]">
+                        <td className="px-5 py-4">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#ea580c]/20 bg-[#ea580c]/10 text-xs font-bold text-[#fdba74]">
+                              {lead.name.trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
-                            <div className="text-white font-medium">{lead.name}</div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm text-gray-300">{lead.email}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm text-gray-300">{lead.phone}</span>
+                            <div className="min-w-0 space-y-1">
+                              <p className="truncate text-sm font-semibold text-white">{lead.name}</p>
+                              <a href={`mailto:${lead.email}`} className="block truncate text-xs text-[#9ca3af] transition-colors hover:text-[#fdba74]">{lead.email}</a>
+                              <a href={`tel:${lead.phone}`} className="block text-xs text-[#6b7280] transition-colors hover:text-[#fdba74]">{lead.phone}</a>
                             </div>
                           </div>
                         </td>
-                        <td className="max-w-[220px] px-4 py-3">
-                          <p className="line-clamp-2 text-sm text-gray-300">{lead.message}</p>
+                        <td className="max-w-[280px] px-4 py-4">
+                          <p className="line-clamp-2 text-sm leading-5 text-[#c4cbc7]">{lead.message}</p>
                         </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant="outline"
-                            className={cn('rounded-lg capitalize', getStatusColor(lead.status))}
+                        <td className="px-4 py-4">
+                          <Select
+                            value={lead.status}
+                            onValueChange={(value) => handleStatusUpdate(lead.id, value)}
                           >
-                            {lead.status.replace('_', ' ').toLowerCase()}
-                          </Badge>
+                            <SelectTrigger
+                              aria-label={`Update status for ${lead.name}`}
+                              className={cn('h-8 w-[132px] rounded-lg bg-[#0c0f14] text-xs focus:ring-[#ea580c]/30', getStatusColor(lead.status))}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className={adminSelectContentClass}>
+                              <SelectItem value="PENDING" className="text-amber-300 focus:bg-[#1e2430] focus:text-amber-300">Pending</SelectItem>
+                              <SelectItem value="RESOLVED" className="text-emerald-300 focus:bg-[#1e2430] focus:text-emerald-300">Resolved</SelectItem>
+                              <SelectItem value="FOLLOW_UP" className="text-[#fdba74] focus:bg-[#1e2430] focus:text-[#fdba74]">Follow Up</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 text-sm text-gray-400">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(lead.createdAt)}
+                        <td className="px-4 py-4">
+                          <div className="flex items-start gap-2 text-xs">
+                            <Calendar className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#6b7280]" />
+                            <div>
+                              <p className="text-[#d1d5db]">{formatDate(lead.createdAt)}</p>
+                              <p className="mt-0.5 text-[#6b7280]">{formatTime(lead.createdAt)}</p>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex space-x-2">
+                        <td className="px-4 py-4">
+                          <div className="flex items-center justify-end gap-1.5">
                             <Button
                               variant="ghost"
-                              size="sm"
-                              className="text-green-400 hover:bg-slate-700 hover:text-green-300"
+                              size="icon"
+                              aria-label={`View lead from ${lead.name}`}
+                              title="View lead"
+                              className="h-8 w-8 rounded-lg text-[#9ca3af] hover:bg-white/5 hover:text-white"
                               onClick={() => {
                                 setSelectedLead(lead)
                                 setIsViewModalOpen(true)
@@ -388,39 +410,13 @@ function ServiceLeadsPageContent() {
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Select
-                              value={lead.status}
-                              onValueChange={(value) => handleStatusUpdate(lead.id, value)}
-                            >
-                              <SelectTrigger className="h-8 w-[120px] rounded-lg border-white/6 bg-[#0c0f14] text-xs text-[#d1d5db] focus:ring-[#ea580c]/30">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className={adminSelectContentClass}>
-                                <SelectItem
-                                  value="PENDING"
-                                  className="text-amber-300 focus:bg-[#1e2430] focus:text-amber-300"
-                                >
-                                  Pending
-                                </SelectItem>
-                                <SelectItem
-                                  value="RESOLVED"
-                                  className="text-emerald-300 focus:bg-[#1e2430] focus:text-emerald-300"
-                                >
-                                  Resolved / Fulfilled
-                                </SelectItem>
-                                <SelectItem
-                                  value="FOLLOW_UP"
-                                  className="text-[#fdba74] focus:bg-[#1e2430] focus:text-[#fdba74]"
-                                >
-                                  Follow Up
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
                             {canDelete && (
                               <Button
                                 variant="ghost"
-                                size="sm"
-                                className="text-red-400 hover:bg-slate-700 hover:text-red-300"
+                                size="icon"
+                                aria-label={`Delete lead from ${lead.name}`}
+                                title="Delete lead"
+                                className="h-8 w-8 rounded-lg text-[#9ca3af] hover:bg-red-500/10 hover:text-red-300"
                                 onClick={() => handleDelete(lead.id, lead.name)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -482,11 +478,11 @@ function ServiceLeadsPageContent() {
               <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-6 py-5 scrollbar-thin">
                 <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
                   <Mail className="h-4 w-4 text-[#6b7280]" />
-                  <span className="text-sm text-[#d1d5db]">{selectedLead.email}</span>
+                  <a href={`mailto:${selectedLead.email}`} className="break-all text-sm text-[#d1d5db] hover:text-[#fdba74]">{selectedLead.email}</a>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
                   <Phone className="h-4 w-4 text-[#6b7280]" />
-                  <span className="text-sm text-[#d1d5db]">{selectedLead.phone}</span>
+                  <a href={`tel:${selectedLead.phone}`} className="text-sm text-[#d1d5db] hover:text-[#fdba74]">{selectedLead.phone}</a>
                 </div>
                 <div className="rounded-xl border border-white/6 bg-[#0c0f14] px-3 py-2.5">
                   <div className="mb-1.5 flex items-center gap-2 text-xs text-[#6b7280]">
@@ -514,6 +510,8 @@ function ServiceLeadsPageContent() {
                 <Button
                   type="button"
                   variant="outline"
+                  aria-label="Close lead details"
+                  title="Close"
                   onClick={() => setIsViewModalOpen(false)}
                   className={adminCancelBtnClass}
                 >

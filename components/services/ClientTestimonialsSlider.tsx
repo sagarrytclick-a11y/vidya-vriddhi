@@ -9,7 +9,7 @@ const testimonials = [
     name: 'Rajesh Verma',
     role: 'Founder, PathFinder Education',
     city: 'Delhi',
-    image: 'https://i.pinimg.com/736x/7c/f1/cd/7cf1cd277fcca1702c45f15fa50c22a3.jpg',
+    image: 'https://i.pinimg.com/736x/b3/f5/ae/b3f5ae3e365875d4248e69a4f8fbdb83.jpg',
     quote:
       'VidyaVriddhi built our consultancy website and set up a lead pipeline. Enquiries doubled within the first month.',
   },
@@ -17,7 +17,7 @@ const testimonials = [
     name: 'Sneha Kapoor',
     role: 'Director, BrightFuture Counsel',
     city: 'Mumbai',
-    image: 'https://i.pinimg.com/736x/46/88/12/468812df30ab33d9c66397e40be563af.jpg',
+    image: 'https://i.pinimg.com/736x/c2/6d/db/c26ddbf9f0b93958edd684732534f4e7.jpg',
     quote:
       'From website design to Instagram and WhatsApp leads — their team handles everything so we can focus on counselling.',
   },
@@ -25,7 +25,7 @@ const testimonials = [
     name: 'Amit Joshi',
     role: 'CEO, Global Admit Hub',
     city: 'Pune',
-    image: 'https://i.pinimg.com/1200x/9e/59/fc/9e59fcaf829d5e01db2ca872733a5338.jpg',
+    image: 'https://i.pinimg.com/736x/a2/16/6f/a2166fc3a93c8f550e58e7b88a47012b.jpg',
     quote:
       'Clean website, faster loading, and qualified education leads every week. Highly recommend for consultants.',
   },
@@ -33,7 +33,7 @@ const testimonials = [
     name: 'Meera Iyer',
     role: 'Owner, Campus Connect',
     city: 'Bengaluru',
-    image: 'https://i.pinimg.com/736x/a2/16/6f/a2166fc3a93c8f550e58e7b88a47012b.jpg',
+    image: 'https://i.pinimg.com/736x/46/84/d5/4684d5566127b11c69519e980d403bac.jpg',
     quote:
       'They redesigned our site and now manage our socials. Brand looks professional and students trust us more.',
   },
@@ -41,7 +41,7 @@ const testimonials = [
     name: 'Vikram Singh',
     role: 'Partner, Aspire Abroad',
     city: 'Chandigarh',
-    image: 'https://i.pinimg.com/736x/72/6f/0e/726f0eafd4441e68e1acf8ca057ef0ba.jpg',
+    image: 'https://i.pinimg.com/1200x/20/ef/9b/20ef9be63530693686f2b6831ebb0410.jpg',
     quote:
       'Lead quality is strong — parents who enquire are already serious about admissions. Great ROI for our agency.',
   },
