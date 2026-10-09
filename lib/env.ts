@@ -26,10 +26,21 @@ const envSchema = z.object({
   NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_IN_URL is required'),
   NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_UP_URL is required'),
 
-  // Resend Email (Required)
-  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
-  RESEND_FROM_EMAIL: z.string().email().min(1, 'RESEND_FROM_EMAIL is required'),
-  ADMIN_EMAIL: z.string().email().min(1, 'ADMIN_EMAIL is required'),
+  // SMTP Email (Optional until mail credentials are configured)
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().regex(/^\d+$/).or(z.literal('')).optional(),
+  SMTP_SECURE: z.enum(['true', 'false']).or(z.literal('')).optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  SMTP_FROM_EMAIL: z.string().email().or(z.literal('')).optional(),
+  SMTP_CC_EMAILS: z.string().optional(),
+  ADMIN_EMAIL: z.string().min(1, 'ADMIN_EMAIL is required').refine(
+    (value) =>
+      value
+        .split(',')
+        .every((email) => z.string().email().safeParse(email.trim()).success),
+    'ADMIN_EMAIL must contain valid comma-separated email addresses'
+  ),
 
   // Optional
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
