@@ -20,11 +20,10 @@ const envSchema = z.object({
     .string()
     .min(32, 'ADMIN_SESSION_SECRET must be at least 32 characters'),
 
-  // Clerk Authentication (Required)
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1, 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required'),
-  CLERK_SECRET_KEY: z.string().min(1, 'CLERK_SECRET_KEY is required'),
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_IN_URL is required'),
-  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1, 'NEXT_PUBLIC_CLERK_SIGN_UP_URL is required'),
+  // Auth.js / Google OAuth (set for user authentication)
+  AUTH_SECRET: z.string().min(32, 'AUTH_SECRET must be at least 32 characters').optional(),
+  GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID cannot be empty').optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET cannot be empty').optional(),
 
   // SMTP Email (Optional until mail credentials are configured)
   SMTP_HOST: z.string().optional(),

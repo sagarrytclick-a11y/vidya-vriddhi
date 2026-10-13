@@ -154,7 +154,7 @@ const ContactPage = () => {
           <div id="visit-us" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="relative h-72 overflow-hidden rounded-2xl">
               <Image
-                src="/about/image-4.jpg"
+                src="/about/office.png"
                 alt={`${SITE_IDENTITY.name} office`}
                 fill
                 className="object-cover"

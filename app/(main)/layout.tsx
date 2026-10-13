@@ -1,6 +1,6 @@
-import { ClerkProvider } from '@clerk/nextjs'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { AuthSessionProvider } from '@/providers/auth-session-provider'
 import { AdmissionModalProvider } from '@/contexts/admission-modal-context'
 import { VVSaarthiProvider } from '@/contexts/vv-saarthi-context'
 import { DeferredWidgets } from '@/components/DeferredWidgets'
@@ -11,7 +11,7 @@ export default function MainLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
+    <AuthSessionProvider>
       <AdmissionModalProvider>
         <VVSaarthiProvider>
           <Navbar />
@@ -21,6 +21,6 @@ export default function MainLayout({
           <DeferredWidgets />
         </VVSaarthiProvider>
       </AdmissionModalProvider>
-    </ClerkProvider>
+    </AuthSessionProvider>
   )
 }

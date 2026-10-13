@@ -213,6 +213,9 @@ const TopColleges: React.FC = () => {
                   <tbody className="divide-y divide-gray-100 bg-white">
                     {colleges.map((college) => {
                       const courseCount = college._count?.courses || 0
+                      const courseNames = college.courses.map((course) => course.name)
+                      const visibleCourseNames = courseNames.join(', ')
+                      const remainingCourseCount = Math.max(0, courseCount - courseNames.length)
 
                       return (
                         <tr
@@ -255,10 +258,19 @@ const TopColleges: React.FC = () => {
                           </td>
 
                           <td className="hidden px-3 py-3 md:table-cell sm:px-4 sm:py-4">
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-800 sm:text-sm">
-                              <BookOpen className="h-3.5 w-3.5 text-orange-500" />
-                              <span>
-                                {courseCount} {courseCount === 1 ? 'course' : 'courses'}
+                            <div className="flex max-w-[220px] items-center gap-1.5 text-xs font-semibold text-gray-800 sm:text-sm">
+                              <BookOpen className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+                              <span
+                                className="truncate whitespace-nowrap"
+                                title={[
+                                  visibleCourseNames,
+                                  remainingCourseCount > 0 ? `+${remainingCourseCount} more` : '',
+                                ]
+                                  .filter(Boolean)
+                                  .join(', ')}
+                              >
+                                {visibleCourseNames || '—'}
+                                {remainingCourseCount > 0 && ` +${remainingCourseCount}`}
                               </span>
                             </div>
                           </td>

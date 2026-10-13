@@ -3,18 +3,18 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { unstable_cache } from 'next/cache'
 import {
-  Map,
-  Home,
-  GraduationCap,
+  ArrowRight,
   BookOpen,
   Building2,
-  Globe,
-  MapPin,
   FileText,
+  Globe,
+  GraduationCap,
+  Home,
+  Map,
+  MapPin,
   Newspaper,
   Phone,
   Shield,
-  ArrowRight,
 } from 'lucide-react'
 import { db } from '@/lib/db'
 import { SITE_IDENTITY } from '@/app/(main)/site-identity'
@@ -140,28 +140,36 @@ async function getSitemapData() {
 function SectionCard({ section }: { section: SitemapSection }) {
   const useInfinite =
     Boolean(section.infiniteType) && (section.total ?? 0) > (section.links.length || 0)
+  const linkCount = section.total ?? section.links.length
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div className="flex items-start justify-between gap-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50/40 px-5 py-4 sm:px-6">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm shadow-orange-500/25">
+    <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_8px_28px_-20px_rgba(15,23,42,0.35)]">
+      <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-5">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 ring-1 ring-orange-100">
             {section.icon}
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">{section.title}</h2>
-            <p className="text-sm text-slate-600 mt-0.5">{section.description}</p>
+          <div className="min-w-0">
+            <h2 className="text-base font-bold text-slate-900 sm:text-lg">{section.title}</h2>
+            <p className="mt-0.5 text-xs leading-relaxed text-slate-500 sm:text-sm">
+              {section.description}
+            </p>
           </div>
         </div>
-        {section.viewAllHref && (
-          <Link
-            href={section.viewAllHref}
-            className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-orange-600 hover:text-orange-700 shrink-0"
-          >
-            View all
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        )}
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span className="rounded-md bg-slate-100 px-2 py-1 text-[11px] font-semibold tabular-nums text-slate-600">
+            {linkCount.toLocaleString()}
+          </span>
+          {section.viewAllHref && (
+            <Link
+              href={section.viewAllHref}
+              className="hidden items-center gap-1 text-xs font-semibold text-orange-600 transition-colors hover:text-orange-700 sm:inline-flex"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </div>
       </div>
 
       {section.links.length > 0 ? (
@@ -173,15 +181,15 @@ function SectionCard({ section }: { section: SitemapSection }) {
             pageSize={INITIAL_LINKS}
           />
         ) : (
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1 p-4 sm:p-5">
+          <ul className="grid gap-x-2 gap-y-1 p-3 sm:grid-cols-2 sm:p-4">
             {section.links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                  className="group flex min-h-10 items-center gap-2 rounded-md px-2.5 py-2 text-sm leading-snug text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-700"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0 group-hover:scale-125 transition-transform" />
-                  <span className="truncate">{link.label}</span>
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400 transition-transform group-hover:scale-125" />
+                  <span className="min-w-0">{link.label}</span>
                 </Link>
               </li>
             ))}
@@ -192,13 +200,13 @@ function SectionCard({ section }: { section: SitemapSection }) {
       )}
 
       {section.viewAllHref && (
-        <div className="sm:hidden border-t border-slate-100 px-5 py-3">
+        <div className="border-t border-slate-100 px-4 py-3 sm:hidden">
           <Link
             href={section.viewAllHref}
             className="inline-flex items-center gap-1 text-sm font-semibold text-orange-600"
           >
             View all
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       )}
@@ -259,20 +267,20 @@ export default async function SitemapPage() {
     {
       title: 'Main Pages',
       description: 'Core pages of the website',
-      icon: <Home className="w-5 h-5" />,
+      icon: <Home className="h-5 w-5" />,
       links: mainPages,
     },
     {
       title: 'Explore',
       description: 'Browse colleges, courses, exams and more',
-      icon: <GraduationCap className="w-5 h-5" />,
+      icon: <GraduationCap className="h-5 w-5" />,
       links: explorePages,
     },
     {
       title: 'Colleges',
       description: `${collegeTotal} college pages — scroll inside to load more`,
-      icon: <Building2 className="w-5 h-5" />,
-      links: colleges.map((c) => ({ href: `/colleges/${c.slug}`, label: c.name })),
+      icon: <Building2 className="h-5 w-5" />,
+      links: colleges.map((college) => ({ href: `/colleges/${college.slug}`, label: college.name })),
       viewAllHref: '/colleges',
       infiniteType: 'colleges',
       total: collegeTotal,
@@ -280,8 +288,8 @@ export default async function SitemapPage() {
     {
       title: 'Courses',
       description: `${courseTotal} course pages — scroll inside to load more`,
-      icon: <BookOpen className="w-5 h-5" />,
-      links: courses.map((c) => ({ href: `/courses/${c.slug}`, label: c.name })),
+      icon: <BookOpen className="h-5 w-5" />,
+      links: courses.map((course) => ({ href: `/courses/${course.slug}`, label: course.name })),
       viewAllHref: '/courses',
       infiniteType: 'courses',
       total: courseTotal,
@@ -289,8 +297,8 @@ export default async function SitemapPage() {
     {
       title: 'Exams',
       description: `${examTotal} exam pages — scroll inside to load more`,
-      icon: <FileText className="w-5 h-5" />,
-      links: exams.map((e) => ({ href: `/exams/${e.slug}`, label: e.name })),
+      icon: <FileText className="h-5 w-5" />,
+      links: exams.map((exam) => ({ href: `/exams/${exam.slug}`, label: exam.name })),
       viewAllHref: '/exams',
       infiniteType: 'exams',
       total: examTotal,
@@ -298,18 +306,18 @@ export default async function SitemapPage() {
     {
       title: 'Countries',
       description: `${countries.length} country pages`,
-      icon: <Globe className="w-5 h-5" />,
-      links: countries.map((c) => ({
-        href: `/countries/${c.slug}`,
-        label: `${c.flagEmoji ? `${c.flagEmoji} ` : ''}${c.name}`,
+      icon: <Globe className="h-5 w-5" />,
+      links: countries.map((country) => ({
+        href: `/countries/${country.slug}`,
+        label: `${country.flagEmoji ? `${country.flagEmoji} ` : ''}${country.name}`,
       })),
       viewAllHref: '/countries',
     },
     {
       title: 'Cities',
       description: `${cityTotal} city pages — scroll inside to load more`,
-      icon: <MapPin className="w-5 h-5" />,
-      links: cities.map((c) => ({ href: `/cities/${c.slug}`, label: c.name })),
+      icon: <MapPin className="h-5 w-5" />,
+      links: cities.map((city) => ({ href: `/cities/${city.slug}`, label: city.name })),
       viewAllHref: '/cities',
       infiniteType: 'cities',
       total: cityTotal,
@@ -317,8 +325,8 @@ export default async function SitemapPage() {
     {
       title: 'Blogs',
       description: `${blogTotal} blog posts — scroll inside to load more`,
-      icon: <BookOpen className="w-5 h-5" />,
-      links: blogs.map((b) => ({ href: `/blogs/${b.slug}`, label: b.title })),
+      icon: <BookOpen className="h-5 w-5" />,
+      links: blogs.map((blog) => ({ href: `/blogs/${blog.slug}`, label: blog.title })),
       viewAllHref: '/blogs',
       infiniteType: 'blogs',
       total: blogTotal,
@@ -326,8 +334,8 @@ export default async function SitemapPage() {
     {
       title: 'News',
       description: `${newsTotal} news articles — scroll inside to load more`,
-      icon: <Newspaper className="w-5 h-5" />,
-      links: news.map((n) => ({ href: `/news/${n.slug}`, label: n.title })),
+      icon: <Newspaper className="h-5 w-5" />,
+      links: news.map((article) => ({ href: `/news/${article.slug}`, label: article.title })),
       viewAllHref: '/news',
       infiniteType: 'news',
       total: newsTotal,
@@ -335,7 +343,7 @@ export default async function SitemapPage() {
     {
       title: 'Company & Legal',
       description: 'Policies and company information',
-      icon: <Shield className="w-5 h-5" />,
+      icon: <Shield className="h-5 w-5" />,
       links: [
         ...legalPages,
         { href: '/about', label: 'About Us' },
@@ -358,72 +366,102 @@ export default async function SitemapPage() {
     newsTotal
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/25 to-white">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <Breadcrumbs
-            dark
-            items={[{ label: 'Sitemap' }]}
-          />
-          <div className="mt-4 flex items-start gap-4">
-            <div className="hidden sm:flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm text-white shrink-0">
-              <Map className="w-7 h-7" />
+    <div className="min-h-screen bg-[#f6f8f6]">
+      <section className="relative overflow-hidden border-b border-[#21433b] bg-[#15352f] text-white">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:44px_44px]" />
+        <div className="absolute inset-y-0 right-0 w-1/3 border-l border-white/10 bg-[#1b4038]/45" />
+        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+          <Breadcrumbs dark items={[{ label: 'Sitemap' }]} />
+          <div className="mt-7 grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <div className="max-w-3xl">
+              <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-orange-300">
+                <Map className="h-4 w-4" />
+                <span>Explore the website</span>
+              </div>
+              <h1 className="text-4xl font-bold text-white sm:text-5xl">Sitemap</h1>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#d4e2dc] sm:text-lg">
+                Every destination in one place, from colleges and courses to the latest news.
+              </p>
             </div>
-            <div>
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">Sitemap</h1>
-              <p className="text-orange-100 text-lg max-w-2xl leading-relaxed">
-                Find every page on {SITE_IDENTITY.name} — from colleges and exams to blogs, cities, and more.
-              </p>
-              <p className="mt-3 text-sm font-medium text-white/90">
-                {totalLinks.toLocaleString()} pages listed
-              </p>
+            <div className="flex items-center gap-8 border-t border-white/15 pt-5 md:border-l md:border-t-0 md:pl-8 md:pt-0">
+              <div>
+                <p className="text-3xl font-bold tabular-nums text-white sm:text-4xl">
+                  {totalLinks.toLocaleString()}
+                </p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-[#b6cdc4]">
+                  Pages listed
+                </p>
+              </div>
+              <div className="h-10 w-px bg-white/20" />
+              <div>
+                <p className="text-3xl font-bold tabular-nums text-orange-300 sm:text-4xl">
+                  {sections.length}
+                </p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-[#b6cdc4]">
+                  Categories
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Quick jump */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
-            <p className="text-sm font-semibold text-slate-900 mb-3">Jump to section</p>
-            <div className="flex flex-wrap gap-2">
+      <section className="px-4 py-7 sm:px-6 sm:py-9 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <nav
+            aria-label="Jump to sitemap section"
+            className="sticky top-20 z-20 mb-6 border-y border-slate-200 bg-[#f6f8f6]/95 py-3 backdrop-blur lg:top-[7.5rem]"
+          >
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+              Jump to section
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {sections.map((section) => (
                 <a
                   key={section.title}
                   href={`#${section.title.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs sm:text-sm font-medium text-orange-700 hover:bg-orange-100 transition-colors"
+                  className="shrink-0 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition-colors hover:border-orange-300 hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
                 >
                   {section.title}
                 </a>
               ))}
             </div>
+          </nav>
+
+          <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-5">
+            {sections.map((section) => (
+              <div
+                key={section.title}
+                id={section.title.toLowerCase().replace(/\s+/g, '-')}
+                className="scroll-mt-40"
+              >
+                <SectionCard section={section} />
+              </div>
+            ))}
           </div>
 
-          {sections.map((section) => (
-            <div key={section.title} id={section.title.toLowerCase().replace(/\s+/g, '-')}>
-              <SectionCard section={section} />
+          <div className="mt-8 flex flex-col gap-5 rounded-xl bg-[#15352f] p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:p-7">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-orange-300">
+                <Phone className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Need help finding something?</h2>
+                <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#c6d8d1]">
+                  Our counselors can guide you to the right college, course, or exam page.
+                </p>
+              </div>
             </div>
-          ))}
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-900 p-6 sm:p-8 text-center">
-            <Phone className="w-8 h-8 text-orange-400 mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-white mb-2">Need help finding something?</h2>
-            <p className="text-slate-300 mb-5 max-w-lg mx-auto">
-              Our counselors can guide you to the right college, course, or exam page.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2.5 transition-colors"
+                className="inline-flex min-h-10 items-center justify-center rounded-md bg-orange-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-orange-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
               >
                 Contact Us
               </Link>
               <Link
                 href="/colleges"
-                className="inline-flex items-center justify-center rounded-xl border border-white/30 text-white hover:bg-white hover:text-slate-900 font-semibold px-5 py-2.5 transition-colors"
+                className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/25 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
                 Browse Colleges
               </Link>

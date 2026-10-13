@@ -21,8 +21,8 @@ This application is designed for an education brand that wants to:
 - Tailwind CSS
 - Prisma ORM
 - PostgreSQL
-- Clerk authentication
-- Better Auth for admin auth flows
+- Auth.js with Google OAuth and Prisma-backed sessions
+- Custom database-backed admin authentication
 - ImageKit for media uploads and delivery
 - Nodemailer for email delivery
 - Zod for validation
@@ -72,7 +72,7 @@ Before getting started, make sure you have:
 - npm or pnpm
 - PostgreSQL database
 - ImageKit account
-- Clerk project credentials
+- Google OAuth client credentials
 - SMTP provider or email relay credentials
 - OpenRouter API key for AI chat
 
@@ -110,10 +110,9 @@ ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="your-password-or-hash"
 ADMIN_SESSION_SECRET="your-strong-session-secret"
 
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
-CLERK_SECRET_KEY="your_clerk_secret_key"
-NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
+AUTH_SECRET="generate-a-random-secret-with-openssl-rand-base64-32"
+GOOGLE_CLIENT_ID="your_google_oauth_client_id"
+GOOGLE_CLIENT_SECRET="your_google_oauth_client_secret"
 
 SMTP_HOST="smtp.example.com"
 SMTP_PORT="587"
@@ -137,14 +136,25 @@ Notes:
 npx tsx scripts/hash-admin-password.ts 'your-password'
 ```
 
+### Google OAuth Setup
+
+Create a Web application OAuth client in Google Cloud Console. Add your site origin as an authorized JavaScript origin and add these authorized redirect URIs:
+
+- Local: `http://localhost:3000/api/auth/callback/google`
+- Production: `https://your-domain.example/api/auth/callback/google`
+
+Set the resulting client ID and secret as `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Generate `AUTH_SECRET` with `openssl rand -base64 32`. Keep the client secret and Auth.js secret server-side; do not prefix them with `NEXT_PUBLIC_`.
+
 ## Database Setup
 
-Generate Prisma client and sync schema:
+Generate Prisma client and apply checked-in migrations:
 
 ```bash
 npx prisma generate
-npx prisma db push
+npx prisma migrate deploy
 ```
+
+For local schema development, use `npx prisma migrate dev` to create and apply migrations.
 
 If you want initial seed data:
 
@@ -195,10 +205,11 @@ For production deployment:
 
 1. Use a managed PostgreSQL provider
 2. Configure all required environment variables in the hosting platform
-3. Run the Prisma generation step during the build pipeline
-4. Set up HTTPS and secure cookie/session configuration
-5. Use a production-grade SMTP provider
-6. Enable proper monitoring and log capture
+3. Run `npx prisma migrate deploy` before serving the new application version
+4. Run the Prisma generation step during the build pipeline
+5. Set up HTTPS and secure cookie/session configuration
+6. Use a production-grade SMTP provider
+7. Enable proper monitoring and log capture
 
 Recommended deployment targets include Vercel, Railway, Render, or a custom Node.js server environment.
 
@@ -206,6 +217,7 @@ Recommended deployment targets include Vercel, Railway, Render, or a custom Node
 
 - Never commit `.env` files to version control
 - Use strong secrets for `ADMIN_SESSION_SECRET`
+- Use a unique, randomly generated `AUTH_SECRET` and register the exact Google OAuth redirect URI
 - Prefer hashed admin passwords in production
 - Restrict admin routes and review access policies regularly
 - Validate all uploaded files before storing or serving them
