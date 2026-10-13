@@ -495,9 +495,9 @@ const NeetRankPredictorPage: React.FC = () => {
                 Get Free Counseling
                 <ArrowRight size={16} />
               </Link>
-              <Link href="/colleges/mbbs-india"
+              <Link href="/colleges?category=medical"
                 className="inline-flex items-center justify-center gap-2 border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/5 transition-all">
-                Browse MBBS Colleges
+                Browse Medical Colleges
               </Link>
             </div>
           </div>

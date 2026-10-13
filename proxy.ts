@@ -1,13 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
 import { safeAdminRedirectPath } from '@/lib/admin-redirect'
 
-const isUserProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/profile(.*)',
-  '/saved(.*)',
-  '/applications(.*)',
-])
+const userProtectedRoutes = ['/dashboard', '/profile', '/saved', '/applications']
 
 /** Live session check via Node API (DB deny-list / deactivate) — Edge-safe, $0 */
 async function isLiveAdminSession(req: Request): Promise<boolean> {
@@ -25,7 +20,7 @@ async function isLiveAdminSession(req: Request): Promise<boolean> {
   }
 }
 
-export default clerkMiddleware(async (auth, req) => {
+export default auth(async (req) => {
   const { pathname } = req.nextUrl
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin-login') {
@@ -46,18 +41,25 @@ export default clerkMiddleware(async (auth, req) => {
     return response
   }
 
-  if (isUserProtectedRoute(req)) {
-    const { userId } = await auth()
-    if (!userId) {
-      return new Response(null, { status: 401 })
-    }
+  const isUserProtectedRoute = userProtectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  )
+  if (isUserProtectedRoute && !req.auth) {
+    const loginUrl = new URL('/sign-in', req.url)
+    loginUrl.searchParams.set('callbackUrl', `${req.nextUrl.pathname}${req.nextUrl.search}`)
+    return NextResponse.redirect(loginUrl)
   }
+
+  return NextResponse.next()
 })
 
 export const config = {
   matcher: [
     '/admin/:path*',
     '/admin-login',
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|svelte|svg))*)',
+    '/dashboard/:path*',
+    '/profile/:path*',
+    '/saved/:path*',
+    '/applications/:path*',
   ],
 }

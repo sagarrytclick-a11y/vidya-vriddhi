@@ -2,17 +2,19 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ChevronDown, User, ArrowRight, Search, Menu, X, LogOut, PencilLine, Bot, Sparkles } from 'lucide-react'
+import { ChevronDown, User, ArrowRight, Search, Menu, X, PencilLine, Bot, Sparkles } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
 import { useAdmissionModal } from '@/contexts/admission-modal-context'
 import { useVVSaarthi } from '@/contexts/vv-saarthi-context'
 import Link from 'next/link'
-import { UserButton, useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
+import { UserAccountMenu } from '@/components/auth/UserAccountMenu'
 
 const Navbar = () => {
-  const { user, isSignedIn } = useUser()
+  const { data: session, status } = useSession()
+  const isSignedIn = status === 'authenticated'
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -53,7 +55,7 @@ const Navbar = () => {
       hasDropdown: true,
       dropdownContent: {
         colleges: ['Indian Institute of Technology Delhi (IIT Delhi)', 'Xavier School of Management', 'Lady Shri Ram College for Women (LSR), Delhi', 'Christian Medical College (CMC)', 'Maulana Azad Medical College (MAMC), Delhi', 'Hansraj College, Delhi', 'St. Stephens College, Delhi', 'Vardhman Mahavir Medical College (VMMC)', 'Vellore Institute of Technology (VIT)'],
-        viewAllLink: 'View all Engineering colleges',
+        viewAllLink: 'View all colleges',
       },
     },
     {
@@ -169,7 +171,7 @@ const Navbar = () => {
                   >
                     <span>Get Guidance</span>
                   </button>
-                  <UserButton />
+                  <UserAccountMenu name={session?.user?.name} email={session?.user?.email} />
                 </div>
               ) : (
                 <>
@@ -214,7 +216,7 @@ const Navbar = () => {
 
         {/* Desktop Secondary Navigation */}
         <div className="hidden lg:block bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto overflow-x-auto no-scrollbar">
+          <div className="max-w-7xl mx-auto overflow-x-clip">
             <div className="flex items-center justify-start xl:justify-center gap-4 xl:gap-8 px-4 w-max min-w-full mx-auto">
               {mainNavItems.map((item) => (
               <div
@@ -243,7 +245,7 @@ const Navbar = () => {
                 {/* Desktop Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
                   <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-[500px] xl:w-[550px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-[110] p-5 animate-in fade-in slide-in-from-top-2 duration-200"
+                    className={`absolute top-full ${item.name === 'All colleges' ? 'left-0' : 'left-1/2 -translate-x-1/2'} w-[500px] xl:w-[550px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-[110] p-5 animate-in fade-in slide-in-from-top-2 duration-200`}
                   >
                     <div>
                       {item.dropdownContent.colleges && (
