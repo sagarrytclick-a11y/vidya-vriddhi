@@ -31,7 +31,7 @@
     "motion": "^12.38.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.32",
-    "nodemailer": "^10.0.16",
+    "nodemailer": "^8.0.11",
     "pg": "^8.20.0",
     "pnpm": "^10.33.0",
     "radix-ui": "^1.4.3",
