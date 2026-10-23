@@ -1,26 +1,27 @@
 import { auth } from '@/auth'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { safeAdminRedirectPath } from '@/lib/admin-redirect'
+import { resolveAdminSession } from '@/lib/auth'
 
 const userProtectedRoutes = ['/dashboard', '/profile', '/saved', '/applications']
 
-function getRequestOrigin(req: Request): string {
-  return new URL(req.url).origin
-}
+/**
+ * Build the public origin from forwarded headers.
+ * On Vercel `req.url` can point at a different host than the one the
+ * browser is on (e.g. apex vs www), which caused cross-origin redirects.
+ */
+function getRequestOrigin(req: NextRequest): string {
+  const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
+  const host = forwardedHost || req.headers.get('host')
+  if (!host) return req.nextUrl.origin
 
-/** Live session check via Node API (DB deny-list / deactivate) — Edge-safe, $0 */
-async function isLiveAdminSession(req: Request): Promise<boolean> {
+  const forwardedProto = req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  const proto = forwardedProto || req.nextUrl.protocol.replace(/:$/, '') || 'https'
+
   try {
-    const verifyUrl = new URL('/api/admin-auth/verify', getRequestOrigin(req))
-    const res = await fetch(verifyUrl, {
-      headers: {
-        cookie: req.headers.get('cookie') || '',
-      },
-      cache: 'no-store',
-    })
-    return res.ok
+    return new URL(`${proto}://${host}`).origin
   } catch {
-    return false
+    return req.nextUrl.origin
   }
 }
 
@@ -31,8 +32,12 @@ export default auth(async (req) => {
       return NextResponse.next()
     }
 
-    const token = req.cookies.get('admin-token')?.value
-    if (!token || !(await isLiveAdminSession(req))) {
+    // Next.js 16 `proxy.ts` runs on the Node.js runtime, so we can validate
+    // the session (DB deny-list / deactivation) directly instead of doing a
+    // self-fetch. The self-fetch lost the cookie on the apex → www redirect,
+    // which made every admin request look unauthenticated in production.
+    const session = await resolveAdminSession(req)
+    if (!session) {
       const loginUrl = new URL('/admin-login', getRequestOrigin(req))
       loginUrl.searchParams.set('redirect', safeAdminRedirectPath(pathname))
       return NextResponse.redirect(loginUrl)
